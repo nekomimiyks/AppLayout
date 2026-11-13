@@ -7,6 +7,9 @@ namespace AppLayout {
  public static class UiFactory {
   public static Form CreateMainForm(AppController c) { return new StandardForm(c); }
  }
+ class SelectionGrid : DataGridView {
+  protected override bool ShowFocusCues { get { return false; } }
+ }
  class StandardForm : Form {
   readonly AppController controller;
   readonly DataGridView grid;
@@ -42,11 +45,16 @@ namespace AppLayout {
    auto.CheckedChanged += delegate { c.AutoStart = auto.Checked; };
    launch.CheckedChanged += delegate { c.LaunchMissing = launch.Checked; };
    close.CheckedChanged += delegate { c.MinimizeToTrayOnClose = close.Checked; };
-   grid = new DataGridView { Dock = DockStyle.Fill, AllowUserToAddRows = false, AllowUserToDeleteRows = false, AllowUserToOrderColumns = false, ReadOnly = true, RowHeadersVisible = false, SelectionMode = DataGridViewSelectionMode.FullRowSelect, MultiSelect = true, AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None };
+   grid = new SelectionGrid { Dock = DockStyle.Fill, BackgroundColor = SystemColors.Window, AllowUserToAddRows = false, AllowUserToDeleteRows = false, AllowUserToOrderColumns = false, ReadOnly = true, RowHeadersVisible = false, SelectionMode = DataGridViewSelectionMode.FullRowSelect, MultiSelect = true, AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None };
    string[] headers = { Texts.Name, Texts.Process, Texts.Position, Texts.Size, Texts.Monitor, Texts.TitleRule, Texts.Maximized, Texts.Status };
    int[] widths = { 170, 125, 95, 110, 60, 140, 60, 100 };
    for (int i = 0; i < headers.Length; i++) {
     var col = new DataGridViewTextBoxColumn { HeaderText = headers[i], Width = Ui.S(widths[i]), SortMode = DataGridViewColumnSortMode.NotSortable };
+    if (i == 0 || i == 1 || i == 5 || i == 7) {
+     col.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+     col.FillWeight = i == 0 || i == 5 ? 160 : 100;
+     col.MinimumWidth = Ui.S(60);
+    }
     grid.Columns.Add(col);
    }
    grid.Columns.Add(new DataGridViewButtonColumn { HeaderText = Texts.Edit, Text = Texts.Edit, UseColumnTextForButtonValue = true, Width = Ui.S(65), SortMode = DataGridViewColumnSortMode.NotSortable });
@@ -78,6 +86,7 @@ namespace AppLayout {
    root.Controls.Add(status, 0, 2); root.SetColumnSpan(status, 2);
    controller.RowsChanged += delegate { RefreshRows(); };
    RefreshRows();
+   Shown += delegate { SelectSaved(); initial = false; };
   }
   List<WindowRow> Selected() {
    var result = new List<WindowRow>();
@@ -104,7 +113,7 @@ namespace AppLayout {
    foreach (DataGridViewRow r in grid.Rows) existing[((WindowRow)r.Tag).Key] = r;
    foreach (var row in incoming) {
     DataGridViewRow r;
-    if (!existing.TryGetValue(row.Key, out r)) { int i = grid.Rows.Add(); r = grid.Rows[i]; }
+    if (!existing.TryGetValue(row.Key, out r)) { int i = grid.Rows.Add(); r = grid.Rows[i]; if (row.Saved) selected.Add(row.Key); }
     r.Tag = row;
     string[] values = { row.Name, row.Process, row.Position, row.Size, row.Monitor, row.TitleRule, row.Maximized, row.Status };
     for (int i = 0; i < values.Length; i++) if (!object.Equals(r.Cells[i].Value, values[i])) r.Cells[i].Value = values[i];
@@ -112,7 +121,6 @@ namespace AppLayout {
    }
    grid.ClearSelection();
    foreach (DataGridViewRow r in grid.Rows) { var row = (WindowRow)r.Tag; r.Selected = initial ? row.Saved : selected.Contains(row.Key); }
-   initial = false;
    if (first >= 0 && grid.Rows.Count > 0) grid.FirstDisplayedScrollingRowIndex = Math.Min(first, grid.Rows.Count - 1);
    grid.HorizontalScrollingOffset = horizontal;
    message.Text = controller.LastMessage;

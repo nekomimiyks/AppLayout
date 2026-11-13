@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
@@ -22,21 +22,20 @@ namespace AppLayout
                 if (!created)
                 {
                     // 既に起動中なら、そちらのウィンドウを前面に出す
-                    try { EventWaitHandle.OpenExisting(ShowEventName).Set(); } catch { }
+                    try { Native.AllowSetForegroundWindow(-1); EventWaitHandle.OpenExisting(ShowEventName).Set(); } catch { }
                     return;
                 }
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                string dir = AppDomain.CurrentDomain.BaseDirectory;
-                var store = new ConfigStore(Path.Combine(dir, "layout.json"));
-                string imported;
-                try { imported = store.Load(); }
+                var store = new ConfigStore(ConfigStore.DefaultPath());
+                try { store.Load(); }
                 catch (Exception ex)
                 {
                     MessageBox.Show("設定ファイルを読み込めませんでした。\n" + store.Path + "\n\n" + ex.Message, "AppLayout", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-                Application.Run(new MainForm(store, startup, imported));
+                var controller = new AppController(store, startup);
+                Shell.Run(UiFactory.CreateMainForm(controller), controller, startup);
             }
         }
     }
@@ -44,7 +43,7 @@ namespace AppLayout
 
 namespace AppLayout
 {
-    static class Ui
+    public static class Ui
     {
         static float k = -1;
         public static float K

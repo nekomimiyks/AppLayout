@@ -1,3 +1,4 @@
+﻿param([string]$Variant = 'A', [string]$Out = 'AppLayout.exe')
 # AppLayout.exe をビルドする（Windows標準の .NET Framework 4 の C# コンパイラを使用。追加インストール不要）
 $ErrorActionPreference = 'Stop'
 $here = $PSScriptRoot
@@ -8,6 +9,7 @@ if (-not (Test-Path $csc)) { $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framewo
 Add-Type -AssemblyName System.Drawing
 $ico = Join-Path $here 'src\app.ico'
 $sizes = 16, 32, 48, 256
+if (-not (Test-Path $ico)) {
 $pngs = foreach ($s in $sizes) {
   $bmp = New-Object System.Drawing.Bitmap $s, $s
   $g = [System.Drawing.Graphics]::FromImage($bmp)
@@ -34,11 +36,15 @@ for ($i = 0; $i -lt $sizes.Count; $i++) {
 }
 foreach ($p in $pngs) { $w.Write($p) }
 $w.Close()
+}
 
-$out = Join-Path $here 'AppLayout.exe'
-$src = Get-ChildItem (Join-Path $here 'src\*.cs') | ForEach-Object { $_.FullName }
-& $csc /nologo /target:winexe /optimize+ /platform:anycpu "/out:$out" "/win32icon:$ico" `
+$outPath = Join-Path $here $Out
+$variantDir = Join-Path $here (Join-Path 'variants' $Variant)
+if (-not (Test-Path -LiteralPath $variantDir -PathType Container)) { throw "UI variant not found: $variantDir" }
+$src = @(Get-ChildItem -LiteralPath (Join-Path $here 'src\core') -Filter '*.cs' | ForEach-Object { $_.FullName })
+$src += @(Get-ChildItem -LiteralPath $variantDir -Filter '*.cs' | ForEach-Object { $_.FullName })
+& $csc /nologo /target:winexe /optimize+ /platform:anycpu "/out:$outPath" "/win32icon:$ico" `
   /r:System.dll /r:System.Core.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll `
-  /r:System.Runtime.Serialization.dll /r:System.Management.dll $src
-if ($LASTEXITCODE -ne 0) { throw "ビルド失敗" }
-Write-Output "ビルド完了: $out"
+  /r:System.Runtime.Serialization.dll $src
+if ($LASTEXITCODE -ne 0) { throw 'Build failed' }
+Write-Output "Build complete: $outPath"

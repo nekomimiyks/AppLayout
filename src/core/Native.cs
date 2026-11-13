@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -37,6 +37,8 @@ namespace AppLayout
         [DllImport("user32.dll")] public static extern bool EnumWindows(EnumProc c, IntPtr p);
         [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr w);
         [DllImport("user32.dll")] public static extern bool IsWindow(IntPtr w);
+        [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr w);
+        [DllImport("user32.dll")] public static extern bool AllowSetForegroundWindow(int pid);
         [DllImport("user32.dll", CharSet = CharSet.Unicode)] public static extern int GetWindowText(IntPtr w, StringBuilder b, int n);
         [DllImport("user32.dll", CharSet = CharSet.Unicode)] public static extern int GetClassName(IntPtr w, StringBuilder b, int n);
         [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr w, out uint p);

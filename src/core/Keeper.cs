@@ -90,13 +90,13 @@ namespace AppLayout
                     {
                         int r = WindowScanner.Apply(w.Handle, a.X, a.Y, a.Width, a.Height, a.Maximized);
                         if (r == 1) st = new EntryStatus { Text = "位置を戻しました", Kind = 0 };
-                        else if (r == 0) st = new EntryStatus { Text = "キープ中", Kind = 0 };
+                        else if (r == 0) st = new EntryStatus { Text = "配置中", Kind = 0 };
                         else
                         {
                             var mons = WindowScanner.GetMonitors();
-                            bool off = WindowScanner.MonitorLabel(a.X, a.Y, a.Width, a.Height, mons).StartsWith("画面外");
+                            bool off = WindowScanner.MonitorLabel(a.X, a.Y, a.Width, a.Height, mons)== "なし";
                             st = off ? new EntryStatus { Text = "保存位置のモニタがありません", Kind = 1 }
-                                     : new EntryStatus { Text = "キープ中", Kind = 0 };
+                                     : new EntryStatus { Text = "配置中", Kind = 0 };
                         }
                     }
                 }

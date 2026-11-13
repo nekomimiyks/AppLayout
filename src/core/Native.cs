@@ -113,15 +113,9 @@ namespace AppLayout
 
     public class MonitorDesc
     {
-        public IntPtr Handle; public int Index; public Native.RECT Bounds; public bool Primary;
-        public string Where = "";
-        public string Label
-        {
-            get
-            {
-                return "モニタ" + Index + "（" + (Primary ? "メイン" : Where) + "） " + (Bounds.Right - Bounds.Left) + "×" + (Bounds.Bottom - Bounds.Top);
-            }
-        }
+        public IntPtr Handle; public int Number; public Native.RECT Bounds; public bool Primary; public string Device;
+        /// Windowsの「設定 > ディスプレイ」に表示される番号（\.\DISPLAYn の n）
+        public string Label { get { return Number > 0 ? Number.ToString() : "?"; } }
     }
 
     public static class WindowScanner
@@ -196,32 +190,15 @@ namespace AppLayout
             {
                 var mi = new Native.MONITORINFOEX(); mi.cbSize = Marshal.SizeOf(mi);
                 if (Native.GetMonitorInfo(hm, ref mi))
-                    list.Add(new MonitorDesc { Handle = hm, Bounds = mi.rcMonitor, Primary = (mi.dwFlags & 1) != 0 });
+                {
+                    var d = new MonitorDesc { Handle = hm, Bounds = mi.rcMonitor, Primary = (mi.dwFlags & 1) != 0, Device = mi.szDevice ?? "" };
+                    var m = System.Text.RegularExpressions.Regex.Match(d.Device, @"(\d+)$");
+                    if (m.Success) d.Number = int.Parse(m.Groups[1].Value);
+                    list.Add(d);
+                }
                 return true;
             }, IntPtr.Zero);
-            list.Sort(delegate (MonitorDesc a, MonitorDesc b)
-            {
-                if (a.Primary != b.Primary) return a.Primary ? -1 : 1;
-                if (a.Bounds.Left != b.Bounds.Left) return a.Bounds.Left.CompareTo(b.Bounds.Left);
-                return a.Bounds.Top.CompareTo(b.Bounds.Top);
-            });
-            for (int i = 0; i < list.Count; i++) list[i].Index = i + 1;
-            if (list.Count > 0 && list[0].Primary)
-            {
-                var pm = list[0].Bounds;
-                foreach (var m in list)
-                {
-                    if (m.Primary) continue;
-                    string dir; Func<MonitorDesc, bool> same; Func<MonitorDesc, int> dist;
-                    if (m.Bounds.Right <= pm.Left) { dir = "左"; same = o => o.Bounds.Right <= pm.Left; dist = o => pm.Left - o.Bounds.Right; }
-                    else if (m.Bounds.Left >= pm.Right) { dir = "右"; same = o => o.Bounds.Left >= pm.Right; dist = o => o.Bounds.Left - pm.Right; }
-                    else if (m.Bounds.Bottom <= pm.Top) { dir = "上"; same = o => o.Bounds.Bottom <= pm.Top; dist = o => pm.Top - o.Bounds.Bottom; }
-                    else { dir = "下"; same = o => o.Bounds.Top >= pm.Bottom; dist = o => o.Bounds.Top - pm.Bottom; }
-                    int rank = 1;
-                    foreach (var o in list) if (o != m && !o.Primary && same(o) && dist(o) < dist(m)) rank++;
-                    m.Where = "メインの" + dir + (rank > 1 ? "の" + dir : "");
-                }
-            }
+            list.Sort(delegate (MonitorDesc a, MonitorDesc b) { return a.Number.CompareTo(b.Number); });
             return list;
         }
 
@@ -229,7 +206,7 @@ namespace AppLayout
         {
             var r = new Native.RECT { Left = x, Top = y, Right = x + width, Bottom = y + height };
             IntPtr h = Native.MonitorFromRect(ref r, 0);
-            if (h == IntPtr.Zero) return "画面外（未接続）";
+            if (h == IntPtr.Zero) return "なし";
             foreach (var m in mons) if (m.Handle == h) return m.Label;
             return "?";
         }

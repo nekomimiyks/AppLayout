@@ -25,6 +25,24 @@ namespace AppLayout
         [DataMember(Name = "width", Order = 12)] public int Width;
         [DataMember(Name = "height", Order = 13)] public int Height;
         [DataMember(Name = "maximized", Order = 14)] public bool Maximized;
+        [DataMember(Name = "id", Order = 0, EmitDefaultValue = false)] public string Id;
+
+        public void EnsureId() { if (string.IsNullOrEmpty(Id)) Id = Guid.NewGuid().ToString("N"); }
+
+        /// 「ウィンドウの見分け方」の表示用文字列
+        public string TitleRuleText
+        {
+            get
+            {
+                switch (TitleModeOrNone)
+                {
+                    case "exact": return "タイトル一致: " + Title;
+                    case "contains": return "タイトルを含む: " + Title;
+                    case "regex": return "正規表現: " + Title;
+                    default: return "アプリで判定";
+                }
+            }
+        }
 
         public AppEntry Clone() { return (AppEntry)MemberwiseClone(); }
 
@@ -68,6 +86,7 @@ namespace AppLayout
         {
             var e = new AppEntry
             {
+                Id = Guid.NewGuid().ToString("N"),
                 Name = FriendlyName(w),
                 Process = w.ProcessName,
                 Class = w.Class,
@@ -100,20 +119,12 @@ namespace AppLayout
         [DataMember(Name = "launchMissingAtStartup", Order = 2)] public bool LaunchMissingAtStartup;
         [DataMember(Name = "intervalSeconds", Order = 3)] public int IntervalSeconds;
         [DataMember(Name = "savedAt", Order = 4)] public string SavedAt;
-        [DataMember(Name = "importedFrom", Order = 5, EmitDefaultValue = false)] public string ImportedFrom;
+        [DataMember(Name = "minimizeToTrayOnClose", Order = 5)] public bool MinimizeToTrayOnClose;
         [DataMember(Name = "apps", Order = 6)] public List<AppEntry> Apps;
 
         public LayoutConfig() { Defaults(); }
         [OnDeserializing] void OnDeserializing(StreamingContext c) { Defaults(); }
-        void Defaults() { Enabled = true; LaunchMissingAtStartup = true; IntervalSeconds = 2; Apps = new List<AppEntry>(); }
-    }
-
-    // 旧版（PowerShell版）の state\fixed-app-layout.json
-    [DataContract]
-    class OldConfig
-    {
-        [DataMember(Name = "enabled")] public bool Enabled;
-        [DataMember(Name = "apps")] public List<AppEntry> Apps;
+        void Defaults() { Enabled = true; LaunchMissingAtStartup = true; MinimizeToTrayOnClose = true; IntervalSeconds = 2; Apps = new List<AppEntry>(); }
     }
 
     public class ConfigStore
@@ -124,51 +135,38 @@ namespace AppLayout
 
         public ConfigStore(string path) { Path = path; }
 
-        public string Load()
+        public void Load()
         {
             if (File.Exists(Path))
             {
                 Config = Read<LayoutConfig>(Path);
                 if (Config.Apps == null) Config.Apps = new List<AppEntry>();
                 if (Config.IntervalSeconds < 1) Config.IntervalSeconds = 2;
-                return null;
+                foreach (var a in Config.Apps) a.EnsureId();
+                return;
             }
             Config = new LayoutConfig();
-            string imported = TryImport();
             Save();
-            return imported;
         }
 
-        string TryImport()
+        /// 設定ファイルの場所: exeと同じフォルダに書き込めればそこ、だめなら %APPDATA%\AppLayout
+        public static string DefaultPath()
         {
-            string exeDir = AppDomain.CurrentDomain.BaseDirectory;
-            var candidates = new List<string>
+            string dir = AppDomain.CurrentDomain.BaseDirectory;
+            string local = System.IO.Path.Combine(dir, "layout.json");
+            if (File.Exists(local) && CanWrite(dir)) return local;
+            if (!File.Exists(local) && CanWrite(dir)) return local;
+            return System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AppLayout", "layout.json");
+        }
+
+        static bool CanWrite(string dir)
+        {
+            try
             {
-                @"C:\Apps\AppLayout\state\fixed-app-layout.json",
-                System.IO.Path.GetFullPath(System.IO.Path.Combine(exeDir, @"..\state\fixed-app-layout.json"))
-            };
-            foreach (var p in candidates)
-            {
-                if (!File.Exists(p)) continue;
-                try
-                {
-                    var old = Read<OldConfig>(p);
-                    if (old.Apps == null) continue;
-                    foreach (var a in old.Apps)
-                    {
-                        // 旧版スクリプトにあった個別のタイトル条件を引き継ぐ
-                        if (string.Equals(a.Process, "LINE", StringComparison.OrdinalIgnoreCase)) { a.TitleMode = "exact"; a.Title = "LINE"; }
-                        else if (string.Equals(a.Process, "Discord", StringComparison.OrdinalIgnoreCase)) { a.TitleMode = "regex"; a.Title = "Discord$"; }
-                        else { a.TitleMode = "none"; a.Title = ""; }
-                        if (a.ExePath == null) a.ExePath = "";
-                        Config.Apps.Add(a);
-                    }
-                    Config.ImportedFrom = p;
-                    return p;
-                }
-                catch { }
+                string t = System.IO.Path.Combine(dir, ".write-test-" + Guid.NewGuid().ToString("N"));
+                File.WriteAllText(t, ""); File.Delete(t); return true;
             }
-            return null;
+            catch { return false; }
         }
 
         public void Save()

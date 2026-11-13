@@ -7,7 +7,9 @@ namespace AppLayout
 {
     static class Program
     {
-        public const string ShowEventName = "Local\\AppLayoutGUI-Show";
+        // exe 名ごとに分ける（UI 案の exe を同時に試せるように）
+        static readonly string InstanceId = Path.GetFileNameWithoutExtension(Application.ExecutablePath).ToLowerInvariant();
+        public static readonly string ShowEventName = "Local\\AppLayoutGUI-Show-" + InstanceId;
 
         [STAThread]
         static void Main(string[] args)
@@ -17,7 +19,7 @@ namespace AppLayout
             foreach (var a in args) if (a.Equals("/startup", StringComparison.OrdinalIgnoreCase)) startup = true;
 
             bool created;
-            using (var mutex = new Mutex(true, "Local\\AppLayoutGUI-Single", out created))
+            using (var mutex = new Mutex(true, "Local\\AppLayoutGUI-Single-" + InstanceId, out created))
             {
                 if (!created)
                 {

@@ -1,0 +1,73 @@
+{
+  "enabled": true,
+  "launchMissingAtStartup": true,
+  "intervalSeconds": 2,
+  "savedAt": "2026-11-14T03:00:00.1869278+09:00",
+  "importedFrom": "C:\\Apps\\AppLayout\\state\\fixed-app-layout.json",
+  "apps": [
+    {
+      "name": "X",
+      "process": "chrome",
+      "class": "Chrome_WidgetWin_1",
+      "appId": "Chrome._crx_lodlkdfmihmddehnfgiljnadcf",
+      "titleMode": "none",
+      "title": "",
+      "launchId": "Chrome._crx_lodlkdfmihmddehnfgiljnadcf",
+      "shortcut": "C:\\Users\\nekom\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Chrome アプリ\\X.lnk",
+      "exePath": "",
+      "x": -2887,
+      "y": -408,
+      "width": 1454,
+      "height": 1287,
+      "maximized": false
+    },
+    {
+      "name": "ChatGPT",
+      "process": "ChatGPT",
+      "class": "Chrome_WidgetWin_1",
+      "appId": "",
+      "titleMode": "none",
+      "title": "",
+      "launchId": "OpenAI.Codex_2p2nqsd0c76g0!App",
+      "shortcut": "",
+      "exePath": "",
+      "x": -1440,
+      "y": 1252,
+      "width": 1440,
+      "height": 900,
+      "maximized": false
+    },
+    {
+      "name": "LINE",
+      "process": "LINE",
+      "class": "Qt663QWindowIcon",
+      "appId": "",
+      "titleMode": "exact",
+      "title": "LINE",
+      "launchId": "NAVER.WIN32_LINEwin8_8ptj331gd3tyt!LINE",
+      "shortcut": "C:\\Users\\nekom\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\LINE\\LINE.lnk",
+      "exePath": "",
+      "x": -1440,
+      "y": 445,
+      "width": 1440,
+      "height": 807,
+      "maximized": false
+    },
+    {
+      "name": "Discord",
+      "process": "Discord",
+      "class": "Chrome_WidgetWin_1",
+      "appId": "",
+      "titleMode": "regex",
+      "title": "Discord$",
+      "launchId": "com.squirrel.Discord.Discord",
+      "shortcut": "C:\\Users\\nekom\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Discord.lnk",
+      "exePath": "",
+      "x": -1446,
+      "y": -408,
+      "width": 1452,
+      "height": 859,
+      "maximized": false
+    }
+  ]
+}

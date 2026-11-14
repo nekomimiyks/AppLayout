@@ -1,0 +1,7 @@
+*.exe
+*.dll
+*.log
+*.json
+*.png
+*.tmp
+shell-test/

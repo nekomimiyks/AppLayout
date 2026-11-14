@@ -7,9 +7,9 @@ namespace AppLayout
 {
     static class Program
     {
-        // exe 名ごとに分ける（UI 案の exe を同時に試せるように）
-        static readonly string InstanceId = Path.GetFileNameWithoutExtension(Application.ExecutablePath).ToLowerInvariant();
-        public static readonly string ShowEventName = "Local\\AppLayoutGUI-Show-" + InstanceId;
+        // ファイル名・UI案・配置フォルダが変わっても同じセッションでは1つだけ起動する。
+        public const string InstanceMutexName = "Local\\AppLayoutGUI-Single";
+        public const string ShowEventName = "Local\\AppLayoutGUI-Show";
 
         [STAThread]
         static void Main(string[] args)
@@ -19,14 +19,20 @@ namespace AppLayout
             foreach (var a in args) if (a.Equals("/startup", StringComparison.OrdinalIgnoreCase)) startup = true;
 
             bool created;
-            using (var mutex = new Mutex(true, "Local\\AppLayoutGUI-Single-" + InstanceId, out created))
+            using (var mutex = new Mutex(true, InstanceMutexName, out created))
             {
                 if (!created)
                 {
                     // 既に起動中なら、そちらのウィンドウを前面に出す
-                    try { Native.AllowSetForegroundWindow(-1); EventWaitHandle.OpenExisting(ShowEventName).Set(); } catch { }
+                    Native.AllowSetForegroundWindow(-1);
+                    // 初回プロセスが通知イベントを作るまでの短い起動競合にも対応。
+                    for (int i = 0; i < 20; i++) {
+                        try { using (var show = EventWaitHandle.OpenExisting(ShowEventName)) show.Set(); break; }
+                        catch (WaitHandleCannotBeOpenedException) { Thread.Sleep(50); }
+                    }
                     return;
                 }
+                using (var earlyShowEvent = new EventWaitHandle(false, EventResetMode.AutoReset, ShowEventName)) {
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
                 var store = new ConfigStore(ConfigStore.DefaultPath());
@@ -38,6 +44,7 @@ namespace AppLayout
                 }
                 var controller = new AppController(store, startup);
                 Shell.Run(UiFactory.CreateMainForm(controller), controller, startup);
+                }
             }
         }
     }
@@ -58,5 +65,6 @@ namespace AppLayout
         }
         public static int S(int v) { return (int)System.Math.Round(v * K); }
         public static System.Drawing.Size Sz(int w, int h) { return new System.Drawing.Size(S(w), S(h)); }
+        internal static void SetDpi(int dpi) { if (dpi >= 48 && dpi <= 768) k = dpi / 96f; }
     }
 }

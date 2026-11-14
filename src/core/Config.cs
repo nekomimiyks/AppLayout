@@ -59,7 +59,7 @@ namespace AppLayout
                 case "exact": return w.Title == t;
                 case "contains": return w.Title.IndexOf(t, StringComparison.OrdinalIgnoreCase) >= 0;
                 case "regex":
-                    try { return Regex.IsMatch(w.Title, t); } catch { return false; }
+                    try { return Regex.IsMatch(w.Title, t, RegexOptions.None, TimeSpan.FromMilliseconds(100)); } catch { return false; }
                 default: return true;
             }
         }

@@ -12,6 +12,7 @@ namespace AppLayout {
  internal static class Verification {
   static int checks;
   static string output;
+  static bool screenshotsOnly;
   [DllImport("user32.dll")] static extern bool PostMessage(IntPtr handle, uint message, IntPtr wParam, IntPtr lParam);
   [DllImport("user32.dll")] static extern IntPtr GetWindowDC(IntPtr handle);
   [DllImport("user32.dll")] static extern int ReleaseDC(IntPtr handle,IntPtr dc);
@@ -28,6 +29,7 @@ namespace AppLayout {
     Native.MakeDpiAware(); Application.EnableVisualStyles(); Application.SetCompatibleTextRenderingDefault(false);
     output = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
     if (args.Length == 1 && args[0] == "screenshots") {
+     screenshotsOnly = true;
      TestEditor(); TestLedger();
      Console.WriteLine("Completed " + checks + " checks."); return 0;
     }
@@ -127,8 +129,25 @@ namespace AppLayout {
   }
   static void Capture(Form form,string name) {
    if(!form.Visible)form.Show();Application.DoEvents();
+   if(screenshotsOnly && (name=="main-theme-light.png" || name=="main-theme-dark.png" || name=="edit-dialog.png")) FitScreenshot(form);
    var watch=Stopwatch.StartNew();while(watch.ElapsedMilliseconds<350){Application.DoEvents();Thread.Sleep(10);}
    using(var bitmap=new Bitmap(form.Width,form.Height)) { form.DrawToBitmap(bitmap,new Rectangle(0,0,bitmap.Width,bitmap.Height));bitmap.Save(Path.Combine(output,name)); }
+  }
+  // 公開画像は実際のウィンドウをリサイズし、一覧や入力欄の下の空白を減らす。
+  static void FitScreenshot(Form form) {
+   var grids=form.Controls.Find("LedgerGrid",true);
+   if(grids.Length>0) {
+    var grid=(DataGridView)grids[0];
+    int needed=grid.ColumnHeadersHeight+8;
+    foreach(DataGridViewRow row in grid.Rows)needed+=row.Height;
+    form.Height-=Math.Max(0,grid.Height-needed);
+   } else if(form is EntryEditDialog) {
+    var flags=BindingFlags.Instance|BindingFlags.NonPublic;
+    var content=(TableLayoutPanel)typeof(EntryEditDialog).GetField("content",flags).GetValue(form);
+    var scroll=(ThemedScrollPanel)typeof(EntryEditDialog).GetField("scroll",flags).GetValue(form);
+    form.Height-=Math.Max(0,scroll.Height-content.Height-8);
+   }
+   form.PerformLayout();Application.DoEvents();
   }
   static IntPtr AppWindow(int pid) {
    IntPtr result=IntPtr.Zero;

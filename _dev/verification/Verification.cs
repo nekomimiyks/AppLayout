@@ -27,6 +27,10 @@ namespace AppLayout {
     Application.SetUnhandledExceptionMode(UnhandledExceptionMode.ThrowException);
     Native.MakeDpiAware(); Application.EnableVisualStyles(); Application.SetCompatibleTextRenderingDefault(false);
     output = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+    if (args.Length == 1 && args[0] == "screenshots") {
+     TestEditor(); TestLedger();
+     Console.WriteLine("Completed " + checks + " checks."); return 0;
+    }
     TestController(); TestRealtime(); TestInstance(args); TestEditor(); TestTrayTransition(); TestCloseToTray(); TestTrayPlacement(); TestScrollbars(); TestStartupSizing();
     if (args.Length > 1 && args[1] == "ledger") TestLedger();
     if (args.Length > 0 && File.Exists(args[0])) TestShell(args[0]);
@@ -158,7 +162,7 @@ namespace AppLayout {
    }
   }
   static void TestEditor() {
-   var entry=Entry("ChatGPT");entry.Process="ChatGPT";entry.Class="Chrome_WidgetWin_1";entry.X=-1440;entry.Y=1252;entry.Width=1440;entry.Height=900;
+   var entry=Entry("チャット");entry.Process="chat-app";entry.Class="SampleWindow";entry.X=-1440;entry.Y=1252;entry.Width=1440;entry.Height=900;
    using(var dialog=new EntryEditDialog(entry,false)) {
     Capture(dialog,"edit-dialog.png");Assert(dialog.Text=="配置を編集","編集画面の名称");
     var x=(NumericUpDown)dialog.Controls.Find("PositionX",true)[0];
@@ -172,7 +176,7 @@ namespace AppLayout {
     Capture(dialog,"edit-dialog-title.png");
     dialog.Close();
    }
-   Assert(entry.X==-1440 && entry.Name=="ChatGPT","編集キャンセルでは元の登録を変更しない");
+   Assert(entry.X==-1440 && entry.Name=="チャット","編集キャンセルでは元の登録を変更しない");
    using(var dialog=new EntryEditDialog(entry,false)) {
     ((TextBox)dialog.Controls.Find("EntryName",true)[0]).Text="変更後の名前";
     ((NumericUpDown)dialog.Controls.Find("PositionX",true)[0]).Value=-1200;
@@ -186,8 +190,9 @@ namespace AppLayout {
    Console.WriteLine("Creating ledger...");
    using(var form=UiFactory.CreateMainForm(controller)) {
     var rows=new List<WindowRow>();
-    string[] names={"Visual Studio Code","作業フォルダー","メモ帳","ChatGPT","LINE","Spotify"};
-    for(int i=0;i<names.Length;i++){var entry=Entry(names[i]);entry.Process=i==3?"ChatGPT":"app";bool saved=i!=2;if(saved)store.Config.Apps.Add(entry);rows.Add(new WindowRow{Key=(saved?"e:":"w:")+entry.Id,Entry=saved?entry:null,Saved=saved,Name=names[i],Process=entry.Process,Position=i<3?"0, 0":"-1440, 0",Size="1440 × 900",Monitor=i<3?"1":"2",TitleRule="アプリで判定",Maximized="いいえ",Status=i==4?"最小化中":i==5?"未起動":saved?"配置中":"未保存",StatusKind=i==5?2:saved?0:3});}
+    string[] names={"コードエディター","作業フォルダー","テキストエディター","チャット","ブラウザー","音楽プレーヤー"};
+    string[] processes={"code-editor","file-manager","text-editor","chat-app","browser","music-player"};
+    for(int i=0;i<names.Length;i++){var entry=Entry(names[i]);entry.Process=processes[i];bool saved=i!=2;if(saved)store.Config.Apps.Add(entry);rows.Add(new WindowRow{Key=(saved?"e:":"w:")+entry.Id,Entry=saved?entry:null,Saved=saved,Name=names[i],Process=entry.Process,Position=i<3?"0, 0":"-1440, 0",Size="1440 × 900",Monitor=i<3?"1":"2",TitleRule="アプリで判定",Maximized="いいえ",Status=i==4?"最小化中":i==5?"未起動":saved?"配置中":"未保存",StatusKind=i==5?2:saved?0:3});}
     Console.WriteLine("Showing ledger..."); form.Show();Application.DoEvents();
     var set=form.GetType().GetMethod("SetRows",BindingFlags.Instance|BindingFlags.NonPublic|BindingFlags.Public);
     Assert(set!=null,"台帳のUI単体テストフック");set.Invoke(form,new object[]{rows,true});
@@ -295,7 +300,7 @@ namespace AppLayout {
    settings.PerformClick();Assert(settings.Text=="設定を閉じる" && settings.BackColor==AppTheme.Band,"設定を開くとボタンの名前と背景も変更");
    int before=ThemeListeners(),clicked=0;grid.CurrentCell=rows[1].Cells[1];
    var currentCell=grid.CurrentCell;int scroll=grid.FirstDisplayedScrollingRowIndex;
-   var sample=Entry("編集中の名前");sample.Process="ChatGPT";
+   var sample=Entry("編集中の名前");sample.Process="chat-app";
    try {
     using(var editor=new EntryEditDialog(sample,false))
     using(var menu=new TrayMenu()) {

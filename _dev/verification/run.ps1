@@ -1,4 +1,4 @@
-param([string]$ApplicationPath)
+param([string]$ApplicationPath, [switch]$ScreenshotsOnly)
 $ErrorActionPreference = 'Stop'
 $project = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
 $compiler = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
@@ -13,7 +13,8 @@ $icon = Join-Path $project 'src\app.ico'
 if ($LASTEXITCODE -ne 0) { throw 'Verification compile failed' }
 $stdout = Join-Path $PSScriptRoot 'stdout.log'
 $stderr = Join-Path $PSScriptRoot 'stderr.log'
-$process = Start-Process -FilePath $output -ArgumentList @(('"' + $ApplicationPath + '"'), 'ledger') `
+$verificationArgs = if ($ScreenshotsOnly) { @('screenshots') } else { @(('"' + $ApplicationPath + '"'), 'ledger') }
+$process = Start-Process -FilePath $output -ArgumentList $verificationArgs `
     -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
 $process.Handle | Out-Null
 if (-not $process.WaitForExit(60000)) { $process.Kill(); throw 'Verification timed out' }

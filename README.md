@@ -88,7 +88,7 @@ Windows標準の.NET Framework 4.xコンパイラでビルドします。C# 5、
 powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1
 ```
 
-既定の画面は `variants/Ledger`、共通処理は `src/core` にあります。旧画面案のソースは `variants` に保存しています。
+画面のソースは `src/ui`、共通処理は `src/core` にあります。ビルドすると `AppLayout.exe` を生成します。
 
 ## 検証
 

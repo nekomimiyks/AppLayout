@@ -89,7 +89,7 @@ namespace AppLayout {
      typeof(Program).GetMethod("Main",BindingFlags.NonPublic|BindingFlags.Static).Invoke(null,new object[]{new string[0]});
      Assert(show.WaitOne(1000),"二重起動は既存画面を開くイベントを通知して終了");
      if(args.Length>0 && File.Exists(args[0])) {
-      foreach(string name in new[]{"AppLayout.RenamedB.exe","AppLayout.RenamedC.exe"}) {
+      foreach(string name in new[]{"AppLayout.Renamed1.exe","AppLayout.Renamed2.exe"}) {
        string dest=Path.Combine(output,name);File.Copy(args[0],dest,true);
        using(var process=Process.Start(new ProcessStartInfo(dest){UseShellExecute=false,CreateNoWindow=true})) {
         if(!process.WaitForExit(5000)) { process.Kill();throw new Exception("duplicate child did not exit"); }

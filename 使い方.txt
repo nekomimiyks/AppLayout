@@ -1,4 +1,4 @@
-﻿AppLayout ― ウィンドウ配置台帳
+AppLayout ― ウィンドウ配置台帳
 
 ■ 起動と終了
 AppLayout.exe を開きます。同じアプリをもう一度起動すると、起動済みの画面が開きます。
@@ -49,6 +49,6 @@ layout.json に配置を保存します。exeと同じフォルダに書き込�
 
 ■ ビルド
 powershell -ExecutionPolicy Bypass -File .\build.ps1
-Windows標準の.NET Frameworkでビルドします。既定の画面はLedgerです。
+Windows標準の.NET Frameworkでビルドします。画面のソースはsrc/ui、共通処理はsrc/coreです。
 
-起動する実行ファイルは AppLayout.exe です。過去の画面案のソースはvariantsに残しています。
+起動する実行ファイルは AppLayout.exe です。

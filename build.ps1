@@ -1,4 +1,4 @@
-﻿param([string]$Variant = 'Ledger', [string]$Out = 'AppLayout.exe')
+﻿param([string]$Out = 'AppLayout.exe')
 # Windows標準の .NET Framework 4 C# コンパイラだけでビルドする。
 $ErrorActionPreference = 'Stop'
 $here = $PSScriptRoot
@@ -46,10 +46,10 @@ if (-not (Test-Path -LiteralPath $ico) -or (Get-Item -LiteralPath $source).LastW
 }
 
 $outPath = if ([System.IO.Path]::IsPathRooted($Out)) { $Out } else { Join-Path $here $Out }
-$variantDir = Join-Path $here (Join-Path 'variants' $Variant)
-if (-not (Test-Path -LiteralPath $variantDir -PathType Container)) { throw "UI variant not found: $variantDir" }
+$uiDir = Join-Path $here 'src\ui'
+
 $src = @(Get-ChildItem -LiteralPath (Join-Path $here 'src\core') -Filter '*.cs' | ForEach-Object { $_.FullName })
-$src += @(Get-ChildItem -LiteralPath $variantDir -Filter '*.cs' | ForEach-Object { $_.FullName })
+$src += @(Get-ChildItem -LiteralPath $uiDir -Filter '*.cs' | ForEach-Object { $_.FullName })
 & $csc /nologo /target:winexe /optimize+ /platform:anycpu "/out:$outPath" "/win32icon:$ico" "/resource:$ico,AppLayout.AppIcon.ico" `
   /r:System.dll /r:System.Core.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll `
   /r:System.Runtime.Serialization.dll $src

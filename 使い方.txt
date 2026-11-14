@@ -51,5 +51,4 @@ layout.json に配置を保存します。exeと同じフォルダに書き込�
 powershell -ExecutionPolicy Bypass -File .\build.ps1
 Windows標準の.NET Frameworkでビルドします。既定の画面はLedgerです。
 
-旧ファイル名の AppLayout_A.exe / AppLayout_B.exe / AppLayout_C.exe / AppLayout_basic.exe も、完成版と同じ内容に更新しています。
-どれを開いても同じ画面になり、重複して常駐しません。過去の画面案のソースはvariantsに残しています。
+起動する実行ファイルは AppLayout.exe です。過去の画面案のソースはvariantsに残しています。

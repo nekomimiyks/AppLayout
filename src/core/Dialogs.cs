@@ -82,7 +82,7 @@ namespace AppLayout
     {
         readonly AppEntry entry;
         TextBox txtName, txtTitle;
-        ComboBox cmbMode;
+        ThemedSelect cmbMode;
         NumericUpDown numX, numY, numW, numH;
         CheckBox chkMax;
         Label lblMatch, lblMonitor;
@@ -150,11 +150,9 @@ namespace AppLayout
             AddBlock(chkMax);
 
             AddSection(L.T("ウィンドウの見分け方"));
-            cmbMode = new ComboBox { Name = "MatchMode", DropDownStyle = ComboBoxStyle.DropDownList, DrawMode = DrawMode.OwnerDrawFixed, ItemHeight = Math.Max(Ui.S(23), TextRenderer.MeasureText("Ag", Font).Height + Ui.S(4)), Dock = DockStyle.Fill };
-            cmbMode.Items.AddRange(ModeLabels);
+            cmbMode = new ThemedSelect { Name = "MatchMode", Dock = DockStyle.Fill, AccessibleName = L.T("ウィンドウの見分け方") };
+            cmbMode.SetItems(Array.ConvertAll(ModeLabels, L.T));
             cmbMode.SelectedIndex = Math.Max(0, Array.IndexOf(ModeKeys, e.TitleModeOrNone));
-            AppTheme.StyleInput(cmbMode);
-            cmbMode.DrawItem += DrawModeItem;
             cmbMode.Margin = new Padding(0, 0, 0, Ui.S(7)); AddBlock(cmbMode);
             txtTitle = new TextBox { Name = "MatchTitle", Text = e.Title ?? "", MaxLength = 2000, Dock = DockStyle.Fill };
             titleField = Field(L.T("タイトル条件"), txtTitle); AddBlock(titleField);
@@ -169,7 +167,7 @@ namespace AppLayout
             detailsButton.Padding = new Padding(0, Ui.S(4), Ui.S(8), Ui.S(4));
             detailsButton.Anchor = AnchorStyles.Left;
             AddBlock(detailsButton);
-            details = new TextBox { ReadOnly = true, Multiline = true, ScrollBars = ScrollBars.None, Height = Ui.S(76), Dock = DockStyle.Fill, Visible = false,
+            details = new TextBox { ReadOnly = true, Multiline = true, ScrollBars = ScrollBars.None, BorderStyle = BorderStyle.None, Height = Ui.S(76), Dock = DockStyle.Fill, Visible = false,
                 Text = L.T("プロセス: ") + e.Process + L.T("\r\nクラス: ") + e.Class + L.T("\r\nアプリID: ") + (string.IsNullOrEmpty(e.AppId) ? "なし" : e.AppId), Margin = new Padding(0, Ui.S(4), 0, 0) };
             AppTheme.StyleInput(details); AddBlock(details);
             detailsButton.Click += delegate { details.Visible = !details.Visible; if(details.Visible)ResizeDetails();detailsButton.Text = details.Visible ? L.T("識別情報を閉じる") : L.T("識別情報を表示"); };
@@ -192,13 +190,13 @@ namespace AppLayout
             content.SizeChanged += delegate { UpdateWrapWidths(); };
             header.SizeChanged += delegate { UpdateWrapWidths(); };
             QueueMatch(); UpdateMonitor();
+            UpdateInputSizes();
             L.Attach(this,delegate {
-                int selected=cmbMode.SelectedIndex;
-                cmbMode.Items.Clear();foreach(string label in ModeLabels)cmbMode.Items.Add(L.T(label));
-                cmbMode.SelectedIndex=Math.Max(0,selected);
+                cmbMode.SetItems(Array.ConvertAll(ModeLabels, L.T));
                 ((Label)header.Controls[1]).Text=L.F("対象アプリ  /  {0}",entry.Process??"");
                 detailsButton.Text=L.T(details.Visible?"識別情報を閉じる":"識別情報を表示");
                 details.Text=L.T("プロセス: ")+entry.Process+L.T("\r\nクラス: ")+entry.Class+L.T("\r\nアプリID: ")+(string.IsNullOrEmpty(entry.AppId)?L.T("なし"):entry.AppId);
+                if (details.Visible) ResizeDetails();
                 UpdateMonitor();QueueMatch();UpdateWrapWidths();
             });
         }
@@ -240,30 +238,21 @@ namespace AppLayout
             p.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
             p.RowStyles.Add(new RowStyle(SizeType.AutoSize)); p.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             p.Controls.Add(new Label { Text = label, ForeColor = AppTheme.Muted, AutoSize = true, Dock = DockStyle.Fill, Margin = new Padding(0, 0, 0, Ui.S(3)) }, 0, 0);
-            input.Dock = DockStyle.Fill; input.Margin = Padding.Empty;
-            AppTheme.StyleInput(input); p.Controls.Add(input, 0, 1);
+            input.AccessibleName = label;
+            p.Controls.Add(new InputFrame(input) { Dock = DockStyle.Fill, Margin = Padding.Empty }, 0, 1);
             return p;
         }
         protected override void OnUiScaleChanged(float factor)
         {
             base.OnUiScaleChanged(factor);
-            if (cmbMode != null) cmbMode.ItemHeight = Math.Max((int)Math.Round(23 * UiScale), TextRenderer.MeasureText("Ag", Font).Height + (int)Math.Round(4 * UiScale));
+            UpdateInputSizes();
             if (lblMatch != null && titleHint != null && lblMonitor != null) UpdateWrapWidths();
         }
         protected override void OnTextMetricsChanged()
         {
             base.OnTextMetricsChanged();
-            if (cmbMode != null) cmbMode.ItemHeight = Math.Max((int)Math.Round(23 * UiScale), TextRenderer.MeasureText("Ag", Font).Height + (int)Math.Round(4 * UiScale));
+            UpdateInputSizes();
             if (lblMatch != null && titleHint != null && lblMonitor != null) UpdateWrapWidths();
-        }
-        void DrawModeItem(object sender, DrawItemEventArgs e)
-        {
-            if (e.Index < 0) return;
-            bool selected = (e.State & DrawItemState.Selected) != 0;
-            using (var brush = new SolidBrush(selected ? AppTheme.Band : AppTheme.Surface)) e.Graphics.FillRectangle(brush, e.Bounds);
-            var bounds = new Rectangle(e.Bounds.X + Ui.S(7), e.Bounds.Y, Math.Max(0, e.Bounds.Width - Ui.S(14)), e.Bounds.Height);
-            TextRenderer.DrawText(e.Graphics, cmbMode.Items[e.Index].ToString(), e.Font, bounds, AppTheme.Foreground, TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPrefix);
-            if ((e.State & DrawItemState.Focus) != 0) e.DrawFocusRectangle();
         }
         static NumericUpDown Num(int v)
         {
@@ -271,6 +260,14 @@ namespace AppLayout
             n.Value = Math.Max(n.Minimum, Math.Min(n.Maximum, v));
             AppTheme.StyleInput(n);
             return n;
+        }
+
+        void UpdateInputSizes()
+        {
+            if (txtTitle == null || txtTitle.Parent == null) return;
+            foreach (var input in new Control[] { txtName, numX, numY, numW, numH, txtTitle })
+                ((InputFrame)input.Parent).UpdateHeight();
+            cmbMode.Height = cmbMode.GetPreferredSize(Size.Empty).Height;
         }
 
         void UpdateWrapWidths()

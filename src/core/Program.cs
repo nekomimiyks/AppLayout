@@ -19,34 +19,31 @@ namespace AppLayout
             foreach (var a in args) if (a.Equals("/startup", StringComparison.OrdinalIgnoreCase)) startup = true;
 
             bool created;
+            // 単一起動の判定より先にイベントを確保し、初回起動中の表示要求も保持する。
+            using (var showEvent = new EventWaitHandle(false, EventResetMode.AutoReset, ShowEventName))
             using (var mutex = new Mutex(true, InstanceMutexName, out created))
             {
                 if (!created)
                 {
                     // 既に起動中なら、そちらのウィンドウを前面に出す
                     Native.AllowSetForegroundWindow(-1);
-                    // 初回プロセスが通知イベントを作るまでの短い起動競合にも対応。
-                    for (int i = 0; i < 20; i++) {
-                        try { using (var show = EventWaitHandle.OpenExisting(ShowEventName)) show.Set(); break; }
-                        catch (WaitHandleCannotBeOpenedException) { Thread.Sleep(50); }
-                    }
+                    showEvent.Set();
                     return;
                 }
-                using (var earlyShowEvent = new EventWaitHandle(false, EventResetMode.AutoReset, ShowEventName)) {
-                L.SetLanguage("auto");
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
                 var store = new ConfigStore(ConfigStore.DefaultPath());
                 try { store.Load(); }
                 catch (Exception ex)
                 {
+                    L.SetLanguage("auto");
                     MessageBox.Show(L.T("設定ファイルを読み込めませんでした。\n") + store.Path + "\n\n" + ex.Message, "AppLayout", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
                 L.SetLanguage(store.Config.Language);
                 var controller = new AppController(store, startup);
-                Shell.Run(UiFactory.CreateMainForm(controller), controller, startup);
-                }
+                using (var form = UiFactory.CreateMainForm(controller))
+                    Shell.Run(form, controller, startup);
             }
         }
     }

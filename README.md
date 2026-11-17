@@ -13,7 +13,7 @@ Windowsのアプリの位置・サイズを登録し、保存した配置へ自�
 
 **[最新版をダウンロードする（GitHub Releases）](https://github.com/nekomimiyks/AppLayout/releases/latest)**
 
-1. リリースページの **Assets** から `AppLayout-vX.Y.Z-Windows.zip` をダウンロードします。最新版は [AppLayout-v1.1.0-Windows.zip](https://github.com/nekomimiyks/AppLayout/releases/download/v1.1.0/AppLayout-v1.1.0-Windows.zip) です。
+1. リリースページの **Assets** から `AppLayout-vX.Y.Z-Windows.zip` をダウンロードします。
 2. ZIPファイルを右クリックし、「すべて展開」で好きなフォルダへ展開します。
 3. 展開したフォルダの `AppLayout.exe` をダブルクリックします。
 
@@ -43,6 +43,14 @@ Windowsの配色に自動で合わせます。画像は一般名のアプリ名�
 
 ![配置の編集画面。名前、X・Y座標、幅・高さ、最大化、ウィンドウの見分け方の入力欄](docs/images/edit-dialog.png)
 
+### 選択メニュー
+
+言語とウィンドウの見分け方を選ぶメニューも、アプリの配色に合わせて表示します。右端のチェックが現在の選択です。
+
+![設定の言語メニュー。自動と9言語から選べます](docs/images/language-options.png)
+
+![ウィンドウの見分け方を選ぶメニュー](docs/images/matching-options.png)
+
 ## はじめての使い方
 
 たとえば、ブラウザを左のモニタ、チャットアプリを右のモニタに固定したい場合は、次の手順で登録します。
@@ -65,6 +73,8 @@ AppLayoutを起動したまま使います。最小化中やドラッグ中の�
 | すべての配置登録を解除する | 「すべての配置を解除する」をクリックし、確認する |
 
 OFFにすると、そのアプリの配置登録が即座に解除されます。「すべての配置を解除する」を押しても、対象アプリ自体は閉じません。
+
+1件の登録に複数のウィンドウが一致する場合や、1つのウィンドウに複数の登録が一致する場合は「該当が複数」と表示して移動を見送ります。「編集」で見分け方を調整してください。
 
 ### 常駐・終了・自動起動
 

@@ -141,9 +141,16 @@ namespace AppLayout
             if (File.Exists(Path))
             {
                 Config = Read<LayoutConfig>(Path);
+                if (Config == null) throw new SerializationException("Empty layout configuration.");
                 if (Config.Apps == null) Config.Apps = new List<AppEntry>();
+                Config.Apps.RemoveAll(entry => entry == null);
                 if (Config.IntervalSeconds < 1) Config.IntervalSeconds = 2;
-                foreach (var a in Config.Apps) a.EnsureId();
+                var ids = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var entry in Config.Apps)
+                {
+                    entry.EnsureId();
+                    while (!ids.Add(entry.Id)) entry.Id = Guid.NewGuid().ToString("N");
+                }
                 return;
             }
             Config = new LayoutConfig();
@@ -174,16 +181,25 @@ namespace AppLayout
         {
             lock (Sync)
             {
-                Config.SavedAt = DateTime.Now.ToString("o");
-                Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Path));
+                string previousSavedAt = Config.SavedAt;
                 string tmp = Path + ".tmp";
-                using (var fs = File.Create(tmp))
-                using (var w = JsonReaderWriterFactory.CreateJsonWriter(fs, new UTF8Encoding(false), true, true, "  "))
+                try
                 {
-                    new DataContractJsonSerializer(typeof(LayoutConfig)).WriteObject(w, Config);
+                    Config.SavedAt = DateTime.Now.ToString("o");
+                    Directory.CreateDirectory(System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(Path)));
+                    using (var fs = File.Create(tmp))
+                    using (var w = JsonReaderWriterFactory.CreateJsonWriter(fs, new UTF8Encoding(false), true, true, "  "))
+                    {
+                        new DataContractJsonSerializer(typeof(LayoutConfig)).WriteObject(w, Config);
+                    }
+                    if (File.Exists(Path)) File.Replace(tmp, Path, null);
+                    else File.Move(tmp, Path);
                 }
-                if (File.Exists(Path)) File.Replace(tmp, Path, null);
-                else File.Move(tmp, Path);
+                catch
+                {
+                    Config.SavedAt = previousSavedAt;
+                    throw;
+                }
             }
         }
 

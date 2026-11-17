@@ -48,7 +48,7 @@ namespace AppLayout
         bool busy, readingSettings;
         DataGridViewRow hoverEdit;
         bool initialSizeApplied;
-        readonly ComboBox language;
+        readonly ThemedSelect language;
         bool readingLanguage;
 
         public LedgerForm(AppController controller)
@@ -109,17 +109,7 @@ namespace AppLayout
             preferences.Controls.AddRange(new Control[] { login, launch, tray });
             var languageLabel=Caption(L.T("言語"),secondary,AppTheme.Muted);
             languageLabel.Margin=Pad(0,6,8,4);
-            language=new ComboBox { Name="LanguageSelector",DropDownStyle=ComboBoxStyle.DropDownList,
-                DrawMode=DrawMode.OwnerDrawFixed,Width=Ui.S(240),Margin=Pad(0,3,0,3),AccessibleName=L.T("言語") };
-            language.DrawItem+=delegate(object sender,DrawItemEventArgs e) {
-                var item=e.Index>=0 && e.Index<language.Items.Count?language.Items[e.Index]:language.SelectedItem;
-                bool selected=(e.State&DrawItemState.Selected)!=0;
-                using(var brush=new SolidBrush(selected?AppTheme.ActiveRow:AppTheme.Surface))e.Graphics.FillRectangle(brush,e.Bounds);
-                if(item!=null)TextRenderer.DrawText(e.Graphics,item.ToString(),e.Font,new Rectangle(e.Bounds.X+Pixel(4),e.Bounds.Y,Math.Max(1,e.Bounds.Width-Pixel(8)),e.Bounds.Height),AppTheme.Foreground,TextFormatFlags.VerticalCenter|TextFormatFlags.SingleLine|TextFormatFlags.NoPrefix|TextFormatFlags.EndEllipsis);
-                e.DrawFocusRectangle();
-            };
-            foreach(var choice in L.Languages)language.Items.Add(choice.ToString());
-            AppTheme.StyleInput(language);
+            language=new ThemedSelect { Name="LanguageSelector",Width=Ui.S(240),Margin=Pad(0,3,0,3),AccessibleName=L.T("言語") };
             var languageGroup=Flow();languageGroup.Controls.Add(languageLabel);languageGroup.Controls.Add(language);
             preferences.Controls.Add(languageGroup);
             language.SelectedIndexChanged+=delegate {
@@ -187,17 +177,15 @@ namespace AppLayout
         void ReadLanguage() {
             readingLanguage=true;
             try {
-                language.Items.Clear();
-                foreach(var choice in L.Languages)language.Items.Add(choice.ToString());
+                language.SetItems(L.Languages.Select(choice => choice.ToString()));
                 for(int i=0;i<language.Items.Count;i++)if(L.Languages[i].Code==controller.Language){language.SelectedIndex=i;break;}
                 MeasureLanguage();
             }finally{readingLanguage=false;}
         }
         void MeasureLanguage() {
             if(language==null)return;
-            int widest=0;foreach(var choice in L.Languages)widest=Math.Max(widest,TextRenderer.MeasureText(choice.ToString(),language.Font).Width);
-            language.Width=Math.Max(Pixel(240),widest+Pixel(32));language.DropDownWidth=language.Width;
-            language.ItemHeight=Math.Max(Pixel(23),TextRenderer.MeasureText("Ag",language.Font).Height+Pixel(4));
+            Size preferred = language.GetPreferredSize(Size.Empty);
+            language.Size = new Size(Math.Max(Pixel(240), preferred.Width), preferred.Height);
             language.Invalidate();
         }
 
@@ -639,6 +627,10 @@ namespace AppLayout
             }
         }
         internal void SetRows(IList<WindowRow> rows, bool resetChecks)
+        {
+            gridHost.UpdateGrid(delegate { UpdateRows(rows); });
+        }
+        void UpdateRows(IList<WindowRow> rows)
         {
             var incoming = new Dictionary<string, WindowRow>();
             foreach (var row in rows) incoming[row.Key] = row;

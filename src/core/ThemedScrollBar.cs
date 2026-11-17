@@ -59,7 +59,6 @@ namespace AppLayout
             if (repaint) Invalidate();
         }
         int Length { get { return orientation == Orientation.Vertical ? Height : Width; } }
-        int Breadth { get { return orientation == Orientation.Vertical ? Width : Height; } }
         int ArrowSize { get { return Math.Min(PreferredThickness, Math.Max(0, Length / 2)); } }
         Rectangle AxisRectangle(int start, int length)
         {
@@ -70,7 +69,7 @@ namespace AppLayout
             int track = Math.Max(0, Length - 2 * ArrowSize);
             if (track == 0) return Rectangle.Empty;
             double range = (double)maximum - minimum;
-            int length = Math.Min(track, Math.Max(PreferredThickness, (int)Math.Round(track * largeChange / (range + largeChange))));
+            int length = Math.Min(track, Math.Max(PreferredThickness, (int)Math.Round(track * (double)largeChange / (range + largeChange))));
             int position = range <= 0 ? 0 : (int)Math.Round((track - length) * (value - (double)minimum) / range);
             return AxisRectangle(ArrowSize + position, length);
         }
@@ -164,7 +163,7 @@ namespace AppLayout
         void EndPress() { repeat.Stop(); if (pressed != Part.None) { pressed = Part.None; Invalidate(); } }
         protected override void OnMouseCaptureChanged(EventArgs e) { base.OnMouseCaptureChanged(e); if (!Capture) EndPress(); }
         protected override void OnEnabledChanged(EventArgs e) { base.OnEnabledChanged(e); if (!Enabled) { EndPress(); Capture = false; } Invalidate(); }
-        protected override void OnVisibleChanged(EventArgs e) { base.OnVisibleChanged(e); if (!Visible) { EndPress(); Capture = false; } }
+        protected override void OnVisibleChanged(EventArgs e) { base.OnVisibleChanged(e); if (!Visible) { EndPress(); SetHover(Part.None); Capture = false; } }
         public void ScrollWheel(int delta)
         {
             wheelRemainder += delta;

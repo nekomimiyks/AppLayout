@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace AppLayout
@@ -12,7 +11,8 @@ namespace AppLayout
         readonly ThemedScrollBar vertical = new ThemedScrollBar();
         readonly ThemedScrollBar horizontal = new ThemedScrollBar { Orientation = Orientation.Horizontal };
         readonly List<int> scrollRows = new List<int>();
-        bool syncing, verticalNeeded, horizontalNeeded;
+        bool syncing, verticalNeeded, horizontalNeeded, syncPending;
+        int updateDepth;
         public bool HorizontalScrollVisible { get { return horizontal.Visible; } }
         public int ScrollBarThickness { get { return horizontal.PreferredThickness; } }
         public GridScrollHost(DataGridView grid)
@@ -41,25 +41,37 @@ namespace AppLayout
             // 表の現在のBoundsを外側のAutoScrollへ必要高さとして戻すと、領域が自己拡大する。
             return MinimumSize;
         }
+        internal void UpdateGrid(Action update)
+        {
+            updateDepth++;
+            try { update(); }
+            finally
+            {
+                if (--updateDepth == 0 && syncPending) SyncScrollBars();
+            }
+        }
         public void SyncScrollBars()
         {
             if (syncing || IsDisposed || Grid == null || Grid.IsDisposed) return;
+            if (updateDepth > 0) { syncPending = true; return; }
+            syncPending = false;
             syncing = true;
             try
             {
                 Grid.ScrollBars = ScrollBars.None;
                 int thickness = vertical.PreferredThickness;
                 bool needVertical = verticalNeeded, needHorizontal = horizontalNeeded;
+                int contentHeight = Grid.Rows.GetRowsHeight(DataGridViewElementStates.Visible);
                 // 一方のバーで表示領域が減ることを含めて、レイアウトを収束させる。
                 for (int pass = 0; pass < 3; pass++)
                 {
                     int width = Math.Max(0, ClientSize.Width - (needVertical ? thickness : 0));
                     int height = Math.Max(0, ClientSize.Height - (needHorizontal ? thickness : 0));
                     Grid.Bounds = new Rectangle(0, 0, width, height);
-                    int contentWidth = Grid.Columns.Cast<DataGridViewColumn>().Where(c => c.Visible).Sum(c => c.Width);
-                    needHorizontal = contentWidth > ViewWidth();
-                    long contentHeight = Grid.Rows.Cast<DataGridViewRow>().Where(r => r.Visible).Sum(r => (long)r.Height);
-                    needVertical = contentHeight > ViewHeight();
+                    bool nextHorizontal = Grid.Columns.GetColumnsWidth(DataGridViewElementStates.Visible) > ViewWidth();
+                    bool nextVertical = contentHeight > ViewHeight();
+                    if (nextHorizontal == needHorizontal && nextVertical == needVertical) break;
+                    needHorizontal = nextHorizontal; needVertical = nextVertical;
                 }
                 Grid.Bounds = new Rectangle(0, 0, Math.Max(0, ClientSize.Width - (needVertical ? thickness : 0)),
                     Math.Max(0, ClientSize.Height - (needHorizontal ? thickness : 0)));
@@ -88,7 +100,7 @@ namespace AppLayout
                 }
                 vertical.SetRange(0, lastPage, Math.Max(1, pageRows), 1);
                 vertical.Value = position;
-                int widthTotal = Grid.Columns.Cast<DataGridViewColumn>().Where(c => c.Visible).Sum(c => c.Width);
+                int widthTotal = Grid.Columns.GetColumnsWidth(DataGridViewElementStates.Visible);
                 horizontal.SetRange(0, Math.Max(0, widthTotal - ViewWidth()), Math.Max(1, ViewWidth()), Math.Max(1, thickness));
                 horizontal.Value = Grid.HorizontalScrollingOffset;
             }

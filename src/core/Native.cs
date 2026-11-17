@@ -129,11 +129,12 @@ namespace AppLayout
         {
             var list = new List<WinInfo>();
             var cache = new Dictionary<uint, string[]>();
+            var title = new StringBuilder(1024);
             Native.EnumWindows(delegate (IntPtr h, IntPtr p)
             {
-                if (!Native.IsWindowVisible(h)) return true;
-                var w = Describe(h, cache);
-                if (w != null && w.Title.Length > 0) list.Add(w);
+                if (!Native.IsWindowVisible(h) || Native.GetWindowText(h, title, title.Capacity) == 0) return true;
+                var w = Describe(h, cache, title.ToString());
+                if (w != null) list.Add(w);
                 return true;
             }, IntPtr.Zero);
             return list;
@@ -162,14 +163,60 @@ namespace AppLayout
 
         public static bool IsOwn(WinInfo w) { return w.Pid == OwnPid; }
 
+        internal static Dictionary<AppEntry, List<WinInfo>> MatchLayouts(IEnumerable<AppEntry> entries,
+            IEnumerable<WinInfo> windows, out Dictionary<IntPtr, int> assignments)
+        {
+            var byProcess = new Dictionary<string, List<WinInfo>>(StringComparer.OrdinalIgnoreCase);
+            foreach (var window in windows)
+            {
+                if (IsOwn(window)) continue;
+                string process = window.ProcessName ?? "";
+                List<WinInfo> candidates;
+                if (!byProcess.TryGetValue(process, out candidates))
+                    byProcess.Add(process, candidates = new List<WinInfo>());
+                candidates.Add(window);
+            }
+
+            assignments = new Dictionary<IntPtr, int>();
+            var matches = new Dictionary<AppEntry, List<WinInfo>>();
+            foreach (var entry in entries)
+            {
+                var matched = new List<WinInfo>();
+                matches.Add(entry, matched);
+                List<WinInfo> candidates;
+                if (!byProcess.TryGetValue(entry.Process ?? "", out candidates)) continue;
+                foreach (var window in candidates)
+                {
+                    if (!entry.Matches(window)) continue;
+                    matched.Add(window);
+                    int count;
+                    assignments.TryGetValue(window.Handle, out count);
+                    assignments[window.Handle] = count + 1;
+                }
+            }
+            return matches;
+        }
+
         public static WinInfo Describe(IntPtr h, Dictionary<uint, string[]> cache)
+        {
+            return Describe(h, cache, null);
+        }
+        static WinInfo Describe(IntPtr h, Dictionary<uint, string[]> cache, string title)
         {
             if (!Native.IsWindow(h)) return null;
             var w = new WinInfo { Handle = h };
-            var b = new StringBuilder(1024); Native.GetWindowText(h, b, b.Capacity); w.Title = b.ToString();
+            if (title == null)
+            {
+                var buffer = new StringBuilder(1024);
+                Native.GetWindowText(h, buffer, buffer.Capacity);
+                title = buffer.ToString();
+            }
+            w.Title = title;
             var c = new StringBuilder(256); Native.GetClassName(h, c, c.Capacity); w.Class = c.ToString();
-            uint pid; Native.GetWindowThreadProcessId(h, out pid); w.Pid = pid;
-            Native.RECT r; Native.GetWindowRect(h, out r); w.Bounds = r;
+            uint pid;
+            Native.RECT r;
+            if (Native.GetWindowThreadProcessId(h, out pid) == 0 || !Native.GetWindowRect(h, out r)) return null;
+            w.Pid = pid; w.Bounds = r;
             var pl = new Native.WINDOWPLACEMENT(); pl.length = Marshal.SizeOf(pl); Native.GetWindowPlacement(h, ref pl); w.ShowCmd = pl.showCmd;
             w.AppId = Native.AppIdFor(h);
             string[] proc;
@@ -177,7 +224,7 @@ namespace AppLayout
             {
                 string exe = Native.ExePathFor(pid), name = "";
                 if (exe.Length > 0) name = Path.GetFileNameWithoutExtension(exe);
-                else { try { name = Process.GetProcessById((int)pid).ProcessName; } catch { } }
+                else { try { using (var process = Process.GetProcessById((int)pid)) name = process.ProcessName; } catch { } }
                 proc = new[] { name, exe };
                 if (cache != null) cache[pid] = proc;
             }
@@ -206,6 +253,8 @@ namespace AppLayout
 
         public static string MonitorLabel(int x, int y, int width, int height, List<MonitorDesc> mons)
         {
+            if (width <= 0 || height <= 0 || (long)x + width > int.MaxValue || (long)y + height > int.MaxValue)
+                return "なし";
             var r = new Native.RECT { Left = x, Top = y, Right = x + width, Bottom = y + height };
             IntPtr h = Native.MonitorFromRect(ref r, 0);
             if (h == IntPtr.Zero) return "なし";
@@ -216,16 +265,24 @@ namespace AppLayout
         /// 旧版 WindowLayoutNative.Apply と同じ挙動。戻り値: 0=位置そのまま 1=戻した -1=スキップ
         public static int Apply(IntPtr w, int x, int y, int width, int height, bool maximized)
         {
-            if (Native.IsIconic(w) || Native.GetAsyncKeyState(1) < 0) return -1; // 最小化中・ドラッグ中は触らない
+            if (w == IntPtr.Zero || width <= 0 || height <= 0 ||
+                (long)x + width > int.MaxValue || (long)y + height > int.MaxValue ||
+                Native.IsIconic(w) || Native.GetAsyncKeyState(1) < 0) return -1;
             var r = new Native.RECT { Left = x, Top = y, Right = x + width, Bottom = y + height };
-            if (Native.MonitorFromRect(ref r, 0) == IntPtr.Zero) return -1;
-            Native.RECT now; Native.GetWindowRect(w, out now);
-            bool same = Math.Abs(now.Left - x) <= 2 && Math.Abs(now.Top - y) <= 2 &&
-                        Math.Abs(now.Right - (x + width)) <= 2 && Math.Abs(now.Bottom - (y + height)) <= 2;
-            if (same) return 0;
-            if (Native.IsZoomed(w)) Native.ShowWindowAsync(w, 9);
-            Native.SetWindowPos(w, IntPtr.Zero, x, y, width, height, 0x0014 | 0x4000);
-            if (maximized) Native.ShowWindowAsync(w, 3);
+            IntPtr targetMonitor = Native.MonitorFromRect(ref r, 0);
+            if (targetMonitor == IntPtr.Zero) return -1;
+            Native.RECT now;
+            if (!Native.GetWindowRect(w, out now)) return -1;
+            bool zoomed = Native.IsZoomed(w);
+            // 最大化時の枠はWindowsが決める。モニタが合っていれば再最大化しない。
+            if (zoomed && maximized && Native.MonitorFromRect(ref now, 0) == targetMonitor) return 0;
+            bool same = Math.Abs((long)now.Left - r.Left) <= 2 && Math.Abs((long)now.Top - r.Top) <= 2 &&
+                        Math.Abs((long)now.Right - r.Right) <= 2 && Math.Abs((long)now.Bottom - r.Bottom) <= 2;
+            if (same && !zoomed)
+                return maximized ? (Native.ShowWindowAsync(w, 3) ? 1 : -1) : 0;
+            if (zoomed && !Native.ShowWindowAsync(w, 9)) return -1;
+            if (!Native.SetWindowPos(w, IntPtr.Zero, x, y, width, height, 0x0014 | 0x4000)) return -1;
+            if (maximized && !Native.ShowWindowAsync(w, 3)) return -1;
             return 1;
         }
     }

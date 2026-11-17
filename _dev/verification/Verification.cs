@@ -37,7 +37,7 @@ namespace AppLayout {
      TestEditor(); TestLedger();
      Console.WriteLine("Completed " + checks + " checks."); return 0;
     }
-    TestLocalization(); TestController(); TestRealtime(); TestInstance(args); TestEditor(); TestTrayTransition(); TestCloseToTray(); TestTrayPlacement(); TestScrollbars(); TestStartupSizing();
+    TestLocalization(); TestController(); TestRealtime(); TestRestoreGeometry(); TestInstance(args); TestEditor(); TestTrayTransition(); TestCloseToTray(); TestTrayPlacement(); TestScrollbars(); TestStartupSizing();
     if (args.Length > 1 && args[1] == "ledger") TestLedger();
     if (args.Length > 0 && File.Exists(args[0])) TestShell(args[0]);
     Console.WriteLine("Completed " + checks + " checks."); return 0;
@@ -63,12 +63,12 @@ namespace AppLayout {
    using(var editor=new EntryEditDialog(entry,false)) {
     form.Show();editor.Show();Application.DoEvents();
     var grid=(DataGridView)form.Controls.Find("LedgerGrid",true)[0];
-    var language=(ComboBox)form.Controls.Find("LanguageSelector",true)[0];
+    var language=(ThemedSelect)form.Controls.Find("LanguageSelector",true)[0];
     ((Button)form.Controls.Find("SettingsButton",true)[0]).PerformClick();Application.DoEvents();
     var name=(TextBox)editor.Controls.Find("EntryName",true)[0];name.Text="Unsaved {1} 編集内容";
     var title=(TextBox)editor.Controls.Find("MatchTitle",true)[0];title.Text="Unsaved title$";
     var x=(NumericUpDown)editor.Controls.Find("PositionX",true)[0];x.Value=-987;
-    var mode=(ComboBox)editor.Controls.Find("MatchMode",true)[0];mode.SelectedIndex=3;
+    var mode=(ThemedSelect)editor.Controls.Find("MatchMode",true)[0];mode.SelectedIndex=3;
     var set=form.GetType().GetMethod("SetRows",BindingFlags.Instance|BindingFlags.NonPublic|BindingFlags.Public);
     var rows=new List<WindowRow>{new WindowRow{Key="e:"+entry.Id,Entry=entry,Saved=true,Name=entry.Name,Process=entry.Process,Position="-1234, 567",Size="800 × 600",Monitor="1",TitleRule=entry.TitleRuleText,Maximized="いいえ",Status="未起動"}};
     foreach(var choice in L.Languages) {
@@ -77,7 +77,8 @@ namespace AppLayout {
      Assert(L.Code==choice.Code && L.Languages[language.SelectedIndex].Code==choice.Code,"表示言語と設定セレクターが即時一致: "+choice.Code);
      Assert(language.Visible && language.Text==choice.NativeName,"設定欄の選択済み言語名を表示: "+choice.Code);
      Assert(editor.Text==L.T("配置を編集") && mode.Items[3].ToString()==L.T("正規表現") && mode.SelectedIndex==3,"編集中の画面と条件選択肢を翻訳: "+choice.Code);
-     Assert(name.Text=="Unsaved {1} 編集内容" && title.Text=="Unsaved title$" && x.Value==-987,"言語切替で未保存の名前・条件・座標を維持: "+choice.Code);
+     Assert(name.Text=="Unsaved {1} 編集内容" && title.Text=="Unsaved title$" && x.Value==-987,
+      "言語切替で未保存の名前・条件・座標を維持: "+choice.Code+" ["+name.Text+" / "+title.Text+" / "+x.Value+"]");
      var view=ViewFor(grid,rows[0].Key);
      Assert(view.Cells[1].Value.ToString().StartsWith(entry.Name+"\n",StringComparison.Ordinal) && entry.X==-1234 && entry.Title=="My private title$","利用者の名前・保存座標・照合条件は翻訳しない: "+choice.Code);
      Assert(view.Cells[3].Value.ToString()==L.Rule(entry.TitleRuleText) && view.Cells[5].Value.ToString()==L.T("登録済み")+"\n"+L.T("未起動"),"一覧の条件・状態も翻訳: "+choice.Code);
@@ -99,7 +100,37 @@ namespace AppLayout {
    }
    L.SetLanguage("ja");
   }
+  static void TestRestoreGeometry() {
+   var first = Entry("First rule");
+   var second = first.Clone();
+   second.TitleMode = "exact"; second.Title = "Shared window";
+   var window = new WinInfo { Handle = new IntPtr(123), Pid = uint.MaxValue,
+    ProcessName = first.Process.ToUpperInvariant(), Class = first.Class, Title = second.Title };
+   Dictionary<IntPtr, int> assignments;
+   var matches = WindowScanner.MatchLayouts(new[] { first, second }, new[] { window }, out assignments);
+   Assert(matches[first].Count==1 && matches[second].Count==1 && assignments[window.Handle]==2,
+    "同じウィンドウに一致する複数の登録を検出する");
+   var area=Screen.PrimaryScreen.WorkingArea;
+   using(var target=new Form {StartPosition=FormStartPosition.Manual, Bounds=new Rectangle(area.Left+40,area.Top+40,420,280),ShowInTaskbar=false}) {
+    target.Show();Pump(80);
+    var normal=target.Bounds;
+    Assert(WindowScanner.Apply(target.Handle,normal.X,normal.Y,normal.Width,normal.Height,true)==1,
+     "同じ座標でも最大化指定を適用する");
+    Pump(100);
+    Assert(Native.IsZoomed(target.Handle),"復元対象が最大化された");
+    Assert(WindowScanner.Apply(target.Handle,normal.X,normal.Y,normal.Width,normal.Height,true)==0,
+     "同じモニタの最大化ウィンドウは再最大化しない");
+    Assert(WindowScanner.Apply(target.Handle,normal.X,normal.Y,0,normal.Height,false)==-1,
+     "不正な大きさの配置は適用しない");
+    target.Close();
+   }
+  }
   static void TestController() {
+   string oldPath = Path.Combine(output,"duplicate-layout-ids.json");
+   File.WriteAllText(oldPath,"{\"apps\":[{\"id\":\"same\",\"name\":\"First\"},null,{\"id\":\"same\",\"name\":\"Second\"}]}");
+   var oldStore = new ConfigStore(oldPath);oldStore.Load();
+   Assert(oldStore.Config.Apps.Count==2 && oldStore.Config.Apps[0].Id=="same" &&
+    oldStore.Config.Apps[1].Id!="same" && oldStore.Config.Apps[1].Name=="Second","空行やIDの重複がある既存設定でも有効な登録を保持");
    string path = Path.Combine(output,"test-layout.json");
    var store = new ConfigStore(path); store.Config = new LayoutConfig { Enabled = false };
    AppEntry keep = Entry("未起動・保持"), remove = Entry("選択解除"), mini = Entry("最小化・保持");
@@ -136,6 +167,14 @@ namespace AppLayout {
    var invalid=new ConfigStore(Path.Combine(output,"Verification.exe","layout.json"));invalid.Config=new LayoutConfig();invalid.Config.Apps.Add(Entry("失敗時保持"));
    var broken=new AppController(invalid,false);bool failed=false;try{broken.UnsaveAll();}catch(IOException){failed=true;}
    Assert(failed && invalid.Config.Apps.Count==1,"保存失敗時は登録一覧をロールバック");
+   bool enabled = invalid.Config.Enabled;
+   failed = false;
+   try { broken.Enabled = !enabled; } catch (IOException) { failed = true; }
+   Assert(failed && invalid.Config.Enabled == enabled,"設定の保存に失敗した場合は配置の有効状態を戻す");
+   failed = false;
+   try { broken.Unsave(new[] { new WindowRow { Saved = true, Entry = invalid.Config.Apps[0] } }); }
+   catch (IOException) { failed = true; }
+   Assert(failed && invalid.Config.Apps.Count == 1,"個別解除の保存に失敗しても登録を保持する");
    Assert(Texts.Save=="今の位置で配置" && Texts.Restore=="配置を実行" && Texts.Unsave=="すべての配置を解除する","指定されたボタン文言");
    var pathological=Entry("正規表現");pathological.TitleMode="regex";pathological.Title="^(a+)+$";
    var regexWindow=new WinInfo { ProcessName=pathological.Process,Class=pathological.Class,Title=new string('a',10000)+"!" };
@@ -247,10 +286,22 @@ namespace AppLayout {
     var x=(NumericUpDown)dialog.Controls.Find("PositionX",true)[0];
     var y=(NumericUpDown)dialog.Controls.Find("PositionY",true)[0];
     Assert(x.Value==-1440 && y.Value==1252,"編集画面に登録済みの座標を表示");
+    VerifySpinnerChrome(dialog);
     Assert(dialog.Controls.Find("Maximized",true)[0] is ToggleSwitch,"最大化はON/OFFスイッチ");
-    var mode=(ComboBox)dialog.Controls.Find("MatchMode",true)[0];
+    var mode=(ThemedSelect)dialog.Controls.Find("MatchMode",true)[0];
     Assert(!dialog.Controls.Find("MatchTitle",true)[0].Visible,"アプリ判定では不要なタイトル入力を非表示");
-    mode.SelectedIndex=1;Application.DoEvents();
+    mode.AccessibilityObject.DoDefaultAction();Application.DoEvents();
+    var menu=(ContextMenuStrip)typeof(ThemedSelect).GetField("popup",BindingFlags.Instance|BindingFlags.NonPublic).GetValue(mode);
+    Assert(menu!=null && menu.Visible && ((ToolStripMenuItem)menu.Items[0]).Checked,
+     "選択欄の読み上げ操作でメニューを開き、現在の選択にチェックを表示");
+    VerifySelectDrawing(mode, menu, "matching-options.png");
+    menu.Items[1].PerformClick();Application.DoEvents();
+    Assert(mode.SelectedIndex==1 && !menu.Visible,"メニューの選択を反映して閉じる");
+    var frame=(InputFrame)x.Parent;
+    foreach(Control child in frame.Controls)
+     if(child is Button && child.AccessibleName=="+") ((Button)child).PerformClick();
+    Assert(x.Value==-1439 && frame.Height==frame.GetPreferredSize(Size.Empty).Height,
+     "負の座標も増加ボタンで変更でき、入力欄を指定した高さで表示");
     Assert(dialog.Controls.Find("MatchTitle",true)[0].Visible,"タイトル判定に切り替えると条件入力を表示");
     Capture(dialog,"edit-dialog-title.png");
     dialog.Close();
@@ -261,6 +312,53 @@ namespace AppLayout {
     ((NumericUpDown)dialog.Controls.Find("PositionX",true)[0]).Value=-1200;
     dialog.GetType().GetMethod("Accept",BindingFlags.Instance|BindingFlags.NonPublic).Invoke(dialog,null);
     Assert(dialog.DialogResult==DialogResult.OK && entry.Name=="変更後の名前" && entry.X==-1200,"編集確定で名前と座標を反映");
+   }
+  }
+  static void VerifySpinnerChrome(Form dialog) {
+   foreach(string name in new[]{"PositionX","PositionY","WindowWidth","WindowHeight"}) {
+    var number=(NumericUpDown)dialog.Controls.Find(name,true)[0];
+    var clip=number.Region;
+    Assert(clip!=null,"数値欄の表示範囲を制限: "+name);
+    foreach(Control child in number.Controls)
+     if(!(child is TextBox))
+      Assert(!child.Visible && !clip.IsVisible(child.Bounds),"標準の増減ボタンは非表示で表示領域外: "+name);
+    using(var graphics=number.CreateGraphics()) {
+     var bounds=clip.GetBounds(graphics);
+     Assert(LivePixel(number,(int)bounds.Right-4,number.Height/2).ToArgb()==AppTheme.Surface.ToArgb(),
+      "数値欄の右端はテーマの背景色: "+name);
+    }
+   }
+  }
+  static void VerifySelectDrawing(ThemedSelect select, ContextMenuStrip menu, string file) {
+   using(var bitmap=new Bitmap(menu.Width,menu.Height)) {
+    menu.DrawToBitmap(bitmap,new Rectangle(Point.Empty,bitmap.Size));
+    bitmap.Save(Path.Combine(output,file));
+    Assert(menu.Width>=Math.Min(select.Width,Screen.FromControl(select).WorkingArea.Width),
+     "展開メニューは選択欄の幅を確保: "+select.Name);
+    int verified=0;
+    foreach(ToolStripMenuItem item in menu.Items) {
+     var row=Rectangle.Intersect(item.Bounds,Rectangle.Inflate(menu.ClientRectangle,-1,-1));
+     if(row.Height<item.Height-2 || row.Width<item.Padding.Horizontal+8)continue;
+     verified++;
+     int top=row.Top+row.Height/4, bottom=row.Bottom-row.Height/4;
+     int first=row.Right;
+     Color foreground=AppTheme.Foreground;
+     for(int x=row.Left+1;x<row.Right-item.Padding.Right;x++)
+      for(int y=top;y<bottom;y++) {
+       Color pixel=bitmap.GetPixel(x,y);
+       if(Math.Abs(pixel.R-foreground.R)+Math.Abs(pixel.G-foreground.G)+Math.Abs(pixel.B-foreground.B)<=100)
+        first=Math.Min(first,x);
+      }
+     Assert(first>=row.Left+item.Padding.Left && first<row.Left+item.Padding.Left+16,
+      "展開した選択肢の先頭文字と左余白が描画される: "+item.Text);
+     if(item.Checked) {
+      bool mark=false;
+      for(int x=row.Right-item.Padding.Right;x<row.Right-2;x++)
+       for(int y=top;y<bottom;y++)mark |= bitmap.GetPixel(x,y).ToArgb()==AppTheme.Accent.ToArgb();
+      Assert(mark,"チェックが選択肢の右余白に描画される: "+select.Name);
+     }
+    }
+    Assert(verified>0,"表示中の選択肢を描画した画像で検査: "+select.Name);
    }
   }
   static void TestLedger() {
@@ -282,6 +380,21 @@ namespace AppLayout {
     Assert(chosen[0].DefaultCellStyle.BackColor==AppTheme.ActiveRow && chosen[2].DefaultCellStyle.BackColor==AppTheme.Surface,"ONは行全体を色付けしOFFと区別");
     Assert(!HasButton(form,Texts.Save),"今の位置で配置ボタンは不要なので撤廃");
     TestLiveTheme(form,grid,chosen);
+    var settings=(Button)form.Controls.Find("SettingsButton",true)[0];
+    var language=(ThemedSelect)form.Controls.Find("LanguageSelector",true)[0];
+    settings.PerformClick();
+    Application.DoEvents();
+    try {
+     foreach(bool dark in new[]{true,false}) {
+      SetTheme(dark,dark);
+      language.Focus();
+      language.OpenList();Application.DoEvents();
+      var menu=(ContextMenuStrip)typeof(ThemedSelect).GetField("popup",BindingFlags.Instance|BindingFlags.NonPublic).GetValue(language);
+      Assert(menu!=null && menu.Visible,"言語メニューを展開: "+(dark?"ダーク":"ライト"));
+      VerifySelectDrawing(language,menu,dark?"language-options-dark.png":"language-options-light.png");
+      menu.Close();
+     }
+    } finally { AppTheme.RefreshFromWindows();settings.PerformClick(); }
     TestTypography(form,grid,chosen);
     int valueChanges=0;grid.CellValueChanged+=delegate{valueChanges++;};set.Invoke(form,new object[]{rows,false});
     Assert(valueChanges==0,"同一データの定期更新ではセル値を書き直さない");

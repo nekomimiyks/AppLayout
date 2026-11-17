@@ -20,7 +20,7 @@ namespace AppLayout
         Thread thread;
         volatile bool stopping;
         readonly bool startupMode;
-        readonly DateTime startedAt = DateTime.Now;
+        readonly Stopwatch uptime = Stopwatch.StartNew();
         bool launchPassDone;
         public string LogPath;
 
@@ -49,7 +49,7 @@ namespace AppLayout
                 int interval = 2;
                 try { interval = Tick(); }
                 catch (Exception ex) { Log(ex.ToString()); }
-                wake.WaitOne(Math.Max(1, interval) * 1000);
+                if (!stopping) wake.WaitOne(Math.Max(1, Math.Min(interval, int.MaxValue / 1000)) * 1000);
             }
         }
 
@@ -63,23 +63,32 @@ namespace AppLayout
                 launchMissing = store.Config.LaunchMissingAtStartup;
                 interval = store.Config.IntervalSeconds;
             }
-            var wins = WindowScanner.ReadAll();
             var result = new Dictionary<AppEntry, EntryStatus>();
-            bool doLaunch = !launchPassDone && (DateTime.Now - startedAt).TotalSeconds > 20;
+            var wins = apps.Length == 0 ? new List<WinInfo>() : WindowScanner.ReadAll();
+            Dictionary<IntPtr, int> assignments;
+            var matchesByEntry = WindowScanner.MatchLayouts(apps, wins, out assignments);
+            bool doLaunch = !launchPassDone && uptime.Elapsed.TotalSeconds > 20;
 
             foreach (var a in apps)
             {
-                var matches = new List<WinInfo>();
-                foreach (var w in wins) if (!WindowScanner.IsOwn(w) && a.Matches(w)) matches.Add(w);
+                if (stopping) break;
+                var matches = matchesByEntry[a];
 
                 EntryStatus st;
                 if (matches.Count == 0)
                 {
                     st = new EntryStatus { Text = "未起動（ウィンドウなし）", Kind = 2 };
-                    if (doLaunch && launchMissing && enabled && TryLaunch(a)) st.Text = "起動しました";
+                    if (doLaunch && launchMissing && enabled)
+                    {
+                        lock (store.Sync)
+                        {
+                            if (!stopping && store.Config.Enabled && store.Config.LaunchMissingAtStartup &&
+                                store.Config.Apps.Contains(a) && TryLaunch(a)) st.Text = "起動しました";
+                        }
+                    }
                 }
-                else if (matches.Count > 1)
-                    st = new EntryStatus { Text = "該当が" + matches.Count + "個（条件を絞ってください）", Kind = 1 };
+                else if (matches.Count > 1 || assignments[matches[0].Handle] > 1)
+                    st = new EntryStatus { Text = "該当が複数", Kind = 1 };
                 else if (!enabled)
                     st = new EntryStatus { Text = "一時停止中", Kind = 2 };
                 else
@@ -88,7 +97,15 @@ namespace AppLayout
                     if (w.Minimized) st = new EntryStatus { Text = "最小化中（そのまま）", Kind = 0 };
                     else
                     {
-                        int r = WindowScanner.Apply(w.Handle, a.X, a.Y, a.Width, a.Height, a.Maximized);
+                        int r;
+                        lock (store.Sync)
+                        {
+                            // 一覧取得の間に解除・編集・一時停止された登録は操作しない。
+                            if (stopping || !store.Config.Enabled || !store.Config.Apps.Contains(a)) continue;
+                            uint pid;
+                            Native.GetWindowThreadProcessId(w.Handle, out pid);
+                            r = pid == w.Pid ? WindowScanner.Apply(w.Handle, a.X, a.Y, a.Width, a.Height, a.Maximized) : -1;
+                        }
                         if (r == 1) st = new EntryStatus { Text = "位置を戻しました", Kind = 0 };
                         else if (r == 0) st = new EntryStatus { Text = "配置中", Kind = 0 };
                         else
@@ -105,7 +122,7 @@ namespace AppLayout
             if (doLaunch) launchPassDone = true;
 
             var h = StatusUpdated;
-            if (h != null) h(result);
+            if (!stopping && h != null) h(result);
             return interval;
         }
 
@@ -113,9 +130,14 @@ namespace AppLayout
         {
             // ブラウザ型アプリ（Chromeアプリ等）は本体プロセスが別用途で動いていても起動する
             bool hostedApp = !string.IsNullOrEmpty(a.AppId);
-            if (!hostedApp && Process.GetProcessesByName(a.Process ?? "").Length > 0) return false;
             try
             {
+                if (!hostedApp)
+                {
+                    var processes = Process.GetProcessesByName(a.Process ?? "");
+                    foreach (var process in processes) process.Dispose();
+                    if (processes.Length > 0) return false;
+                }
                 if (!string.IsNullOrEmpty(a.Shortcut) && File.Exists(a.Shortcut))
                     Process.Start(new ProcessStartInfo(a.Shortcut) { UseShellExecute = true });
                 else if (!string.IsNullOrEmpty(a.LaunchId))

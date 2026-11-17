@@ -1,4 +1,4 @@
-param([string]$ApplicationPath, [switch]$ScreenshotsOnly)
+param([string]$ApplicationPath, [switch]$ScreenshotsOnly, [switch]$LocalizationOnly)
 $ErrorActionPreference = 'Stop'
 $project = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
 $compiler = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
@@ -6,14 +6,15 @@ if (-not $ApplicationPath) { $ApplicationPath = Join-Path $project 'AppLayout.ex
 $sources = @((Get-ChildItem -LiteralPath (Join-Path $project 'src\core') -Filter '*.cs').FullName)
 $sources += @((Get-ChildItem -LiteralPath (Join-Path $project 'src\ui') -Filter '*.cs').FullName)
 $sources += (Join-Path $PSScriptRoot 'Verification.cs')
+$resources = @(Get-ChildItem -LiteralPath (Join-Path $project 'src\locales') -Filter '*.json' | ForEach-Object { '/resource:' + $_.FullName + ',AppLayout.Locales.' + $_.Name })
 $output = Join-Path $PSScriptRoot 'Verification.exe'
 $icon = Join-Path $project 'src\app.ico'
 & $compiler /nologo /target:exe /main:AppLayout.Verification "/out:$output" "/resource:$icon,AppLayout.AppIcon.ico" `
-    /r:System.dll /r:System.Core.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll /r:System.Runtime.Serialization.dll $sources
+    /r:System.dll /r:System.Core.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll /r:System.Runtime.Serialization.dll $resources $sources
 if ($LASTEXITCODE -ne 0) { throw 'Verification compile failed' }
 $stdout = Join-Path $PSScriptRoot 'stdout.log'
 $stderr = Join-Path $PSScriptRoot 'stderr.log'
-$verificationArgs = if ($ScreenshotsOnly) { @('screenshots') } else { @(('"' + $ApplicationPath + '"'), 'ledger') }
+$verificationArgs = if ($LocalizationOnly) { @('localization') } elseif ($ScreenshotsOnly) { @('screenshots') } else { @(('"' + $ApplicationPath + '"'), 'ledger') }
 $process = Start-Process -FilePath $output -ArgumentList $verificationArgs `
     -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
 $process.Handle | Out-Null

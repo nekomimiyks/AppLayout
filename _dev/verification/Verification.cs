@@ -28,16 +28,76 @@ namespace AppLayout {
     Application.SetUnhandledExceptionMode(UnhandledExceptionMode.ThrowException);
     Native.MakeDpiAware(); Application.EnableVisualStyles(); Application.SetCompatibleTextRenderingDefault(false);
     output = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+    L.SetLanguage("ja");
+    if(args.Length==1 && args[0]=="localization") {
+     TestLocalization();Console.WriteLine("Completed " + checks + " checks.");return 0;
+    }
     if (args.Length == 1 && args[0] == "screenshots") {
      screenshotsOnly = true;
      TestEditor(); TestLedger();
      Console.WriteLine("Completed " + checks + " checks."); return 0;
     }
-    TestController(); TestRealtime(); TestInstance(args); TestEditor(); TestTrayTransition(); TestCloseToTray(); TestTrayPlacement(); TestScrollbars(); TestStartupSizing();
+    TestLocalization(); TestController(); TestRealtime(); TestInstance(args); TestEditor(); TestTrayTransition(); TestCloseToTray(); TestTrayPlacement(); TestScrollbars(); TestStartupSizing();
     if (args.Length > 1 && args[1] == "ledger") TestLedger();
     if (args.Length > 0 && File.Exists(args[0])) TestShell(args[0]);
     Console.WriteLine("Completed " + checks + " checks."); return 0;
    } catch (Exception e) { Console.Error.WriteLine(e); return 1; }
+  }
+  static void TestLocalization() {
+   Assert(L.Resolve("en-US")=="en" && L.Resolve("ja-JP")=="ja","Windows表示言語の地域付きコードを解決");
+   Assert(L.Resolve("zh-CN")=="zh-Hans" && L.Resolve("zh-SG")=="zh-Hans","中国・シンガポールは簡体字");
+   Assert(L.Resolve("zh-TW")=="zh-Hant" && L.Resolve("zh-HK")=="zh-Hant" && L.Resolve("zh-MO")=="zh-Hant" && L.Resolve("zh-Hant")=="zh-Hant","台湾・香港・マカオ・Hantは繁体字");
+   Assert(L.Resolve("ko-KR")=="ko" && L.Resolve("pt-BR")=="pt" && L.Resolve("pt-PT")=="pt","韓国語・ポルトガル語の地域コード");
+   Assert(L.Resolve("it-IT")=="en" && L.Resolve("ar-SA")=="en","未対応のWindows表示言語は英語へフォールバック");
+   Assert(L.NormalizeSelection(null)=="auto" && L.NormalizeSelection("invalid")=="auto","旧設定・不明な言語設定は自動扱い");
+   L.SetLanguage("en");using(var newEditor=new EntryEditDialog(Entry("New app"),true)) {
+    L.SetLanguage("ja");
+    Assert(newEditor.Text=="配置を登録" && newEditor.Controls.Find("ConfirmEntry",true)[0].Text=="登録を確定","同じ英訳を持つタイトルと確定ボタンも別の原文に戻る");
+   }
+   string legacyPath=Path.Combine(output,"legacy-language.json");File.WriteAllText(legacyPath,"{\"enabled\":false,\"apps\":[]}");
+   var legacy=new ConfigStore(legacyPath);legacy.Load();Assert(legacy.Config.Language==null && legacy.Config.Apps.Count==0,"言語フィールドのない既存設定を読める");
+   var store=new ConfigStore(Path.Combine(output,"language-layout.json"));store.Config=new LayoutConfig{Enabled=false,Language="ja"};
+   var entry=Entry("My {0} 名前");entry.Process="sample-chat";entry.TitleMode="regex";entry.Title="My private title$";entry.X=-1234;entry.Y=567;
+   store.Config.Apps.Add(entry);store.Save();var controller=new AppController(store,false);
+   using(var form=UiFactory.CreateMainForm(controller))
+   using(var editor=new EntryEditDialog(entry,false)) {
+    form.Show();editor.Show();Application.DoEvents();
+    var grid=(DataGridView)form.Controls.Find("LedgerGrid",true)[0];
+    var language=(ComboBox)form.Controls.Find("LanguageSelector",true)[0];
+    ((Button)form.Controls.Find("SettingsButton",true)[0]).PerformClick();Application.DoEvents();
+    var name=(TextBox)editor.Controls.Find("EntryName",true)[0];name.Text="Unsaved {1} 編集内容";
+    var title=(TextBox)editor.Controls.Find("MatchTitle",true)[0];title.Text="Unsaved title$";
+    var x=(NumericUpDown)editor.Controls.Find("PositionX",true)[0];x.Value=-987;
+    var mode=(ComboBox)editor.Controls.Find("MatchMode",true)[0];mode.SelectedIndex=3;
+    var set=form.GetType().GetMethod("SetRows",BindingFlags.Instance|BindingFlags.NonPublic|BindingFlags.Public);
+    var rows=new List<WindowRow>{new WindowRow{Key="e:"+entry.Id,Entry=entry,Saved=true,Name=entry.Name,Process=entry.Process,Position="-1234, 567",Size="800 × 600",Monitor="1",TitleRule=entry.TitleRuleText,Maximized="いいえ",Status="未起動"}};
+    foreach(var choice in L.Languages) {
+     if(choice.Code=="auto")continue;
+     controller.Language=choice.Code;Application.DoEvents();set.Invoke(form,new object[]{rows,false});
+     Assert(L.Code==choice.Code && L.Languages[language.SelectedIndex].Code==choice.Code,"表示言語と設定セレクターが即時一致: "+choice.Code);
+     Assert(language.Visible && language.Text==choice.NativeName,"設定欄の選択済み言語名を表示: "+choice.Code);
+     Assert(editor.Text==L.T("配置を編集") && mode.Items[3].ToString()==L.T("正規表現") && mode.SelectedIndex==3,"編集中の画面と条件選択肢を翻訳: "+choice.Code);
+     Assert(name.Text=="Unsaved {1} 編集内容" && title.Text=="Unsaved title$" && x.Value==-987,"言語切替で未保存の名前・条件・座標を維持: "+choice.Code);
+     var view=ViewFor(grid,rows[0].Key);
+     Assert(view.Cells[1].Value.ToString().StartsWith(entry.Name+"\n",StringComparison.Ordinal) && entry.X==-1234 && entry.Title=="My private title$","利用者の名前・保存座標・照合条件は翻訳しない: "+choice.Code);
+     Assert(view.Cells[3].Value.ToString()==L.Rule(entry.TitleRuleText) && view.Cells[5].Value.ToString()==L.T("登録済み")+"\n"+L.T("未起動"),"一覧の条件・状態も翻訳: "+choice.Code);
+     Assert(L.F("{0}をONにしました。現在の配置を保存しました。",entry.Name).Contains(entry.Name),"翻訳の書式引数に利用者名をそのまま挿入: "+choice.Code);
+     if(choice.Code!="ja")Assert(Texts.Restore!="配置を実行" && L.T("アプリを終了する")!="アプリを終了する","主要ボタンとトレイの翻訳リソースを読み込み: "+choice.Code);
+     var reload=new ConfigStore(store.Path);reload.Load();Assert(reload.Config.Language==choice.Code,"明示した言語を再起動用に保存: "+choice.Code);
+     FitScreenshot(form);FitScreenshot(editor);Capture(form,"language-main-"+choice.Code+".png");Capture(editor,"language-edit-"+choice.Code+".png");
+    }
+    language.SelectedIndex=2;Application.DoEvents();Assert(controller.Language=="en" && L.Code=="en","設定ドロップダウンから実際に言語を変更・保存");
+    controller.Language="auto";Assert(L.Selection=="auto","自動選択へ戻せる");
+    controller.UnsaveAll();Assert(!string.IsNullOrEmpty(controller.LastMessage),"切替前の操作メッセージを生成");
+    L.SetLanguage(L.Code=="en"?"ja":"en");Assert(controller.LastMessage=="","自動表示切替でも旧言語の操作メッセージを消す");
+    var autoReload=new ConfigStore(store.Path);autoReload.Load();Assert(autoReload.Config.Language=="auto","自動選択も保存");
+    var invalid=new ConfigStore(Path.Combine(output,"Verification.exe","language.json"));invalid.Config=new LayoutConfig{Language="ja"};
+    var broken=new AppController(invalid,false);string before=L.Code;bool failed=false;
+    try{broken.Language="fr";}catch(IOException){failed=true;}
+    Assert(failed && invalid.Config.Language=="ja" && L.Code==before,"言語の保存に失敗したら設定と表示を維持");
+    editor.Close();form.Close();
+   }
+   L.SetLanguage("ja");
   }
   static void TestController() {
    string path = Path.Combine(output,"test-layout.json");

@@ -1,0 +1,634 @@
+[
+  {
+    "Key": "\r\nアプリID: ",
+    "Value": "\r\nID do aplicativo: "
+  },
+  {
+    "Key": "\r\nクラス: ",
+    "Value": "\r\nClasse: "
+  },
+  {
+    "Key": " 件",
+    "Value": " itens"
+  },
+  {
+    "Key": " 件をすべて解除しますか？",
+    "Value": " layouts salvos?"
+  },
+  {
+    "Key": "・既存の配置を保持 ",
+    "Value": " · Manter layouts existentes: "
+  },
+  {
+    "Key": "・既存の配置を保持 {0}件（未起動・最小化中など）",
+    "Value": " · {0} layouts existentes mantidos (aplicativos fechados ou minimizados, entre outros)"
+  },
+  {
+    "Key": "。登録できませんでした: ",
+    "Value": ". Não foi possível salvar: "
+  },
+  {
+    "Key": "。登録できませんでした: {0}",
+    "Value": ". Não foi possível salvar: {0}"
+  },
+  {
+    "Key": "（最小化中）",
+    "Value": "(Minimizada)"
+  },
+  {
+    "Key": "（未起動・最小化中など ",
+    "Value": "(Sem alterações para aplicativos fechados ou minimizados, entre outros: "
+  },
+  {
+    "Key": "（未起動・最小化中など {0}件はそのまま）",
+    "Value": "({0} mantidos sem alterações, incluindo aplicativos fechados ou minimizados)"
+  },
+  {
+    "Key": "{0} 件",
+    "Value": "{0} itens"
+  },
+  {
+    "Key": "{0}の配置を登録しました",
+    "Value": "Layout de {0} salvo"
+  },
+  {
+    "Key": "{0}をOFFにしました。配置の登録を解除しました。",
+    "Value": "{0} está OFF. O layout salvo foi removido."
+  },
+  {
+    "Key": "{0}をONにしました。現在の配置を保存しました。",
+    "Value": "{0} está ON. O layout atual foi salvo."
+  },
+  {
+    "Key": "{0}件に一致。1件に絞り込むまで配置は実行しません。",
+    "Value": "{0} correspondências. O layout só será aplicado quando houver uma única janela correspondente."
+  },
+  {
+    "Key": "{0}件の配置を実行しました",
+    "Value": "{0} layouts aplicados"
+  },
+  {
+    "Key": "{0}件の保存を解除しました",
+    "Value": "{0} layouts salvos removidos"
+  },
+  {
+    "Key": "×ボタンで閉じたとき、終了せずにタスクトレイに入ります。オフのときは×で終了します。",
+    "Value": "Ao fechar com ×, o aplicativo permanece na área de notificação. Se esta opção estiver desativada, × encerra o aplicativo."
+  },
+  {
+    "Key": "1件に一致。この条件で配置できます。",
+    "Value": "1 correspondência. Este layout pode ser aplicado."
+  },
+  {
+    "Key": "AppLayout のメニュー",
+    "Value": "Menu do AppLayout"
+  },
+  {
+    "Key": "Windowsにサインインしたとき、画面を出さずにタスクトレイに常駐した状態で起動します。",
+    "Value": "Inicia o aplicativo na área de notificação, sem exibir sua janela, ao entrar no Windows."
+  },
+  {
+    "Key": "X 座標（px）",
+    "Value": "Coordenada X (px)"
+  },
+  {
+    "Key": "Y 座標（px）",
+    "Value": "Coordenada Y (px)"
+  },
+  {
+    "Key": "アプリ（プロセス）",
+    "Value": "Aplicativo (processo)"
+  },
+  {
+    "Key": "アプリ（プロセス名）",
+    "Value": "Aplicativo (nome do processo)"
+  },
+  {
+    "Key": "アプリで判定",
+    "Value": "Identificar pelo aplicativo"
+  },
+  {
+    "Key": "アプリを開く",
+    "Value": "Abrir aplicativo"
+  },
+  {
+    "Key": "アプリを終了する",
+    "Value": "Sair do aplicativo"
+  },
+  {
+    "Key": "アプリ自動起動",
+    "Value": "Iniciar aplicativos automaticamente"
+  },
+  {
+    "Key": "アプリ終了時自動縮小",
+    "Value": "Minimizar para a área de notificação ao fechar"
+  },
+  {
+    "Key": "いいえ",
+    "Value": "Não"
+  },
+  {
+    "Key": "ウィンドウが閉じられたか最小化されています。ウィンドウを開いてから編集してください。",
+    "Value": "A janela está fechada ou minimizada. Abra-a antes de editar."
+  },
+  {
+    "Key": "ウィンドウのタイトル",
+    "Value": "Título da janela"
+  },
+  {
+    "Key": "ウィンドウの見分け方",
+    "Value": "Identificação da janela"
+  },
+  {
+    "Key": "ウィンドウを1つ選んでください。",
+    "Value": "Selecione uma janela."
+  },
+  {
+    "Key": "オンの間、保存したウィンドウを約2秒ごとに保存位置へ戻します。オフにするとウィンドウを自由に動かせます。",
+    "Value": "Quando está ON, restaura as janelas salvas para suas posições a cada 2 segundos aproximadamente. Quando está OFF, você pode movê-las livremente."
+  },
+  {
+    "Key": "キャンセル",
+    "Value": "Cancelar"
+  },
+  {
+    "Key": "この配置はすでに解除されています。",
+    "Value": "Este layout já foi removido."
+  },
+  {
+    "Key": "サイズ",
+    "Value": "Tamanho"
+  },
+  {
+    "Key": "サイズ(幅×高さ)",
+    "Value": "Tamanho (largura × altura)"
+  },
+  {
+    "Key": "すべての配置を解除しました（",
+    "Value": "Todos os layouts foram removidos ("
+  },
+  {
+    "Key": "すべての配置を解除しました（{0}件）",
+    "Value": "Todos os layouts foram removidos ({0})"
+  },
+  {
+    "Key": "すべての配置を解除する",
+    "Value": "Remover todos os layouts"
+  },
+  {
+    "Key": "タイトルが完全に一致",
+    "Value": "O título corresponde exatamente"
+  },
+  {
+    "Key": "タイトルに含まれる文字を指定します。大文字・小文字は区別しません。",
+    "Value": "Especifique o texto que o título deve conter. Não diferencia maiúsculas de minúsculas."
+  },
+  {
+    "Key": "タイトルに含む",
+    "Value": "O título contém"
+  },
+  {
+    "Key": "タイトルを含む: ",
+    "Value": "O título contém: "
+  },
+  {
+    "Key": "タイトル一致: ",
+    "Value": "Título exato: "
+  },
+  {
+    "Key": "タイトル条件",
+    "Value": "Condição do título"
+  },
+  {
+    "Key": "タイトル条件を入力するか、「アプリで判定」を選んでください。",
+    "Value": "Insira uma condição do título ou selecione “Identificar pelo aplicativo”."
+  },
+  {
+    "Key": "タイトル全体を指定します。大文字・小文字も区別します。",
+    "Value": "Especifique o título completo. Diferencia maiúsculas de minúsculas."
+  },
+  {
+    "Key": "なし",
+    "Value": "Nenhum"
+  },
+  {
+    "Key": "の配置を登録しました",
+    "Value": ": layout salvo"
+  },
+  {
+    "Key": "はい",
+    "Value": "Sim"
+  },
+  {
+    "Key": "プロセス: ",
+    "Value": "Processo: "
+  },
+  {
+    "Key": "モニタ",
+    "Value": "Monitor"
+  },
+  {
+    "Key": "モニタ ",
+    "Value": "Monitor "
+  },
+  {
+    "Key": "モニタ {0}",
+    "Value": "Monitor {0}"
+  },
+  {
+    "Key": "モニタ 1",
+    "Value": "Monitor 1"
+  },
+  {
+    "Key": "モニタ{0}",
+    "Value": "Monitor: {0}"
+  },
+  {
+    "Key": "モニタなし",
+    "Value": "Sem monitor"
+  },
+  {
+    "Key": "モニタ別の配置台帳",
+    "Value": "Layouts por monitor"
+  },
+  {
+    "Key": "ログイン時に自動起動",
+    "Value": "Iniciar ao entrar no Windows"
+  },
+  {
+    "Key": "ログイン時の自動起動のとき、保存済みのアプリが起動していなければ起動します。",
+    "Value": "Durante a inicialização automática ao entrar no Windows, abre os aplicativos salvos que ainda não estão em execução."
+  },
+  {
+    "Key": "をOFFにしました。配置の登録を解除しました。",
+    "Value": " está OFF. O layout salvo foi removido."
+  },
+  {
+    "Key": "をONにしました。現在の配置を保存しました。",
+    "Value": " está ON. O layout atual foi salvo."
+  },
+  {
+    "Key": "位置 ／ サイズ",
+    "Value": "Posição / Tamanho"
+  },
+  {
+    "Key": "位置 X, Y",
+    "Value": "Posição X, Y"
+  },
+  {
+    "Key": "位置(X, Y)",
+    "Value": "Posição (X, Y)"
+  },
+  {
+    "Key": "位置を戻しました",
+    "Value": "Posição restaurada"
+  },
+  {
+    "Key": "一時停止中",
+    "Value": "Pausado"
+  },
+  {
+    "Key": "一致するウィンドウはありません。未起動でも登録できます。",
+    "Value": "Nenhuma janela correspondente. Você pode salvar o layout mesmo que o aplicativo não esteja aberto."
+  },
+  {
+    "Key": "一覧を更新",
+    "Value": "Atualizar lista"
+  },
+  {
+    "Key": "横スクロール",
+    "Value": "Rolagem horizontal"
+  },
+  {
+    "Key": "該当が",
+    "Value": "Correspondências: "
+  },
+  {
+    "Key": "該当が複数",
+    "Value": "Várias correspondências"
+  },
+  {
+    "Key": "記憶したいウィンドウを選んで「追加」を押してください（ダブルクリックでも追加できます）。",
+    "Value": "Selecione a janela que deseja salvar e clique em “Adicionar”. Você também pode clicar duas vezes."
+  },
+  {
+    "Key": "起動しました",
+    "Value": "Aplicativo iniciado"
+  },
+  {
+    "Key": "起動と終了の",
+    "Value": "Inicialização e encerramento: "
+  },
+  {
+    "Key": "起動と終了の設定を開く",
+    "Value": "Abrir configurações de inicialização e encerramento"
+  },
+  {
+    "Key": "起動失敗 ",
+    "Value": "Falha ao iniciar "
+  },
+  {
+    "Key": "起動中のウィンドウから追加",
+    "Value": "Adicionar a partir de janelas abertas"
+  },
+  {
+    "Key": "件",
+    "Value": " itens"
+  },
+  {
+    "Key": "件・登録を解除 ",
+    "Value": "; removidos: "
+  },
+  {
+    "Key": "件（未起動・最小化中など）",
+    "Value": " (aplicativos fechados ou minimizados, entre outros)"
+  },
+  {
+    "Key": "件）",
+    "Value": " itens)"
+  },
+  {
+    "Key": "件に一致。1件に絞り込むまで配置は実行しません。",
+    "Value": " correspondências. O layout só será aplicado quando houver uma única janela correspondente."
+  },
+  {
+    "Key": "件の配置を実行しました",
+    "Value": " layouts aplicados"
+  },
+  {
+    "Key": "件の保存を解除しました",
+    "Value": " layouts salvos removidos"
+  },
+  {
+    "Key": "件はそのまま）",
+    "Value": " sem alterações)"
+  },
+  {
+    "Key": "見分け方",
+    "Value": "Identificação"
+  },
+  {
+    "Key": "現在位置を取得できません。ウィンドウを開いて最小化を解除してからONにしてください。",
+    "Value": "Não foi possível obter a posição atual. Abra a janela e restaure-a se estiver minimizada antes de ativar ON."
+  },
+  {
+    "Key": "現在位置を登録 ",
+    "Value": "Posições atuais salvas: "
+  },
+  {
+    "Key": "現在位置を登録 {0}件・登録を解除 {1}件",
+    "Value": "Posições atuais salvas: {0}; layouts removidos: {1}"
+  },
+  {
+    "Key": "言語",
+    "Value": "Idioma"
+  },
+  {
+    "Key": "個（条件を絞ってください）",
+    "Value": " (restrinja as condições)"
+  },
+  {
+    "Key": "高さ（px）",
+    "Value": "Altura (px)"
+  },
+  {
+    "Key": "今の位置で配置",
+    "Value": "Salvar posição atual"
+  },
+  {
+    "Key": "最小化中",
+    "Value": "Minimizada"
+  },
+  {
+    "Key": "最小化中（そのまま）",
+    "Value": "Minimizada (sem alterações)"
+  },
+  {
+    "Key": "最大化",
+    "Value": "Maximizada"
+  },
+  {
+    "Key": "最大化して配置",
+    "Value": "Aplicar maximizado"
+  },
+  {
+    "Key": "自動（Windowsの表示言語）",
+    "Value": "Automático (idioma de exibição do Windows)"
+  },
+  {
+    "Key": "自動復元を一時停止中",
+    "Value": "Restauração automática pausada"
+  },
+  {
+    "Key": "識別情報を表示",
+    "Value": "Mostrar identificação"
+  },
+  {
+    "Key": "識別情報を閉じる",
+    "Value": "Ocultar identificação"
+  },
+  {
+    "Key": "縦スクロール",
+    "Value": "Rolagem vertical"
+  },
+  {
+    "Key": "条件の確認に時間がかかっています。条件を短くしてください。",
+    "Value": "A verificação está demorando muito. Encurte a condição."
+  },
+  {
+    "Key": "条件を確認しています…",
+    "Value": "Verificando condição…"
+  },
+  {
+    "Key": "状態",
+    "Value": "Status"
+  },
+  {
+    "Key": "正規表現",
+    "Value": "Expressão regular"
+  },
+  {
+    "Key": "正規表現: ",
+    "Value": "Expressão regular: "
+  },
+  {
+    "Key": "正規表現の確認を中断しました。条件を簡単にしてください。",
+    "Value": "A verificação da expressão regular foi interrompida. Simplifique a condição."
+  },
+  {
+    "Key": "正規表現の書き方が正しくありません",
+    "Value": "A expressão regular é inválida"
+  },
+  {
+    "Key": "正規表現の書き方が正しくありません。",
+    "Value": "A expressão regular é inválida."
+  },
+  {
+    "Key": "設定ファイルを読み込めませんでした。\n",
+    "Value": "Não foi possível carregar o arquivo de configuração.\n"
+  },
+  {
+    "Key": "設定を開く",
+    "Value": "Abrir configurações"
+  },
+  {
+    "Key": "設定を閉じる",
+    "Value": "Fechar configurações"
+  },
+  {
+    "Key": "設定を変更できませんでした",
+    "Value": "Não foi possível alterar as configurações"
+  },
+  {
+    "Key": "対象",
+    "Value": "Ativo"
+  },
+  {
+    "Key": "対象アプリ  /  ",
+    "Value": "Aplicativo de destino  /  "
+  },
+  {
+    "Key": "対象アプリ  /  {0}",
+    "Value": "Aplicativo de destino  /  {0}"
+  },
+  {
+    "Key": "対象を ON にすると現在位置を登録し、OFF にすると登録を解除します。",
+    "Value": "Ative ON para salvar a posição atual; selecione OFF para remover o layout salvo."
+  },
+  {
+    "Key": "追加",
+    "Value": "Adicionar"
+  },
+  {
+    "Key": "登録 ／ 状態",
+    "Value": "Registro / Status"
+  },
+  {
+    "Key": "登録を確定",
+    "Value": "Salvar layout"
+  },
+  {
+    "Key": "登録済み",
+    "Value": "Salvo"
+  },
+  {
+    "Key": "登録済みの ",
+    "Value": "Remover todos os "
+  },
+  {
+    "Key": "登録済みの {0} 件をすべて解除しますか？",
+    "Value": "Remover todos os {0} layouts salvos?"
+  },
+  {
+    "Key": "登録済みの配置",
+    "Value": "Layouts salvos"
+  },
+  {
+    "Key": "同じアプリのウィンドウが複数ある場合は、タイトル条件で絞り込みます。",
+    "Value": "Se houver várias janelas do mesmo aplicativo, use uma condição do título para diferenciá-las."
+  },
+  {
+    "Key": "配置",
+    "Value": "Layout"
+  },
+  {
+    "Key": "配置 Ag",
+    "Value": "Layout Ag"
+  },
+  {
+    "Key": "配置を実行",
+    "Value": "Aplicar layout"
+  },
+  {
+    "Key": "配置を登録",
+    "Value": "Salvar layout"
+  },
+  {
+    "Key": "配置を変更できませんでした",
+    "Value": "Não foi possível alterar o layout"
+  },
+  {
+    "Key": "配置を編集",
+    "Value": "Editar layout"
+  },
+  {
+    "Key": "配置を有効",
+    "Value": "Ativar layouts"
+  },
+  {
+    "Key": "配置先: モニタ ",
+    "Value": "Destino: monitor "
+  },
+  {
+    "Key": "配置先: モニタ {0}",
+    "Value": "Destino: monitor {0}"
+  },
+  {
+    "Key": "配置先: 該当するモニタがありません",
+    "Value": "Destino: nenhum monitor correspondente"
+  },
+  {
+    "Key": "配置中",
+    "Value": "Mantendo posição"
+  },
+  {
+    "Key": "不明",
+    "Value": "Desconhecido"
+  },
+  {
+    "Key": "幅（px）",
+    "Value": "Largura (px)"
+  },
+  {
+    "Key": "編集",
+    "Value": "Editar"
+  },
+  {
+    "Key": "保存位置のモニタがありません",
+    "Value": "O monitor da posição salva não está disponível"
+  },
+  {
+    "Key": "未起動",
+    "Value": "Não iniciado"
+  },
+  {
+    "Key": "未起動（ウィンドウなし）",
+    "Value": "Não iniciado (sem janela)"
+  },
+  {
+    "Key": "未接続",
+    "Value": "Desconectado"
+  },
+  {
+    "Key": "未登録",
+    "Value": "Não registrado"
+  },
+  {
+    "Key": "未保存",
+    "Value": "Não salvo"
+  },
+  {
+    "Key": "名前",
+    "Value": "Nome"
+  },
+  {
+    "Key": "名前 ／ プロセス",
+    "Value": "Nome / Processo"
+  },
+  {
+    "Key": "名前を入力してください。",
+    "Value": "Insira um nome."
+  },
+  {
+    "Key": "約2秒ごとに自動復元",
+    "Value": "Restaurar a cada 2 segundos aprox."
+  },
+  {
+    "Key": "例: Chat$ は、タイトルの末尾が Chat のウィンドウです。",
+    "Value": "Exemplo: Chat$ corresponde a janelas cujo título termina em Chat."
+  },
+  {
+    "Key": "例: Discord$ は、タイトルの末尾が Discord のウィンドウです。",
+    "Value": "Exemplo: Discord$ corresponde a janelas cujo título termina em Discord."
+  }
+]

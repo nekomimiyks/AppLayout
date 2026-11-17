@@ -11,10 +11,22 @@ namespace AppLayout {
    using (var tray = new NotifyIcon())
    using (var menu = new TrayMenu()) {
     Action show = delegate { if(transition!=null && !transition.IsDisposed)transition.Close();transition=null;form.ShowInTaskbar = true; form.Show(); if (form.WindowState == FormWindowState.Minimized) form.WindowState = FormWindowState.Normal; form.Activate(); form.BringToFront(); Native.SetForegroundWindow(form.Handle); };
-    menu.Items.Add("アプリを開く", null, delegate { show(); });
+    menu.Items.Add(L.T("アプリを開く"), null, delegate { show(); });
     menu.Items.Add(Texts.Restore, null, delegate { controller.RestoreNow(new System.Collections.Generic.List<WindowRow>()); });
     menu.Items.Add(new ToolStripSeparator());
-    menu.Items.Add("アプリを終了する", null, delegate { exiting = true; form.Close(); });
+    menu.Items.Add(L.T("アプリを終了する"), null, delegate { exiting = true; form.Close(); });
+    EventHandler languageChanged=delegate {
+     menu.Items[0].Text=L.T("アプリを開く");menu.Items[1].Text=Texts.Restore;menu.Items[3].Text=L.T("アプリを終了する");
+     menu.AccessibleName=L.T("AppLayout のメニュー");
+    };
+    L.Changed+=languageChanged;
+    form.Disposed+=delegate {L.Changed-=languageChanged;};
+    Microsoft.Win32.UserPreferenceChangedEventHandler windowsLanguageChanged=delegate {
+     if(L.Selection!="auto" || form.IsDisposed || !form.IsHandleCreated)return;
+     try{form.BeginInvoke((Action)delegate {if(!form.IsDisposed && L.Selection=="auto")L.SetLanguage("auto");});}catch(InvalidOperationException){}
+    };
+    Microsoft.Win32.SystemEvents.UserPreferenceChanged+=windowsLanguageChanged;
+    form.Disposed+=delegate {Microsoft.Win32.SystemEvents.UserPreferenceChanged-=windowsLanguageChanged;};
     tray.Icon = AppIcon.Create(); tray.Text = "AppLayout"; tray.ContextMenuStrip = menu; tray.Visible = true; tray.DoubleClick += delegate { show(); };
     form.Resize += delegate { if (form.WindowState == FormWindowState.Minimized) { form.Hide(); form.ShowInTaskbar = false; } };
     form.FormClosing += delegate(object sender, FormClosingEventArgs e) { if (!exiting && e.CloseReason == CloseReason.UserClosing && controller.MinimizeToTrayOnClose) { e.Cancel = true; if(transition!=null && !transition.IsDisposed)transition.Close();transition=TrayTransition.HideToTray(form); } };

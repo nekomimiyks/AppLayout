@@ -50,8 +50,9 @@ $uiDir = Join-Path $here 'src\ui'
 
 $src = @(Get-ChildItem -LiteralPath (Join-Path $here 'src\core') -Filter '*.cs' | ForEach-Object { $_.FullName })
 $src += @(Get-ChildItem -LiteralPath $uiDir -Filter '*.cs' | ForEach-Object { $_.FullName })
+$resources = @(Get-ChildItem -LiteralPath (Join-Path $here 'src\locales') -Filter '*.json' | ForEach-Object { '/resource:' + $_.FullName + ',AppLayout.Locales.' + $_.Name })
 & $csc /nologo /target:winexe /optimize+ /platform:anycpu "/out:$outPath" "/win32icon:$ico" "/resource:$ico,AppLayout.AppIcon.ico" `
   /r:System.dll /r:System.Core.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll `
-  /r:System.Runtime.Serialization.dll $src
+  /r:System.Runtime.Serialization.dll $resources $src
 if ($LASTEXITCODE -ne 0) { throw 'Build failed' }
 Write-Output "Build complete: $outPath"

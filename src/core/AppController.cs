@@ -10,13 +10,13 @@ namespace AppLayout {
   public string Name, Process, Position, Size, Monitor, TitleRule, Maximized, Status; public int StatusKind;
  }
  public static class Texts {
-  public const string Enabled = "配置を有効", AutoStart = "ログイン時に自動起動", LaunchMissing = "アプリ自動起動", MinimizeToTrayOnClose = "アプリ終了時自動縮小";
-  public const string EnabledTip = "オンの間、保存したウィンドウを約2秒ごとに保存位置へ戻します。オフにするとウィンドウを自由に動かせます。";
-  public const string AutoStartTip = "Windowsにサインインしたとき、画面を出さずにタスクトレイに常駐した状態で起動します。";
-  public const string LaunchMissingTip = "ログイン時の自動起動のとき、保存済みのアプリが起動していなければ起動します。";
-  public const string MinimizeToTrayOnCloseTip = "×ボタンで閉じたとき、終了せずにタスクトレイに入ります。オフのときは×で終了します。";
-  public const string Save = "今の位置で配置", Unsave = "すべての配置を解除する", Restore = "配置を実行", Edit = "編集";
-  public const string Name = "名前", Process = "アプリ（プロセス名）", Position = "位置(X, Y)", Size = "サイズ(幅×高さ)", Monitor = "モニタ", TitleRule = "ウィンドウの見分け方", Maximized = "最大化", Status = "状態";
+  public static string Enabled { get { return L.T("配置を有効"); } } public static string AutoStart { get { return L.T("ログイン時に自動起動"); } } public static string LaunchMissing { get { return L.T("アプリ自動起動"); } } public static string MinimizeToTrayOnClose { get { return L.T("アプリ終了時自動縮小"); } }
+  public static string EnabledTip { get { return L.T("オンの間、保存したウィンドウを約2秒ごとに保存位置へ戻します。オフにするとウィンドウを自由に動かせます。"); } }
+  public static string AutoStartTip { get { return L.T("Windowsにサインインしたとき、画面を出さずにタスクトレイに常駐した状態で起動します。"); } }
+  public static string LaunchMissingTip { get { return L.T("ログイン時の自動起動のとき、保存済みのアプリが起動していなければ起動します。"); } }
+  public static string MinimizeToTrayOnCloseTip { get { return L.T("×ボタンで閉じたとき、終了せずにタスクトレイに入ります。オフのときは×で終了します。"); } }
+  public static string Save { get { return L.T("今の位置で配置"); } } public static string Unsave { get { return L.T("すべての配置を解除する"); } } public static string Restore { get { return L.T("配置を実行"); } } public static string Edit { get { return L.T("編集"); } }
+  public static string Name { get { return L.T("名前"); } } public static string Process { get { return L.T("アプリ（プロセス名）"); } } public static string Position { get { return L.T("位置(X, Y)"); } } public static string Size { get { return L.T("サイズ(幅×高さ)"); } } public static string Monitor { get { return L.T("モニタ"); } } public static string TitleRule { get { return L.T("ウィンドウの見分け方"); } } public static string Maximized { get { return L.T("最大化"); } } public static string Status { get { return L.T("状態"); } }
  }
  public class AppController {
   readonly ConfigStore store; readonly Keeper keeper; readonly SynchronizationContext context;
@@ -29,6 +29,7 @@ namespace AppLayout {
    keeper.StatusUpdated += delegate(Dictionary<AppEntry, EntryStatus> s) { context.Post(delegate { statuses = s; Changed(); }, null); };
   }
   void Changed() { var h = RowsChanged; if (h != null) h(this, EventArgs.Empty); }
+  internal void ClearMessage() {LastMessage="";}
   public List<WindowRow> GetRows() {
    var all = WindowScanner.ReadAll(); var mons = WindowScanner.GetMonitors(); var result = new List<WindowRow>(); var matched = new HashSet<IntPtr>();
    AppEntry[] entries; lock(store.Sync) entries = store.Config.Apps.ToArray();
@@ -64,7 +65,7 @@ namespace AppLayout {
      if(window==null || window.Minimized || window.Pid!=row.Window.Pid ||
       !string.Equals(window.ProcessName,row.Window.ProcessName,StringComparison.OrdinalIgnoreCase) ||
       AppEntry.ClassKey(window.Class)!=AppEntry.ClassKey(row.Window.Class)) {
-      LastMessage="現在位置を取得できません。ウィンドウを開いて最小化を解除してからONにしてください。";Changed();return false;
+      LastMessage=L.T("現在位置を取得できません。ウィンドウを開いて最小化を解除してからONにしてください。");Changed();return false;
      }
      // 更新待ちの古い未登録行から同じウィンドウを二重に登録しない。
      foreach(var item in next)if(item.Matches(window))return true;
@@ -73,7 +74,7 @@ namespace AppLayout {
     store.Config.Apps=next;
     try{store.Save();}catch{store.Config.Apps=previous;throw;}
    }
-   LastMessage=enabled?row.Name+"をONにしました。現在の配置を保存しました。":row.Name+"をOFFにしました。配置の登録を解除しました。";
+   LastMessage=L.F(enabled?"{0}をONにしました。現在の配置を保存しました。":"{0}をOFFにしました。配置の登録を解除しました。",row.Name);
    keeper.Kick();Changed();return true;
   }
   public void SaveCurrent(IList<WindowRow> rows, IWin32Window owner) {
@@ -107,7 +108,7 @@ namespace AppLayout {
     store.Config.Apps = next;
     try { store.Save(); } catch { store.Config.Apps = previous; throw; }
    }
-   LastMessage = "現在位置を登録 " + saved + "件・登録を解除 " + removed + "件" + (kept > 0 ? "・既存の配置を保持 " + kept + "件（未起動・最小化中など）" : "") + (skipped.Count > 0 ? "。登録できませんでした: " + string.Join("、", skipped.ToArray()) : "");
+   LastMessage = L.F("現在位置を登録 {0}件・登録を解除 {1}件",saved,removed) + (kept > 0 ? L.F("・既存の配置を保持 {0}件（未起動・最小化中など）",kept) : "") + (skipped.Count > 0 ? L.F("。登録できませんでした: {0}",string.Join(", ", skipped.ToArray())) : "");
    keeper.Kick(); Changed();
   }
   public void UnsaveAll() {
@@ -117,17 +118,17 @@ namespace AppLayout {
     store.Config.Apps = new List<AppEntry>();
     try { store.Save(); } catch { store.Config.Apps = previous; throw; }
    }
-   LastMessage = "すべての配置を解除しました（" + count + "件）"; keeper.Kick(); Changed();
+   LastMessage = L.F("すべての配置を解除しました（{0}件）",count); keeper.Kick(); Changed();
   }
-  public void Unsave(IList<WindowRow> rows) { int n = 0; lock(store.Sync) { foreach (var row in rows) if (row.Saved && store.Config.Apps.Remove(row.Entry)) n++; if (n > 0) store.Save(); } LastMessage = n + "件の保存を解除しました"; keeper.Kick(); Changed(); }
-  public void RestoreNow(IList<WindowRow> rows) { var targets = rows.Count == 0 ? GetRows() : rows; int n = 0, skipped = 0; foreach (var row in targets) if (row.Saved) { if (row.Window == null || row.Window.Minimized) { skipped++; continue; } var e = row.Entry; if (WindowScanner.Apply(row.Window.Handle,e.X,e.Y,e.Width,e.Height,e.Maximized) >= 0) n++; else skipped++; } LastMessage = n + "件の配置を実行しました" + (skipped > 0 ? "（未起動・最小化中など " + skipped + "件はそのまま）" : ""); Changed(); }
+  public void Unsave(IList<WindowRow> rows) { int n = 0; lock(store.Sync) { foreach (var row in rows) if (row.Saved && store.Config.Apps.Remove(row.Entry)) n++; if (n > 0) store.Save(); } LastMessage = L.F("{0}件の保存を解除しました",n); keeper.Kick(); Changed(); }
+  public void RestoreNow(IList<WindowRow> rows) { var targets = rows.Count == 0 ? GetRows() : rows; int n = 0, skipped = 0; foreach (var row in targets) if (row.Saved) { if (row.Window == null || row.Window.Minimized) { skipped++; continue; } var e = row.Entry; if (WindowScanner.Apply(row.Window.Handle,e.X,e.Y,e.Width,e.Height,e.Maximized) >= 0) n++; else skipped++; } LastMessage = L.F("{0}件の配置を実行しました",n) + (skipped > 0 ? L.F("（未起動・最小化中など {0}件はそのまま）",skipped) : ""); Changed(); }
   public bool Edit(WindowRow row, IWin32Window owner) {
    AppEntry e;
    if (row.Saved) e = row.Entry.Clone();
    else {
     var window = row.Window == null ? null : WindowScanner.Describe(row.Window.Handle, null);
     if (window == null || window.Minimized || window.Pid != row.Window.Pid) {
-     LastMessage = "ウィンドウが閉じられたか最小化されています。ウィンドウを開いてから編集してください。"; Changed(); return false;
+     LastMessage = L.T("ウィンドウが閉じられたか最小化されています。ウィンドウを開いてから編集してください。"); Changed(); return false;
     }
     e = NewEntry(window);
    }
@@ -135,12 +136,12 @@ namespace AppLayout {
    lock(store.Sync) {
     var previous = store.Config.Apps;
     var next = new List<AppEntry>(previous);
-    if (row.Saved) { int i = next.FindIndex(delegate(AppEntry item) { return item.Id == e.Id; }); if (i < 0) { LastMessage = "この配置はすでに解除されています。"; Changed(); return false; } next[i] = e; }
+    if (row.Saved) { int i = next.FindIndex(delegate(AppEntry item) { return item.Id == e.Id; }); if (i < 0) { LastMessage = L.T("この配置はすでに解除されています。"); Changed(); return false; } next[i] = e; }
     else next.Add(e);
     store.Config.Apps = next;
     try { store.Save(); } catch { store.Config.Apps = previous; throw; }
    }
-   LastMessage = e.Name + "の配置を登録しました"; keeper.Kick(); Changed(); return true;
+   LastMessage = L.F("{0}の配置を登録しました",e.Name); keeper.Kick(); Changed(); return true;
   }
   public bool Enabled { get { return store.Config.Enabled; } set { lock(store.Sync) { store.Config.Enabled = value; store.Save(); } keeper.Kick(); Changed(); } }
   public bool LaunchMissing { get { return store.Config.LaunchMissingAtStartup; } set { lock(store.Sync) { store.Config.LaunchMissingAtStartup = value; store.Save(); } Changed(); } }
@@ -154,5 +155,16 @@ namespace AppLayout {
    set { using (var k = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run")) { if (value) k.SetValue("AppLayout", "\"" + Application.ExecutablePath + "\" /startup"); else k.DeleteValue("AppLayout", false); } Changed(); }
   }
   public void Start() { keeper.Start(); } public void Stop() { keeper.Stop(); }
+  public string Language {
+   get {return L.NormalizeSelection(store.Config.Language);}
+   set {
+    string next=L.NormalizeSelection(value);
+    lock(store.Sync) {
+     string previous=store.Config.Language;store.Config.Language=next;
+     try{store.Save();}catch{store.Config.Language=previous;throw;}
+    }
+    L.SetLanguage(next);LastMessage="";Changed();
+   }
+  }
  }
 }

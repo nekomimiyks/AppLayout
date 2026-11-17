@@ -1,0 +1,634 @@
+[
+  {
+    "Key": "\r\nアプリID: ",
+    "Value": "\r\nApp-ID: "
+  },
+  {
+    "Key": "\r\nクラス: ",
+    "Value": "\r\nKlasse: "
+  },
+  {
+    "Key": " 件",
+    "Value": " Einträge"
+  },
+  {
+    "Key": " 件をすべて解除しますか？",
+    "Value": " gespeicherten Anordnungen entfernen?"
+  },
+  {
+    "Key": "・既存の配置を保持 ",
+    "Value": " · Vorhandene Anordnungen beibehalten: "
+  },
+  {
+    "Key": "・既存の配置を保持 {0}件（未起動・最小化中など）",
+    "Value": " · {0} vorhandene Anordnungen beibehalten (z. B. für geschlossene oder minimierte Apps)"
+  },
+  {
+    "Key": "。登録できませんでした: ",
+    "Value": ". Speichern fehlgeschlagen: "
+  },
+  {
+    "Key": "。登録できませんでした: {0}",
+    "Value": ". Speichern fehlgeschlagen: {0}"
+  },
+  {
+    "Key": "（最小化中）",
+    "Value": "(Minimiert)"
+  },
+  {
+    "Key": "（未起動・最小化中など ",
+    "Value": "(Unverändert, z. B. geschlossene oder minimierte Apps: "
+  },
+  {
+    "Key": "（未起動・最小化中など {0}件はそのまま）",
+    "Value": "({0} unverändert, z. B. geschlossene oder minimierte Apps)"
+  },
+  {
+    "Key": "{0} 件",
+    "Value": "{0} Einträge"
+  },
+  {
+    "Key": "{0}の配置を登録しました",
+    "Value": "Anordnung für {0} gespeichert"
+  },
+  {
+    "Key": "{0}をOFFにしました。配置の登録を解除しました。",
+    "Value": "{0} ist OFF. Die gespeicherte Anordnung wurde entfernt."
+  },
+  {
+    "Key": "{0}をONにしました。現在の配置を保存しました。",
+    "Value": "{0} ist ON. Die aktuelle Anordnung wurde gespeichert."
+  },
+  {
+    "Key": "{0}件に一致。1件に絞り込むまで配置は実行しません。",
+    "Value": "{0} Treffer. Die Anordnung wird erst angewendet, wenn genau ein Fenster übereinstimmt."
+  },
+  {
+    "Key": "{0}件の配置を実行しました",
+    "Value": "{0} Anordnungen angewendet"
+  },
+  {
+    "Key": "{0}件の保存を解除しました",
+    "Value": "{0} gespeicherte Anordnungen entfernt"
+  },
+  {
+    "Key": "×ボタンで閉じたとき、終了せずにタスクトレイに入ります。オフのときは×で終了します。",
+    "Value": "Beim Schließen mit × bleibt die App im Infobereich aktiv. Wenn diese Option deaktiviert ist, beendet × die App."
+  },
+  {
+    "Key": "1件に一致。この条件で配置できます。",
+    "Value": "1 Treffer. Diese Anordnung kann angewendet werden."
+  },
+  {
+    "Key": "AppLayout のメニュー",
+    "Value": "AppLayout-Menü"
+  },
+  {
+    "Key": "Windowsにサインインしたとき、画面を出さずにタスクトレイに常駐した状態で起動します。",
+    "Value": "Startet die App bei der Windows-Anmeldung im Infobereich, ohne das Fenster anzuzeigen."
+  },
+  {
+    "Key": "X 座標（px）",
+    "Value": "X-Koordinate (px)"
+  },
+  {
+    "Key": "Y 座標（px）",
+    "Value": "Y-Koordinate (px)"
+  },
+  {
+    "Key": "アプリ（プロセス）",
+    "Value": "App (Prozess)"
+  },
+  {
+    "Key": "アプリ（プロセス名）",
+    "Value": "App (Prozessname)"
+  },
+  {
+    "Key": "アプリで判定",
+    "Value": "Anhand der App erkennen"
+  },
+  {
+    "Key": "アプリを開く",
+    "Value": "App öffnen"
+  },
+  {
+    "Key": "アプリを終了する",
+    "Value": "App beenden"
+  },
+  {
+    "Key": "アプリ自動起動",
+    "Value": "Apps automatisch starten"
+  },
+  {
+    "Key": "アプリ終了時自動縮小",
+    "Value": "Beim Schließen in den Infobereich minimieren"
+  },
+  {
+    "Key": "いいえ",
+    "Value": "Nein"
+  },
+  {
+    "Key": "ウィンドウが閉じられたか最小化されています。ウィンドウを開いてから編集してください。",
+    "Value": "Das Fenster ist geschlossen oder minimiert. Öffnen Sie es vor dem Bearbeiten."
+  },
+  {
+    "Key": "ウィンドウのタイトル",
+    "Value": "Fenstertitel"
+  },
+  {
+    "Key": "ウィンドウの見分け方",
+    "Value": "Fenstererkennung"
+  },
+  {
+    "Key": "ウィンドウを1つ選んでください。",
+    "Value": "Wählen Sie ein Fenster aus."
+  },
+  {
+    "Key": "オンの間、保存したウィンドウを約2秒ごとに保存位置へ戻します。オフにするとウィンドウを自由に動かせます。",
+    "Value": "Bei ON werden gespeicherte Fenster etwa alle 2 Sekunden an ihre Position zurückgesetzt. Bei OFF können Sie die Fenster frei verschieben."
+  },
+  {
+    "Key": "キャンセル",
+    "Value": "Abbrechen"
+  },
+  {
+    "Key": "この配置はすでに解除されています。",
+    "Value": "Diese Anordnung wurde bereits entfernt."
+  },
+  {
+    "Key": "サイズ",
+    "Value": "Größe"
+  },
+  {
+    "Key": "サイズ(幅×高さ)",
+    "Value": "Größe (Breite × Höhe)"
+  },
+  {
+    "Key": "すべての配置を解除しました（",
+    "Value": "Alle Anordnungen entfernt ("
+  },
+  {
+    "Key": "すべての配置を解除しました（{0}件）",
+    "Value": "Alle Anordnungen entfernt ({0})"
+  },
+  {
+    "Key": "すべての配置を解除する",
+    "Value": "Alle Anordnungen entfernen"
+  },
+  {
+    "Key": "タイトルが完全に一致",
+    "Value": "Titel stimmt genau überein"
+  },
+  {
+    "Key": "タイトルに含まれる文字を指定します。大文字・小文字は区別しません。",
+    "Value": "Geben Sie den Text an, den der Titel enthalten muss. Groß- und Kleinschreibung wird nicht berücksichtigt."
+  },
+  {
+    "Key": "タイトルに含む",
+    "Value": "Titel enthält"
+  },
+  {
+    "Key": "タイトルを含む: ",
+    "Value": "Titel enthält: "
+  },
+  {
+    "Key": "タイトル一致: ",
+    "Value": "Exakter Titel: "
+  },
+  {
+    "Key": "タイトル条件",
+    "Value": "Titelbedingung"
+  },
+  {
+    "Key": "タイトル条件を入力するか、「アプリで判定」を選んでください。",
+    "Value": "Geben Sie eine Titelbedingung ein oder wählen Sie „Anhand der App erkennen“."
+  },
+  {
+    "Key": "タイトル全体を指定します。大文字・小文字も区別します。",
+    "Value": "Geben Sie den vollständigen Titel an. Groß- und Kleinschreibung wird berücksichtigt."
+  },
+  {
+    "Key": "なし",
+    "Value": "Keine"
+  },
+  {
+    "Key": "の配置を登録しました",
+    "Value": ": Anordnung gespeichert"
+  },
+  {
+    "Key": "はい",
+    "Value": "Ja"
+  },
+  {
+    "Key": "プロセス: ",
+    "Value": "Prozess: "
+  },
+  {
+    "Key": "モニタ",
+    "Value": "Monitor"
+  },
+  {
+    "Key": "モニタ ",
+    "Value": "Monitor "
+  },
+  {
+    "Key": "モニタ {0}",
+    "Value": "Monitor {0}"
+  },
+  {
+    "Key": "モニタ 1",
+    "Value": "Monitor 1"
+  },
+  {
+    "Key": "モニタ{0}",
+    "Value": "Monitor: {0}"
+  },
+  {
+    "Key": "モニタなし",
+    "Value": "Kein Monitor"
+  },
+  {
+    "Key": "モニタ別の配置台帳",
+    "Value": "Anordnungen nach Monitor"
+  },
+  {
+    "Key": "ログイン時に自動起動",
+    "Value": "Bei Anmeldung starten"
+  },
+  {
+    "Key": "ログイン時の自動起動のとき、保存済みのアプリが起動していなければ起動します。",
+    "Value": "Startet beim automatischen Start nach der Anmeldung gespeicherte Apps, die noch nicht ausgeführt werden."
+  },
+  {
+    "Key": "をOFFにしました。配置の登録を解除しました。",
+    "Value": " ist OFF. Die gespeicherte Anordnung wurde entfernt."
+  },
+  {
+    "Key": "をONにしました。現在の配置を保存しました。",
+    "Value": " ist ON. Die aktuelle Anordnung wurde gespeichert."
+  },
+  {
+    "Key": "位置 ／ サイズ",
+    "Value": "Position / Größe"
+  },
+  {
+    "Key": "位置 X, Y",
+    "Value": "Position X, Y"
+  },
+  {
+    "Key": "位置(X, Y)",
+    "Value": "Position (X, Y)"
+  },
+  {
+    "Key": "位置を戻しました",
+    "Value": "Position wiederhergestellt"
+  },
+  {
+    "Key": "一時停止中",
+    "Value": "Pausiert"
+  },
+  {
+    "Key": "一致するウィンドウはありません。未起動でも登録できます。",
+    "Value": "Keine passenden Fenster. Sie können die Anordnung auch speichern, wenn die App nicht geöffnet ist."
+  },
+  {
+    "Key": "一覧を更新",
+    "Value": "Liste aktualisieren"
+  },
+  {
+    "Key": "横スクロール",
+    "Value": "Horizontaler Bildlauf"
+  },
+  {
+    "Key": "該当が",
+    "Value": "Treffer: "
+  },
+  {
+    "Key": "該当が複数",
+    "Value": "Mehrere Treffer"
+  },
+  {
+    "Key": "記憶したいウィンドウを選んで「追加」を押してください（ダブルクリックでも追加できます）。",
+    "Value": "Wählen Sie das zu speichernde Fenster aus und klicken Sie auf „Hinzufügen“. Ein Doppelklick ist ebenfalls möglich."
+  },
+  {
+    "Key": "起動しました",
+    "Value": "App gestartet"
+  },
+  {
+    "Key": "起動と終了の",
+    "Value": "Start und Beenden: "
+  },
+  {
+    "Key": "起動と終了の設定を開く",
+    "Value": "Einstellungen für Start und Beenden öffnen"
+  },
+  {
+    "Key": "起動失敗 ",
+    "Value": "Start fehlgeschlagen: "
+  },
+  {
+    "Key": "起動中のウィンドウから追加",
+    "Value": "Aus geöffneten Fenstern hinzufügen"
+  },
+  {
+    "Key": "件",
+    "Value": " Einträge"
+  },
+  {
+    "Key": "件・登録を解除 ",
+    "Value": "; entfernt: "
+  },
+  {
+    "Key": "件（未起動・最小化中など）",
+    "Value": " (z. B. geschlossene oder minimierte Apps)"
+  },
+  {
+    "Key": "件）",
+    "Value": " Einträge)"
+  },
+  {
+    "Key": "件に一致。1件に絞り込むまで配置は実行しません。",
+    "Value": " Treffer. Die Anordnung wird erst angewendet, wenn genau ein Fenster übereinstimmt."
+  },
+  {
+    "Key": "件の配置を実行しました",
+    "Value": " Anordnungen angewendet"
+  },
+  {
+    "Key": "件の保存を解除しました",
+    "Value": " gespeicherte Anordnungen entfernt"
+  },
+  {
+    "Key": "件はそのまま）",
+    "Value": " unverändert)"
+  },
+  {
+    "Key": "見分け方",
+    "Value": "Erkennung"
+  },
+  {
+    "Key": "現在位置を取得できません。ウィンドウを開いて最小化を解除してからONにしてください。",
+    "Value": "Die aktuelle Position kann nicht ermittelt werden. Öffnen Sie das Fenster und heben Sie die Minimierung auf, bevor Sie auf ON schalten."
+  },
+  {
+    "Key": "現在位置を登録 ",
+    "Value": "Aktuelle Positionen gespeichert: "
+  },
+  {
+    "Key": "現在位置を登録 {0}件・登録を解除 {1}件",
+    "Value": "Aktuelle Positionen gespeichert: {0}; Anordnungen entfernt: {1}"
+  },
+  {
+    "Key": "言語",
+    "Value": "Sprache"
+  },
+  {
+    "Key": "個（条件を絞ってください）",
+    "Value": " (Bedingungen eingrenzen)"
+  },
+  {
+    "Key": "高さ（px）",
+    "Value": "Höhe (px)"
+  },
+  {
+    "Key": "今の位置で配置",
+    "Value": "Aktuelle Position speichern"
+  },
+  {
+    "Key": "最小化中",
+    "Value": "Minimiert"
+  },
+  {
+    "Key": "最小化中（そのまま）",
+    "Value": "Minimiert (unverändert)"
+  },
+  {
+    "Key": "最大化",
+    "Value": "Maximiert"
+  },
+  {
+    "Key": "最大化して配置",
+    "Value": "Maximiert anordnen"
+  },
+  {
+    "Key": "自動（Windowsの表示言語）",
+    "Value": "Automatisch (Windows-Anzeigesprache)"
+  },
+  {
+    "Key": "自動復元を一時停止中",
+    "Value": "Automatische Wiederherstellung pausiert"
+  },
+  {
+    "Key": "識別情報を表示",
+    "Value": "Erkennungsdaten anzeigen"
+  },
+  {
+    "Key": "識別情報を閉じる",
+    "Value": "Erkennungsdaten ausblenden"
+  },
+  {
+    "Key": "縦スクロール",
+    "Value": "Vertikaler Bildlauf"
+  },
+  {
+    "Key": "条件の確認に時間がかかっています。条件を短くしてください。",
+    "Value": "Die Prüfung dauert zu lange. Kürzen Sie die Bedingung."
+  },
+  {
+    "Key": "条件を確認しています…",
+    "Value": "Bedingung wird geprüft…"
+  },
+  {
+    "Key": "状態",
+    "Value": "Status"
+  },
+  {
+    "Key": "正規表現",
+    "Value": "Regulärer Ausdruck"
+  },
+  {
+    "Key": "正規表現: ",
+    "Value": "Regulärer Ausdruck: "
+  },
+  {
+    "Key": "正規表現の確認を中断しました。条件を簡単にしてください。",
+    "Value": "Die Prüfung des regulären Ausdrucks wurde abgebrochen. Vereinfachen Sie die Bedingung."
+  },
+  {
+    "Key": "正規表現の書き方が正しくありません",
+    "Value": "Der reguläre Ausdruck ist ungültig"
+  },
+  {
+    "Key": "正規表現の書き方が正しくありません。",
+    "Value": "Der reguläre Ausdruck ist ungültig."
+  },
+  {
+    "Key": "設定ファイルを読み込めませんでした。\n",
+    "Value": "Die Einstellungsdatei konnte nicht geladen werden.\n"
+  },
+  {
+    "Key": "設定を開く",
+    "Value": "Einstellungen öffnen"
+  },
+  {
+    "Key": "設定を閉じる",
+    "Value": "Einstellungen schließen"
+  },
+  {
+    "Key": "設定を変更できませんでした",
+    "Value": "Einstellungen konnten nicht geändert werden"
+  },
+  {
+    "Key": "対象",
+    "Value": "Aktiv"
+  },
+  {
+    "Key": "対象アプリ  /  ",
+    "Value": "Ziel-App  /  "
+  },
+  {
+    "Key": "対象アプリ  /  {0}",
+    "Value": "Ziel-App  /  {0}"
+  },
+  {
+    "Key": "対象を ON にすると現在位置を登録し、OFF にすると登録を解除します。",
+    "Value": "Mit ON speichern Sie die aktuelle Position, mit OFF entfernen Sie die gespeicherte Anordnung."
+  },
+  {
+    "Key": "追加",
+    "Value": "Hinzufügen"
+  },
+  {
+    "Key": "登録 ／ 状態",
+    "Value": "Gespeichert / Status"
+  },
+  {
+    "Key": "登録を確定",
+    "Value": "Anordnung speichern"
+  },
+  {
+    "Key": "登録済み",
+    "Value": "Gespeichert"
+  },
+  {
+    "Key": "登録済みの ",
+    "Value": "Alle "
+  },
+  {
+    "Key": "登録済みの {0} 件をすべて解除しますか？",
+    "Value": "Alle {0} gespeicherten Anordnungen entfernen?"
+  },
+  {
+    "Key": "登録済みの配置",
+    "Value": "Gespeicherte Anordnungen"
+  },
+  {
+    "Key": "同じアプリのウィンドウが複数ある場合は、タイトル条件で絞り込みます。",
+    "Value": "Wenn eine App mehrere Fenster hat, grenzen Sie diese anhand des Titels ein."
+  },
+  {
+    "Key": "配置",
+    "Value": "Anordnung"
+  },
+  {
+    "Key": "配置 Ag",
+    "Value": "Anordnung Ag"
+  },
+  {
+    "Key": "配置を実行",
+    "Value": "Anordnung anwenden"
+  },
+  {
+    "Key": "配置を登録",
+    "Value": "Anordnung speichern"
+  },
+  {
+    "Key": "配置を変更できませんでした",
+    "Value": "Anordnung konnte nicht geändert werden"
+  },
+  {
+    "Key": "配置を編集",
+    "Value": "Anordnung bearbeiten"
+  },
+  {
+    "Key": "配置を有効",
+    "Value": "Anordnungen aktivieren"
+  },
+  {
+    "Key": "配置先: モニタ ",
+    "Value": "Ziel: Monitor "
+  },
+  {
+    "Key": "配置先: モニタ {0}",
+    "Value": "Ziel: Monitor {0}"
+  },
+  {
+    "Key": "配置先: 該当するモニタがありません",
+    "Value": "Ziel: Kein passender Monitor"
+  },
+  {
+    "Key": "配置中",
+    "Value": "Position wird beibehalten"
+  },
+  {
+    "Key": "不明",
+    "Value": "Unbekannt"
+  },
+  {
+    "Key": "幅（px）",
+    "Value": "Breite (px)"
+  },
+  {
+    "Key": "編集",
+    "Value": "Bearbeiten"
+  },
+  {
+    "Key": "保存位置のモニタがありません",
+    "Value": "Der Monitor der gespeicherten Position ist nicht verfügbar"
+  },
+  {
+    "Key": "未起動",
+    "Value": "Nicht gestartet"
+  },
+  {
+    "Key": "未起動（ウィンドウなし）",
+    "Value": "Nicht gestartet (kein Fenster)"
+  },
+  {
+    "Key": "未接続",
+    "Value": "Nicht verbunden"
+  },
+  {
+    "Key": "未登録",
+    "Value": "Nicht gespeichert"
+  },
+  {
+    "Key": "未保存",
+    "Value": "Ungespeichert"
+  },
+  {
+    "Key": "名前",
+    "Value": "Name"
+  },
+  {
+    "Key": "名前 ／ プロセス",
+    "Value": "Name / Prozess"
+  },
+  {
+    "Key": "名前を入力してください。",
+    "Value": "Geben Sie einen Namen ein."
+  },
+  {
+    "Key": "約2秒ごとに自動復元",
+    "Value": "Etwa alle 2 Sekunden wiederherstellen"
+  },
+  {
+    "Key": "例: Chat$ は、タイトルの末尾が Chat のウィンドウです。",
+    "Value": "Beispiel: Chat$ erkennt Fenster, deren Titel mit Chat endet."
+  },
+  {
+    "Key": "例: Discord$ は、タイトルの末尾が Discord のウィンドウです。",
+    "Value": "Beispiel: Discord$ erkennt Fenster, deren Titel mit Discord endet."
+  }
+]

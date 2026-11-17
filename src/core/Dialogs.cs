@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -14,7 +14,7 @@ namespace AppLayout
 
         public WindowPickerDialog()
         {
-            Text = "起動中のウィンドウから追加";
+            Text = L.T("起動中のウィンドウから追加");
             Font = UiTypography.BodyFont();
             ClientSize = Ui.Sz(860, 460); MinimumSize = Ui.Sz(600, 300);
             StartPosition = FormStartPosition.CenterParent; ShowInTaskbar = false; MinimizeBox = false;
@@ -24,27 +24,28 @@ namespace AppLayout
             root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
             root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             Controls.Add(root);
-            root.Controls.Add(new Label { AutoSize = true, Text = "記憶したいウィンドウを選んで「追加」を押してください（ダブルクリックでも追加できます）。", Margin = new Padding(0, 0, 0, 6) }, 0, 0);
+            root.Controls.Add(new Label { AutoSize = true, Text = L.T("記憶したいウィンドウを選んで「追加」を押してください（ダブルクリックでも追加できます）。"), Margin = new Padding(0, 0, 0, 6) }, 0, 0);
 
             list = new ListView { Dock = DockStyle.Fill, View = View.Details, FullRowSelect = true, HideSelection = false, MultiSelect = false, GridLines = true };
-            list.Columns.Add("ウィンドウのタイトル", Ui.S(330));
-            list.Columns.Add("アプリ（プロセス）", Ui.S(130));
-            list.Columns.Add("位置 X, Y", Ui.S(100));
-            list.Columns.Add("サイズ", Ui.S(100));
-            list.Columns.Add("モニタ", Ui.S(170));
+            list.Columns.Add(L.T("ウィンドウのタイトル"), Ui.S(330));
+            list.Columns.Add(L.T("アプリ（プロセス）"), Ui.S(130));
+            list.Columns.Add(L.T("位置 X, Y"), Ui.S(100));
+            list.Columns.Add(L.T("サイズ"), Ui.S(100));
+            list.Columns.Add(L.T("モニタ"), Ui.S(170));
             list.DoubleClick += delegate { Accept(); };
             root.Controls.Add(list, 0, 1);
 
             var buttons = new FlowLayoutPanel { AutoSize = true, Dock = DockStyle.Fill, FlowDirection = FlowDirection.RightToLeft, Margin = new Padding(0, 8, 0, 0) };
-            var cancel = new Button { Text = "キャンセル", AutoSize = true, MinimumSize = Ui.Sz(100, 32), DialogResult = DialogResult.Cancel };
-            var ok = new Button { Text = "追加", AutoSize = true, MinimumSize = Ui.Sz(100, 32) };
+            var cancel = new Button { Text = L.T("キャンセル"), AutoSize = true, MinimumSize = Ui.Sz(100, 32), DialogResult = DialogResult.Cancel };
+            var ok = new Button { Text = L.T("追加"), AutoSize = true, MinimumSize = Ui.Sz(100, 32) };
             ok.Click += delegate { Accept(); };
-            var refresh = new Button { Text = "一覧を更新", AutoSize = true, MinimumSize = Ui.Sz(100, 32) };
+            var refresh = new Button { Text = L.T("一覧を更新"), AutoSize = true, MinimumSize = Ui.Sz(100, 32) };
             refresh.Click += delegate { Reload(); };
             buttons.Controls.AddRange(new Control[] { cancel, ok, refresh });
             root.Controls.Add(buttons, 0, 2);
             AcceptButton = ok; CancelButton = cancel;
             Reload();
+            L.Attach(this,Reload);
         }
 
         void Reload()
@@ -55,7 +56,7 @@ namespace AppLayout
             {
                 var it = new ListViewItem(w.Title);
                 it.SubItems.Add(w.ProcessName);
-                if (w.Minimized) { it.SubItems.Add("（最小化中）"); it.SubItems.Add(""); it.SubItems.Add(""); it.ForeColor = SystemColors.GrayText; }
+                if (w.Minimized) { it.SubItems.Add(L.T("（最小化中）")); it.SubItems.Add(""); it.SubItems.Add(""); it.ForeColor = SystemColors.GrayText; }
                 else
                 {
                     it.SubItems.Add(w.Bounds.Left + ", " + w.Bounds.Top);
@@ -70,7 +71,7 @@ namespace AppLayout
 
         void Accept()
         {
-            if (list.SelectedItems.Count != 1) { MessageBox.Show(this, "ウィンドウを1つ選んでください。", "AppLayout"); return; }
+            if (list.SelectedItems.Count != 1) { MessageBox.Show(this, L.T("ウィンドウを1つ選んでください。"), "AppLayout"); return; }
             Selected = (WinInfo)list.SelectedItems[0].Tag;
             DialogResult = DialogResult.OK;
         }
@@ -101,7 +102,8 @@ namespace AppLayout
         {
             entry = e;
             AppTheme.Apply(this);
-            Text = isNew ? "配置を登録" : "配置を編集";
+            Text = isNew ? L.T("配置を登録") : L.T("配置を編集");
+            L.BindText(this,isNew?"配置を登録":"配置を編集");
             MaximizeBox = false; MinimizeBox = false; ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
             ClientSize = Ui.Sz(590, 600); MinimumSize = Ui.Sz(390, 330);
@@ -115,7 +117,8 @@ namespace AppLayout
 
             header = new TableLayoutPanel { AutoSize = true, Dock = DockStyle.Fill, ColumnCount = 1, BackColor = AppTheme.Surface, Padding = new Padding(Ui.S(24), Ui.S(16), Ui.S(24), Ui.S(10)), Margin = Padding.Empty };
             header.Controls.Add(new Label { Text = Text, AutoSize = true, Font = UiTypography.BodyFont(1.25f, FontStyle.Bold), Margin = Padding.Empty });
-            header.Controls.Add(new Label { Text = "対象アプリ  /  " + (e.Process ?? ""), ForeColor = AppTheme.Muted, AutoSize = true, Margin = new Padding(0, Ui.S(4), 0, 0) });
+            L.BindText(header.Controls[0],isNew?"配置を登録":"配置を編集");
+            header.Controls.Add(new Label { Text = L.T("対象アプリ  /  ") + (e.Process ?? ""), ForeColor = AppTheme.Muted, AutoSize = true, Margin = new Padding(0, Ui.S(4), 0, 0) });
             root.Controls.Add(header, 0, 0);
 
             scroll = new ThemedScrollPanel { Dock = DockStyle.Fill, Margin = Padding.Empty, BackColor = AppTheme.Surface };
@@ -124,9 +127,9 @@ namespace AppLayout
             scroll.Content.Controls.Add(content); root.Controls.Add(scroll, 0, 1);
 
             txtName = new TextBox { Name = "EntryName", Text = e.Name ?? "", MaxLength = 200, Dock = DockStyle.Fill };
-            AddBlock(Field("名前", txtName));
+            AddBlock(Field(L.T("名前"), txtName));
 
-            AddSection("配置");
+            AddSection(L.T("配置"));
             var geometry = new TableLayoutPanel { AutoSize = true, Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 2, Margin = Padding.Empty };
             geometry.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50)); geometry.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
             geometry.RowStyles.Add(new RowStyle(SizeType.AutoSize)); geometry.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -134,7 +137,7 @@ namespace AppLayout
             numX.Name = "PositionX"; numY.Name = "PositionY";
             numW = Num(Math.Max(1, e.Width)); numH = Num(Math.Max(1, e.Height)); numW.Minimum = 1; numH.Minimum = 1;
             numW.Name = "WindowWidth"; numH.Name = "WindowHeight";
-            var fields = new Control[] { Field("X 座標（px）", numX), Field("Y 座標（px）", numY), Field("幅（px）", numW), Field("高さ（px）", numH) };
+            var fields = new Control[] { Field(L.T("X 座標（px）"), numX), Field(L.T("Y 座標（px）"), numY), Field(L.T("幅（px）"), numW), Field(L.T("高さ（px）"), numH) };
             for (int i = 0; i < fields.Length; i++)
             {
                 fields[i].Margin = new Padding(i % 2 == 0 ? 0 : Ui.S(8), 0, i % 2 == 0 ? Ui.S(8) : 0, Ui.S(7));
@@ -143,10 +146,10 @@ namespace AppLayout
             AddBlock(geometry);
             lblMonitor = new Label { AutoSize = true, ForeColor = AppTheme.Muted, Dock = DockStyle.Fill, Margin = new Padding(0, 0, 0, Ui.S(7)) };
             AddBlock(lblMonitor);
-            chkMax = new ToggleSwitch { Name = "Maximized", Text = "最大化して配置", Checked = e.Maximized, AutoSize = true, Margin = new Padding(0, 0, 0, Ui.S(4)) };
+            chkMax = new ToggleSwitch { Name = "Maximized", Text = L.T("最大化して配置"), Checked = e.Maximized, AutoSize = true, Margin = new Padding(0, 0, 0, Ui.S(4)) };
             AddBlock(chkMax);
 
-            AddSection("ウィンドウの見分け方");
+            AddSection(L.T("ウィンドウの見分け方"));
             cmbMode = new ComboBox { Name = "MatchMode", DropDownStyle = ComboBoxStyle.DropDownList, DrawMode = DrawMode.OwnerDrawFixed, ItemHeight = Math.Max(Ui.S(23), TextRenderer.MeasureText("Ag", Font).Height + Ui.S(4)), Dock = DockStyle.Fill };
             cmbMode.Items.AddRange(ModeLabels);
             cmbMode.SelectedIndex = Math.Max(0, Array.IndexOf(ModeKeys, e.TitleModeOrNone));
@@ -154,27 +157,28 @@ namespace AppLayout
             cmbMode.DrawItem += DrawModeItem;
             cmbMode.Margin = new Padding(0, 0, 0, Ui.S(7)); AddBlock(cmbMode);
             txtTitle = new TextBox { Name = "MatchTitle", Text = e.Title ?? "", MaxLength = 2000, Dock = DockStyle.Fill };
-            titleField = Field("タイトル条件", txtTitle); AddBlock(titleField);
+            titleField = Field(L.T("タイトル条件"), txtTitle); AddBlock(titleField);
             titleHint = new Label { AutoSize = true, ForeColor = AppTheme.Muted, Dock = DockStyle.Fill, Margin = new Padding(0, 0, 0, Ui.S(6)) };
             AddBlock(titleHint);
             lblMatch = new Label { Name = "MatchStatus", AutoSize = true, Dock = DockStyle.Fill, Margin = new Padding(0, 0, 0, Ui.S(2)) };
             AddBlock(lblMatch);
 
-            detailsButton = AppTheme.Button("識別情報を表示", false);
+            detailsButton = AppTheme.Button(L.T("識別情報を表示"), false);
             detailsButton.FlatAppearance.BorderSize = 0; detailsButton.ForeColor = AppTheme.Muted;
             detailsButton.Margin = new Padding(0, Ui.S(6), 0, 0); detailsButton.MinimumSize = Size.Empty;
             detailsButton.Padding = new Padding(0, Ui.S(4), Ui.S(8), Ui.S(4));
             detailsButton.Anchor = AnchorStyles.Left;
             AddBlock(detailsButton);
             details = new TextBox { ReadOnly = true, Multiline = true, ScrollBars = ScrollBars.None, Height = Ui.S(76), Dock = DockStyle.Fill, Visible = false,
-                Text = "プロセス: " + e.Process + "\r\nクラス: " + e.Class + "\r\nアプリID: " + (string.IsNullOrEmpty(e.AppId) ? "なし" : e.AppId), Margin = new Padding(0, Ui.S(4), 0, 0) };
+                Text = L.T("プロセス: ") + e.Process + L.T("\r\nクラス: ") + e.Class + L.T("\r\nアプリID: ") + (string.IsNullOrEmpty(e.AppId) ? "なし" : e.AppId), Margin = new Padding(0, Ui.S(4), 0, 0) };
             AppTheme.StyleInput(details); AddBlock(details);
-            detailsButton.Click += delegate { details.Visible = !details.Visible; if(details.Visible)ResizeDetails();detailsButton.Text = details.Visible ? "識別情報を閉じる" : "識別情報を表示"; };
+            detailsButton.Click += delegate { details.Visible = !details.Visible; if(details.Visible)ResizeDetails();detailsButton.Text = details.Visible ? L.T("識別情報を閉じる") : L.T("識別情報を表示"); };
             details.SizeChanged+=delegate {if(details.Visible)ResizeDetails();};
 
             var buttons = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.RightToLeft, Dock = DockStyle.Fill, BackColor = AppTheme.Background, Padding = new Padding(Ui.S(16), Ui.S(12), Ui.S(24), Ui.S(12)), Margin = Padding.Empty, WrapContents = true };
-            var cancel = AppTheme.Button("キャンセル", false); cancel.DialogResult = DialogResult.Cancel;
-            var ok = AppTheme.Button("登録を確定", true); ok.Name = "ConfirmEntry";
+            var cancel = AppTheme.Button(L.T("キャンセル"), false); cancel.DialogResult = DialogResult.Cancel;
+            var ok = AppTheme.Button(L.T("登録を確定"), true); ok.Name = "ConfirmEntry";
+            L.BindText(ok,"登録を確定");
             ok.Click += delegate { Accept(); };
             buttons.Controls.Add(ok); buttons.Controls.Add(cancel);
             root.Controls.Add(buttons, 0, 2);
@@ -188,6 +192,15 @@ namespace AppLayout
             content.SizeChanged += delegate { UpdateWrapWidths(); };
             header.SizeChanged += delegate { UpdateWrapWidths(); };
             QueueMatch(); UpdateMonitor();
+            L.Attach(this,delegate {
+                int selected=cmbMode.SelectedIndex;
+                cmbMode.Items.Clear();foreach(string label in ModeLabels)cmbMode.Items.Add(L.T(label));
+                cmbMode.SelectedIndex=Math.Max(0,selected);
+                ((Label)header.Controls[1]).Text=L.F("対象アプリ  /  {0}",entry.Process??"");
+                detailsButton.Text=L.T(details.Visible?"識別情報を閉じる":"識別情報を表示");
+                details.Text=L.T("プロセス: ")+entry.Process+L.T("\r\nクラス: ")+entry.Class+L.T("\r\nアプリID: ")+(string.IsNullOrEmpty(entry.AppId)?L.T("なし"):entry.AppId);
+                UpdateMonitor();QueueMatch();UpdateWrapWidths();
+            });
         }
 
         protected override void OnShown(EventArgs e)
@@ -286,17 +299,17 @@ namespace AppLayout
         {
             txtTitle.Enabled = cmbMode.SelectedIndex > 0;
             titleField.Visible = cmbMode.SelectedIndex > 0;
-            titleHint.Text = cmbMode.SelectedIndex == 0 ? "同じアプリのウィンドウが複数ある場合は、タイトル条件で絞り込みます。"
-                : cmbMode.SelectedIndex == 3 ? "例: Discord$ は、タイトルの末尾が Discord のウィンドウです。"
-                : cmbMode.SelectedIndex == 2 ? "タイトルに含まれる文字を指定します。大文字・小文字は区別しません。" : "タイトル全体を指定します。大文字・小文字も区別します。";
-            lblMatch.Text = "条件を確認しています…"; lblMatch.ForeColor = AppTheme.Muted;
+            titleHint.Text = cmbMode.SelectedIndex == 0 ? L.T("同じアプリのウィンドウが複数ある場合は、タイトル条件で絞り込みます。")
+                : cmbMode.SelectedIndex == 3 ? L.T("例: Chat$ は、タイトルの末尾が Chat のウィンドウです。")
+                : cmbMode.SelectedIndex == 2 ? L.T("タイトルに含まれる文字を指定します。大文字・小文字は区別しません。") : L.T("タイトル全体を指定します。大文字・小文字も区別します。");
+            lblMatch.Text = L.T("条件を確認しています…"); lblMatch.ForeColor = AppTheme.Muted;
             matchTimer.Stop(); matchTimer.Start();
         }
 
         void UpdateMonitor()
         {
             string monitor = WindowScanner.MonitorLabel((int)numX.Value, (int)numY.Value, (int)numW.Value, (int)numH.Value, WindowScanner.GetMonitors());
-            lblMonitor.Text = monitor == "なし" || monitor == "?" ? "配置先: 該当するモニタがありません" : "配置先: モニタ " + monitor;
+            lblMonitor.Text = monitor == "なし" || monitor == "?" ? L.T("配置先: 該当するモニタがありません") : L.F("配置先: モニタ {0}",monitor);
         }
 
         AppEntry Preview()
@@ -314,7 +327,7 @@ namespace AppLayout
             if (p.TitleMode == "regex")
             {
                 try { pattern = new System.Text.RegularExpressions.Regex(p.Title, System.Text.RegularExpressions.RegexOptions.None, TimeSpan.FromMilliseconds(100)); }
-                catch (ArgumentException) { lblMatch.Text = "正規表現の書き方が正しくありません"; lblMatch.ForeColor = AppTheme.Warning; return; }
+                catch (ArgumentException) { lblMatch.Text = L.T("正規表現の書き方が正しくありません"); lblMatch.ForeColor = AppTheme.Warning; return; }
             }
             int n = 0;
             try
@@ -331,24 +344,24 @@ namespace AppLayout
                         bool sameApp = p.Matches(w); p.TitleMode = mode;
                         if (sameApp && pattern.IsMatch(w.Title ?? "")) n++;
                     }
-                    if (watch.ElapsedMilliseconds > 300) { lblMatch.Text = "条件の確認に時間がかかっています。条件を短くしてください。"; lblMatch.ForeColor = AppTheme.Warning; return; }
+                    if (watch.ElapsedMilliseconds > 300) { lblMatch.Text = L.T("条件の確認に時間がかかっています。条件を短くしてください。"); lblMatch.ForeColor = AppTheme.Warning; return; }
                 }
             }
-            catch (System.Text.RegularExpressions.RegexMatchTimeoutException) { lblMatch.Text = "正規表現の確認を中断しました。条件を簡単にしてください。"; lblMatch.ForeColor = AppTheme.Warning; return; }
-            if (n == 1) { lblMatch.Text = "1件に一致。この条件で配置できます。"; lblMatch.ForeColor = AppTheme.Accent; }
-            else if (n == 0) { lblMatch.Text = "一致するウィンドウはありません。未起動でも登録できます。"; lblMatch.ForeColor = AppTheme.Muted; }
-            else { lblMatch.Text = n + "件に一致。1件に絞り込むまで配置は実行しません。"; lblMatch.ForeColor = AppTheme.Warning; }
+            catch (System.Text.RegularExpressions.RegexMatchTimeoutException) { lblMatch.Text = L.T("正規表現の確認を中断しました。条件を簡単にしてください。"); lblMatch.ForeColor = AppTheme.Warning; return; }
+            if (n == 1) { lblMatch.Text = L.T("1件に一致。この条件で配置できます。"); lblMatch.ForeColor = AppTheme.Accent; }
+            else if (n == 0) { lblMatch.Text = L.T("一致するウィンドウはありません。未起動でも登録できます。"); lblMatch.ForeColor = AppTheme.Muted; }
+            else { lblMatch.Text = L.F("{0}件に一致。1件に絞り込むまで配置は実行しません。",n); lblMatch.ForeColor = AppTheme.Warning; }
         }
 
         void Accept()
         {
-            if (txtName.Text.Trim().Length == 0) { MessageBox.Show(this, "名前を入力してください。", "AppLayout"); return; }
+            if (txtName.Text.Trim().Length == 0) { MessageBox.Show(this, L.T("名前を入力してください。"), "AppLayout"); return; }
             var p = Preview();
-            if (p.TitleMode != "none" && p.Title.Length == 0) { MessageBox.Show(this, "タイトル条件を入力するか、「アプリで判定」を選んでください。", "AppLayout"); return; }
+            if (p.TitleMode != "none" && p.Title.Length == 0) { MessageBox.Show(this, L.T("タイトル条件を入力するか、「アプリで判定」を選んでください。"), "AppLayout"); return; }
             if (p.TitleMode == "regex")
             {
                 try { new System.Text.RegularExpressions.Regex(p.Title, System.Text.RegularExpressions.RegexOptions.None, TimeSpan.FromMilliseconds(100)); }
-                catch (ArgumentException) { MessageBox.Show(this, "正規表現の書き方が正しくありません。", "AppLayout", MessageBoxButtons.OK, MessageBoxIcon.Warning); txtTitle.Focus(); return; }
+                catch (ArgumentException) { MessageBox.Show(this, L.T("正規表現の書き方が正しくありません。"), "AppLayout", MessageBoxButtons.OK, MessageBoxIcon.Warning); txtTitle.Focus(); return; }
             }
             entry.Name = txtName.Text.Trim();
             entry.TitleMode = p.TitleMode; entry.Title = p.TitleMode == "none" ? "" : p.Title;

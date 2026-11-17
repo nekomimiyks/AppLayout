@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -48,6 +48,8 @@ namespace AppLayout
         bool busy, readingSettings;
         DataGridViewRow hoverEdit;
         bool initialSizeApplied;
+        readonly ComboBox language;
+        bool readingLanguage;
 
         public LedgerForm(AppController controller)
         {
@@ -75,7 +77,7 @@ namespace AppLayout
 
             command = Strip(AppTheme.Surface, 13, 3);
             title = Flow();
-            title.Controls.Add(Caption("登録済みの配置", heading, AppTheme.Foreground));
+            title.Controls.Add(Caption(L.T("登録済みの配置"), heading, AppTheme.Foreground));
             savedCount = Caption("", bold, AppTheme.Accent);
             title.Controls.Add(savedCount);
             commands = Flow();
@@ -90,9 +92,9 @@ namespace AppLayout
             enabled = Check(Texts.Enabled, Texts.EnabledTip);
             autoStatus = Caption("", secondary, AppTheme.Muted);
             automatic.Controls.AddRange(new Control[] { enabled, autoStatus });
-            settings = AppTheme.Button("設定を開く", false);
+            settings = AppTheme.Button(L.T("設定を開く"), false);
             settings.Name = "SettingsButton";
-            settings.AccessibleName = "起動と終了の設定を開く";
+            settings.AccessibleName = L.T("起動と終了の設定を開く");
             settings.MinimumSize = Ui.Sz(120, 36);
             settings.BackColor = AppTheme.Background;
             settings.FlatAppearance.BorderColor = AppTheme.Muted;
@@ -105,13 +107,33 @@ namespace AppLayout
             login = Check(Texts.AutoStart, Texts.AutoStartTip); launch = Check(Texts.LaunchMissing, Texts.LaunchMissingTip);
             tray = Check(Texts.MinimizeToTrayOnClose, Texts.MinimizeToTrayOnCloseTip);
             preferences.Controls.AddRange(new Control[] { login, launch, tray });
+            var languageLabel=Caption(L.T("言語"),secondary,AppTheme.Muted);
+            languageLabel.Margin=Pad(0,6,8,4);
+            language=new ComboBox { Name="LanguageSelector",DropDownStyle=ComboBoxStyle.DropDownList,
+                DrawMode=DrawMode.OwnerDrawFixed,Width=Ui.S(240),Margin=Pad(0,3,0,3),AccessibleName=L.T("言語") };
+            language.DrawItem+=delegate(object sender,DrawItemEventArgs e) {
+                var item=e.Index>=0 && e.Index<language.Items.Count?language.Items[e.Index]:language.SelectedItem;
+                bool selected=(e.State&DrawItemState.Selected)!=0;
+                using(var brush=new SolidBrush(selected?AppTheme.ActiveRow:AppTheme.Surface))e.Graphics.FillRectangle(brush,e.Bounds);
+                if(item!=null)TextRenderer.DrawText(e.Graphics,item.ToString(),e.Font,new Rectangle(e.Bounds.X+Pixel(4),e.Bounds.Y,Math.Max(1,e.Bounds.Width-Pixel(8)),e.Bounds.Height),AppTheme.Foreground,TextFormatFlags.VerticalCenter|TextFormatFlags.SingleLine|TextFormatFlags.NoPrefix|TextFormatFlags.EndEllipsis);
+                e.DrawFocusRectangle();
+            };
+            foreach(var choice in L.Languages)language.Items.Add(choice.ToString());
+            AppTheme.StyleInput(language);
+            var languageGroup=Flow();languageGroup.Controls.Add(languageLabel);languageGroup.Controls.Add(language);
+            preferences.Controls.Add(languageGroup);
+            language.SelectedIndexChanged+=delegate {
+                if(readingLanguage || language.SelectedItem==null)return;
+                try{controller.Language=L.Languages[language.SelectedIndex].Code;}
+                catch(Exception ex){MessageBox.Show(this,ex.Message,L.T("設定を変更できませんでした"),MessageBoxButtons.OK,MessageBoxIcon.Error);ReadLanguage();}
+            };
             preferences.Visible = false; root.Controls.Add(preferences, 0, 2);
             settings.Click += delegate
             {
                 bool open = !preferences.Visible;
                 preferences.Visible = open;
-                settings.Text = open ? "設定を閉じる" : "設定を開く";
-                settings.AccessibleName = "起動と終了の" + settings.Text;
+                settings.Text = open ? L.T("設定を閉じる") : L.T("設定を開く");
+                settings.AccessibleName = settings.Text;
                 settings.BackColor = open ? AppTheme.Band : AppTheme.Background;
                 settings.FlatAppearance.BorderColor = open ? AppTheme.Accent : AppTheme.Muted;
                 ArrangeCommands();
@@ -121,7 +143,7 @@ namespace AppLayout
             gridHost = new GridScrollHost(grid) { Dock = DockStyle.Fill, MinimumSize = Ui.Sz(0, 84) };
             root.Controls.Add(gridHost, 0, 3);
             var footer = Strip(AppTheme.Background, 10, 10);
-            var hint = Caption("対象を ON にすると現在位置を登録し、OFF にすると登録を解除します。", secondary, AppTheme.Muted);
+            var hint = Caption(L.T("対象を ON にすると現在位置を登録し、OFF にすると登録を解除します。"), secondary, AppTheme.Muted);
             hint.Dock = DockStyle.Fill;
             footer.Controls.Add(hint, 0, 0); footer.SetColumnSpan(hint, 2);
             root.Controls.Add(footer, 0, 4);
@@ -135,7 +157,7 @@ namespace AppLayout
             {
                 Perform(delegate
                 {
-                    if (MessageBox.Show(this, "登録済みの " + savedTotal + " 件をすべて解除しますか？",
+                    if (MessageBox.Show(this, L.F("登録済みの {0} 件をすべて解除しますか？",savedTotal),
                         Texts.Unsave, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                         controller.UnsaveAll();
                 });
@@ -151,6 +173,32 @@ namespace AppLayout
             ArrangeCommands();
             controller.RowsChanged += RowsChanged;
             VisibleChanged += delegate { if (Visible && !IsDisposed) RefreshLedger(); };
+            L.Attach(this,delegate {
+                controller.ClearMessage();
+                ReadLanguage();
+                settings.Text=L.T(preferences.Visible?"設定を閉じる":"設定を開く");
+                settings.AccessibleName=L.T("起動と終了の設定を開く");
+                tips.SetToolTip(enabled,Texts.EnabledTip);tips.SetToolTip(login,Texts.AutoStartTip);
+                tips.SetToolTip(launch,Texts.LaunchMissingTip);tips.SetToolTip(tray,Texts.MinimizeToTrayOnCloseTip);
+                ReadSettings();RefreshLedger();MeasureGrid();ArrangeCommands();
+            });
+        }
+
+        void ReadLanguage() {
+            readingLanguage=true;
+            try {
+                language.Items.Clear();
+                foreach(var choice in L.Languages)language.Items.Add(choice.ToString());
+                for(int i=0;i<language.Items.Count;i++)if(L.Languages[i].Code==controller.Language){language.SelectedIndex=i;break;}
+                MeasureLanguage();
+            }finally{readingLanguage=false;}
+        }
+        void MeasureLanguage() {
+            if(language==null)return;
+            int widest=0;foreach(var choice in L.Languages)widest=Math.Max(widest,TextRenderer.MeasureText(choice.ToString(),language.Font).Width);
+            language.Width=Math.Max(Pixel(240),widest+Pixel(32));language.DropDownWidth=language.Width;
+            language.ItemHeight=Math.Max(Pixel(23),TextRenderer.MeasureText("Ag",language.Font).Height+Pixel(4));
+            language.Invalidate();
         }
 
         static Point StartupPoint()
@@ -306,7 +354,7 @@ namespace AppLayout
             {
                 enabled.Checked = controller.Enabled; login.Checked = controller.AutoStart; launch.Checked = controller.LaunchMissing;
                 tray.Checked = controller.MinimizeToTrayOnClose;
-                autoStatus.Text = enabled.Checked ? "約2秒ごとに自動復元" : "自動復元を一時停止中";
+                autoStatus.Text = enabled.Checked ? L.T("約2秒ごとに自動復元") : L.T("自動復元を一時停止中");
                 ArrangeCommands();
             }
             finally { readingSettings = false; }
@@ -317,13 +365,13 @@ namespace AppLayout
             {
                 if (readingSettings) return;
                 try { write(check.Checked); }
-                catch (Exception ex) { MessageBox.Show(this, ex.Message, "設定を変更できませんでした", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+                catch (Exception ex) { MessageBox.Show(this, ex.Message, L.T("設定を変更できませんでした"), MessageBoxButtons.OK, MessageBoxIcon.Error); }
                 ReadSettings();
             };
         }
         void ConfigureGrid()
         {
-            grid.Name = "LedgerGrid"; grid.AccessibleName = "モニタ別の配置台帳";
+            grid.Name = "LedgerGrid"; grid.AccessibleName = L.T("モニタ別の配置台帳");
             grid.Dock = DockStyle.Fill; grid.Margin = Padding.Empty; grid.BorderStyle = BorderStyle.None;
             grid.BackgroundColor = AppTheme.Surface; grid.GridColor = AppTheme.Border; grid.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
             grid.EnableHeadersVisualStyles = false; grid.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
@@ -335,15 +383,15 @@ namespace AppLayout
             grid.DefaultCellStyle = Style(AppTheme.Surface, AppTheme.Foreground);
             grid.DefaultCellStyle.Padding = Pad(7, 0, 6, 0);
             grid.ColumnHeadersDefaultCellStyle.Padding = Pad(7, 0, 4, 0);
-            var check = new DataGridViewCheckBoxColumn { HeaderText = "対象", Name = "Target", Width = Ui.S(82),
+            var check = new DataGridViewCheckBoxColumn { HeaderText = L.T("対象"), Name = "Target", Width = Ui.S(82),
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.None, FlatStyle = FlatStyle.Standard };
             check.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             check.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
             check.HeaderCell.Style.Padding = check.DefaultCellStyle.Padding = Padding.Empty;
             grid.Columns.Add(check);
-            AddColumn("名前 ／ プロセス", 24, 115); AddColumn("位置 ／ サイズ", 19, 111); AddColumn("見分け方", 18, 100);
-            AddColumn("最大化", 8, 61); AddColumn("登録 ／ 状態", 20, 127);
-            var edit = new DataGridViewButtonColumn { HeaderText = "編集", Width = Ui.S(62), Name = "Edit",
+            AddColumn(L.T("名前 ／ プロセス"), 24, 115); AddColumn(L.T("位置 ／ サイズ"), 19, 111); AddColumn(L.T("見分け方"), 18, 100);
+            AddColumn(L.T("最大化"), 8, 61); AddColumn(L.T("登録 ／ 状態"), 20, 127);
+            var edit = new DataGridViewButtonColumn { HeaderText = L.T("編集"), Width = Ui.S(62), Name = "Edit",
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.None, FlatStyle = FlatStyle.Flat };
             edit.DefaultCellStyle.Padding = Pad(3, 9, 6, 9); grid.Columns.Add(edit);
             foreach (DataGridViewColumn col in grid.Columns) col.SortMode = DataGridViewColumnSortMode.NotSortable;
@@ -380,7 +428,7 @@ namespace AppLayout
         {
             base.OnUiScaleChanged(factor);
             if (grid == null || grid.Columns.Count <= EditColumn || message == null) return;
-            MeasureGrid(); ArrangeCommands();
+            MeasureGrid(); MeasureLanguage(); ArrangeCommands();
         }
         protected override void OnTextMetricsChanged()
         {
@@ -389,7 +437,7 @@ namespace AppLayout
             var priorHeading = heading; var priorBold = bold; var priorSecondary = secondary;
             CreateFonts();
             priorHeading.Dispose(); priorBold.Dispose(); priorSecondary.Dispose();
-            MeasureGrid(); ArrangeCommands();
+            MeasureGrid(); MeasureLanguage(); ArrangeCommands();
         }
         void MeasureGrid()
         {
@@ -408,7 +456,7 @@ namespace AppLayout
                 grid.ColumnHeadersHeight = Math.Max(Pixel(30), bodyLineHeight + Pixel(8));
                 grid.RowTemplate.Height = rowHeight;
                 int[] minima = { 82, 115, 111, 100, 61, 105, 62 };
-                string[] samples = { "", "", "-2887, -1673", "アプリで判定", "いいえ", "位置を戻しました", Texts.Edit };
+                string[] samples = { "", "", "-2887, -1673", L.T("アプリで判定"), L.T("いいえ"), L.T("位置を戻しました"), Texts.Edit };
                 for (int i = 0; i < minima.Length; i++)
                 {
                     var column = grid.Columns[i];
@@ -537,7 +585,7 @@ namespace AppLayout
             if (busy) return;
             busy = true;
             try { action(); }
-            catch (Exception ex) { MessageBox.Show(this, ex.Message, "配置を変更できませんでした", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+            catch (Exception ex) { MessageBox.Show(this, ex.Message, L.T("配置を変更できませんでした"), MessageBoxButtons.OK, MessageBoxIcon.Error); }
             finally { busy = false; RefreshLedger(); }
         }
         void RowsChanged(object sender, EventArgs e) { if (Visible) RefreshLedger(); }
@@ -643,13 +691,13 @@ namespace AppLayout
                     SetCell(view, NameColumn, row.Name + "\n" + row.Process);
                     SetCell(view, Geometry, (string.IsNullOrEmpty(row.Position) ? "—" : row.Position) + "\n" +
                         (string.IsNullOrEmpty(row.Size) ? "—" : row.Size));
-                    SetCell(view, Rule, row.TitleRule); SetCell(view, Max, row.Maximized); SetCell(view, EditColumn, Texts.Edit);
+                    SetCell(view, Rule, L.Rule(row.TitleRule)); SetCell(view, Max, L.T(row.Maximized)); SetCell(view, EditColumn, Texts.Edit);
                 }
                 else
                 {
                     string group = key.Substring(6);
-                    string caption = GroupOrder(group) < int.MaxValue - 1 ? "モニタ " + group : "モニタ" + group;
-                    if (SetCell(view, NameColumn, caption + "    " + counts[key] + " 件"))
+                    string caption = GroupOrder(group) < int.MaxValue - 1 ? L.F("モニタ {0}",group) : L.F("モニタ{0}",L.T(group));
+                    if (SetCell(view, NameColumn, caption + "    " + L.F("{0} 件",counts[key])))
                         grid.InvalidateCell(view.Cells[Target]);
                 }
             }
@@ -666,7 +714,7 @@ namespace AppLayout
         void UpdateTarget(DataGridViewRow view, WindowRow row)
         {
             SetCell(view, Target, row.Saved);
-            SetCell(view, State, (row.Saved ? "登録済み" : "未登録") + "\n" + row.Status);
+            SetCell(view, State, (row.Saved ? L.T("登録済み") : L.T("未登録")) + "\n" + L.T(row.Status));
             Color background = row.Saved ? AppTheme.ActiveRow : AppTheme.Surface;
             if (view.DefaultCellStyle.BackColor != background)
                 view.DefaultCellStyle = Style(background, AppTheme.Foreground);
@@ -682,7 +730,7 @@ namespace AppLayout
         void UpdateSummary()
         {
             savedTotal = views.Values.Select(v => v.Tag as WindowRow).Count(r => r != null && r.Saved);
-            savedCount.Text = savedTotal + " 件";
+            savedCount.Text = L.F("{0} 件",savedTotal);
             execute.Enabled = clear.Enabled = savedTotal > 0;
         }
         protected override void Dispose(bool disposing)

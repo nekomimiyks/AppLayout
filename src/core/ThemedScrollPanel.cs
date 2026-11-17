@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -8,8 +8,8 @@ namespace AppLayout {
  public class ThemedScrollPanel : UserControl {
   readonly Panel viewport=new Panel {AutoScroll=false,Margin=Padding.Empty};
   readonly Panel content=new Panel {AutoScroll=false,Margin=Padding.Empty};
-  readonly ThemedScrollBar vertical=new ThemedScrollBar {Orientation=Orientation.Vertical,AccessibleName="縦スクロール"};
-  readonly ThemedScrollBar horizontal=new ThemedScrollBar {Orientation=Orientation.Horizontal,AccessibleName="横スクロール"};
+  readonly ThemedScrollBar vertical=new ThemedScrollBar {Orientation=Orientation.Vertical,AccessibleName=L.T("縦スクロール")};
+  readonly ThemedScrollBar horizontal=new ThemedScrollBar {Orientation=Orientation.Horizontal,AccessibleName=L.T("横スクロール")};
   readonly HashSet<Control> watched=new HashSet<Control>();
   bool arranging;
   public Panel Content {get{return content;}}

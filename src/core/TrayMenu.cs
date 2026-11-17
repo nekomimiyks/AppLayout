@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -26,7 +26,7 @@ namespace AppLayout
 
         public TrayMenu()
         {
-            AccessibleName = "AppLayout のメニュー";
+            AccessibleName = L.T("AppLayout のメニュー");
             ShowImageMargin = false;
             ShowCheckMargin = false;
             DropShadowEnabled = true;

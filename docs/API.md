@@ -5,6 +5,8 @@
 - 初期表示と `RowsChanged` で `GetRows()` を呼び一覧を描画する。イベントは UI スレッドで発火する。更新前に選択行の `Key` を保持し、更新後に同じキーを再選択する。
 - 一覧は保存順の保存済み行に続いて未保存ウィンドウを返す。`Saved`、`Window`、`StatusKind` を使って表示を分ける。保存済みでも未起動や複数該当の場合は `Window` が null になる。
 - `SetTarget(row, enabled)` は対象1行だけを即時登録／解除し、保存する。成功はtrue、ONにできない場合はfalseとLastMessage。I/O失敗時は例外を返し、メモリ上の登録は元に戻す。既存ONの再通知では座標を変えない。
+- 表示文言は `L.T(日本語原文)`、値を挿入する文言は `L.F(原文, args)` を使う。`src/locales/*.json` のKey/Value配列をexeへ埋め込む。`L.Attach(form, refresh)` は固定ラベルを再翻訳し、入力欄は変更しない。状態の内部キーとタイトル条件は翻訳しない。
+- `AppController.Language` は `auto` または対応言語コードを保存してから表示を切り替える。保存失敗時は元の設定と表示を維持する。翻訳の検証は `_dev/localization/verify.ps1`、言語切替の検証は `_dev/verification/run.ps1 -LocalizationOnly`。
 - `SaveCurrent(rows, owner)` は選択中を登録／更新し、非選択の登録済み行を解除する一括API。現在の画面では `SetTarget` を使う。
 - `UnsaveAll()` は全登録を解除する。UI側で事前に確認画面を出す。`Unsave(rows)` は指定した登録済み行を解除するAPI。
 - `RestoreNow(new List<WindowRow>())` は登録済みすべてに配置を実行する。編集は `Edit(row, owner)`、結果は `LastMessage` から表示する。

@@ -33,15 +33,17 @@ namespace AppLayout
                     return;
                 }
                 using (var earlyShowEvent = new EventWaitHandle(false, EventResetMode.AutoReset, ShowEventName)) {
+                L.SetLanguage("auto");
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
                 var store = new ConfigStore(ConfigStore.DefaultPath());
                 try { store.Load(); }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("設定ファイルを読み込めませんでした。\n" + store.Path + "\n\n" + ex.Message, "AppLayout", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(L.T("設定ファイルを読み込めませんでした。\n") + store.Path + "\n\n" + ex.Message, "AppLayout", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
+                L.SetLanguage(store.Config.Language);
                 var controller = new AppController(store, startup);
                 Shell.Run(UiFactory.CreateMainForm(controller), controller, startup);
                 }

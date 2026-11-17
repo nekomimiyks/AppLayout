@@ -121,6 +121,7 @@ namespace AppLayout
         [DataMember(Name = "savedAt", Order = 4)] public string SavedAt;
         [DataMember(Name = "minimizeToTrayOnClose", Order = 5)] public bool MinimizeToTrayOnClose;
         [DataMember(Name = "apps", Order = 6)] public List<AppEntry> Apps;
+        [DataMember(Name = "language", Order = 7, EmitDefaultValue = false)] public string Language;
 
         public LayoutConfig() { Defaults(); }
         [OnDeserializing] void OnDeserializing(StreamingContext c) { Defaults(); }

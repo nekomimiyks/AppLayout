@@ -162,7 +162,12 @@ namespace AppLayout
             options.SizeChanged += delegate { ArrangeCommands(); };
             ArrangeCommands();
             controller.RowsChanged += RowsChanged;
-            VisibleChanged += delegate { if (Visible && !IsDisposed) RefreshLedger(); };
+            bool firstShow = true;
+            VisibleChanged += delegate {
+                if (!Visible || IsDisposed) return;
+                if (firstShow) firstShow = false;
+                else RefreshLedger();
+            };
             L.Attach(this,delegate {
                 controller.ClearMessage();
                 ReadLanguage();
@@ -209,9 +214,10 @@ namespace AppLayout
             return new Size((int)Math.Min(width, Math.Max(1L, (long)desiredClient.Width + frame.Width)),
                 (int)Math.Min(height, Math.Max(1L, (long)desiredClient.Height + frame.Height)));
         }
-        protected override void OnShown(EventArgs e)
+        protected override void OnLoad(EventArgs e)
         {
-            base.OnShown(e);
+            base.OnLoad(e);
+            RefreshLedger();
             FitInitialWindow();
         }
         internal void FitInitialWindow()
@@ -232,11 +238,16 @@ namespace AppLayout
             PerformLayout();
             var root = (TableLayoutPanel)gridHost.Parent;
             root.PerformLayout();
-            int chromeHeight = root.Controls.Cast<Control>().Where(c => c != gridHost && c.Visible)
-                .Sum(c => c.Height + c.Margin.Vertical) + root.Padding.Vertical;
+            // 初回表示前は親フォームが非表示なので、Visible に頼らず常設の行を測る。
+            int chromeHeight = root.Padding.Vertical;
+            foreach (int row in new[] { 0, 1, 4 })
+            {
+                Control strip = root.GetControlFromPosition(0, row);
+                chromeHeight += strip.GetPreferredSize(new Size(root.ClientSize.Width, 0)).Height + strip.Margin.Vertical;
+            }
             long rowsHeight = grid.Rows.Cast<DataGridViewRow>().Sum(r => (long)r.Height);
             gridHost.SyncScrollBars();
-            int scrollbar = gridHost.HorizontalScrollVisible ? gridHost.ScrollBarThickness : 0;
+            int scrollbar = gridHost.HorizontalScrollNeeded ? gridHost.ScrollBarThickness : 0;
             int height = (int)Math.Min(int.MaxValue, Math.Max(Pixel(420),
                 rowsHeight + grid.ColumnHeadersHeight + chromeHeight + scrollbar + Pixel(4)));
             fit = FitStartupSize(new Size(width, height), frame, work, Pixel(14));

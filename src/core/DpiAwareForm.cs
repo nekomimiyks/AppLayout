@@ -10,11 +10,11 @@ namespace AppLayout {
   float uiScale = Ui.K;
   bool scaling;
   public float UiScale { get { return uiScale; } }
-  protected override void OnShown(EventArgs e) {
+  protected override void OnLoad(EventArgs e) {
    try { uint dpi = GetDpiForWindow(Handle); if (dpi > 0) UpdateDpi((int)dpi); }
    catch (EntryPointNotFoundException) { }
    ConstrainToScreen(Bounds);
-   base.OnShown(e);
+   base.OnLoad(e);
   }
   protected override void WndProc(ref Message message) {
    if (message.Msg == 0x02E0 && message.LParam != IntPtr.Zero) {

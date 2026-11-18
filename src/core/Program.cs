@@ -32,12 +32,12 @@ namespace AppLayout
                 }
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                var store = new ConfigStore(ConfigStore.DefaultPath());
-                try { store.Load(); }
+                ConfigStore store = null;
+                try { store = ConfigStore.OpenDefault(); store.Load(); }
                 catch (Exception ex)
                 {
                     L.SetLanguage("auto");
-                    MessageBox.Show(L.T("設定ファイルを読み込めませんでした。\n") + store.Path + "\n\n" + ex.Message, "AppLayout", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(L.T("設定ファイルを読み込めませんでした。\n") + (store == null ? "" : store.Path + "\n\n") + ex.Message, "AppLayout", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
                 L.SetLanguage(store.Config.Language);

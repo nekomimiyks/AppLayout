@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Diagnostics;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace AppLayout
 {
@@ -133,38 +137,74 @@ namespace AppLayout
         public readonly string Path;
         public LayoutConfig Config;
         public readonly object Sync = new object();
+        readonly string importPath;
+        byte[] savedContents;
+        const int SharingViolation = 32;
 
-        public ConfigStore(string path) { Path = path; }
+        public ConfigStore(string path) : this(path, null) { }
+        ConfigStore(string path, string importPath) { Path = path; this.importPath = importPath; }
 
         public void Load()
         {
-            if (File.Exists(Path))
+            lock (Sync)
             {
-                Config = Read<LayoutConfig>(Path);
-                if (Config == null) throw new SerializationException("Empty layout configuration.");
-                if (Config.Apps == null) Config.Apps = new List<AppEntry>();
-                Config.Apps.RemoveAll(entry => entry == null);
-                if (Config.IntervalSeconds < 1) Config.IntervalSeconds = 2;
-                var ids = new HashSet<string>(StringComparer.Ordinal);
-                foreach (var entry in Config.Apps)
+                byte[] contents = ReadFile(Path);
+                if (contents != null)
                 {
-                    entry.EnsureId();
-                    while (!ids.Add(entry.Id)) entry.Id = Guid.NewGuid().ToString("N");
+                    Config = Decode(contents);
+                    savedContents = contents;
+                    return;
                 }
-                return;
+                using (LockFile())
+                {
+                    // 別セッションが先に新規作成していたらその内容を使う。
+                    contents = ReadFile(Path);
+                    if (contents != null)
+                    {
+                        Config = Decode(contents);
+                        savedContents = contents;
+                        return;
+                    }
+                    Config = importPath == null ? new LayoutConfig() : Decode(File.ReadAllBytes(importPath));
+                    WriteFile();
+                }
             }
-            Config = new LayoutConfig();
-            Save();
         }
 
-        /// 設定ファイルの場所: exeと同じフォルダに書き込めればそこ、だめなら %APPDATA%\AppLayout
-        public static string DefaultPath()
+        internal static ConfigStore OpenDefault()
         {
-            string dir = AppDomain.CurrentDomain.BaseDirectory;
-            string local = System.IO.Path.Combine(dir, "layout.json");
-            if (File.Exists(local) && CanWrite(dir)) return local;
-            if (!File.Exists(local) && CanWrite(dir)) return local;
-            return System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AppLayout", "layout.json");
+            return OpenDefault(AppDomain.CurrentDomain.BaseDirectory,
+                System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AppLayout"));
+        }
+
+        internal static ConfigStore OpenDefault(string directory, string applicationData)
+        {
+            string local = System.IO.Path.Combine(directory, "layout.json");
+            string fallback = System.IO.Path.Combine(applicationData, "layout.json");
+            string imported = System.IO.Path.Combine(applicationData, "portable", PortableKey(local), "layout.json");
+            if (File.Exists(imported)) return new ConfigStore(imported);
+            bool localExists = File.Exists(local);
+            bool directoryWritable = CanWrite(directory);
+            if (directoryWritable && (!localExists || CanUpdate(local))) return new ConfigStore(local);
+            // 旧版が書き込めないディレクトリから使っていたユーザー設定はそのまま引き継ぐ。
+            if (!directoryWritable && File.Exists(fallback)) return new ConfigStore(fallback);
+            return localExists ? new ConfigStore(imported, local) : new ConfigStore(fallback);
+        }
+
+        static string PortableKey(string path)
+        {
+            using (var hash = SHA256.Create())
+                return BitConverter.ToString(hash.ComputeHash(Encoding.UTF8.GetBytes(System.IO.Path.GetFullPath(path).ToUpperInvariant())), 0, 16).Replace("-", "");
+        }
+
+        static bool CanUpdate(string path)
+        {
+            try
+            {
+                using (File.Open(path, FileMode.Open, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete)) return true;
+            }
+            catch (IOException ex) { if ((ex.HResult & 0xffff) == SharingViolation) return true; throw; }
+            catch (UnauthorizedAccessException) { return false; }
         }
 
         static bool CanWrite(string dir)
@@ -174,40 +214,106 @@ namespace AppLayout
                 string t = System.IO.Path.Combine(dir, ".write-test-" + Guid.NewGuid().ToString("N"));
                 File.WriteAllText(t, ""); File.Delete(t); return true;
             }
-            catch { return false; }
+            catch (IOException) { return false; }
+            catch (UnauthorizedAccessException) { return false; }
         }
 
         public void Save()
         {
             lock (Sync)
             {
-                string previousSavedAt = Config.SavedAt;
-                string tmp = Path + ".tmp";
-                try
+                using (LockFile())
                 {
-                    Config.SavedAt = DateTime.Now.ToString("o");
-                    Directory.CreateDirectory(System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(Path)));
-                    using (var fs = File.Create(tmp))
-                    using (var w = JsonReaderWriterFactory.CreateJsonWriter(fs, new UTF8Encoding(false), true, true, "  "))
-                    {
-                        new DataContractJsonSerializer(typeof(LayoutConfig)).WriteObject(w, Config);
-                    }
-                    if (File.Exists(Path)) File.Replace(tmp, Path, null);
-                    else File.Move(tmp, Path);
-                }
-                catch
-                {
-                    Config.SavedAt = previousSavedAt;
-                    throw;
+                    byte[] current = ReadFile(Path);
+                    if (current != savedContents &&
+                        (current == null || savedContents == null || !current.SequenceEqual(savedContents)))
+                        throw new IOException(L.T("設定が別の場所で変更されました。AppLayoutを再起動して最新の設定を読み込んでください。"));
+                    WriteFile();
                 }
             }
         }
 
-        static T Read<T>(string path)
+        FileStream LockFile()
         {
-            string text = File.ReadAllText(path, Encoding.UTF8).TrimStart('\uFEFF');
-            using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(text)))
-                return (T)new DataContractJsonSerializer(typeof(T)).ReadObject(ms);
+            Directory.CreateDirectory(System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(Path)));
+            var elapsed = Stopwatch.StartNew();
+            for (;;)
+            {
+                try { return File.Open(Path + ".lock", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None); }
+                catch (IOException ex)
+                {
+                    if ((ex.HResult & 0xffff) != SharingViolation || elapsed.ElapsedMilliseconds >= 500) throw;
+                    Thread.Sleep(20);
+                }
+            }
+        }
+
+        void WriteFile()
+        {
+            string previousSavedAt = Config.SavedAt;
+            string tmp = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(Path)),
+                ".layout-" + System.IO.Path.GetRandomFileName() + ".tmp");
+            bool created = false;
+            try
+            {
+                Config.SavedAt = DateTime.Now.ToString("o");
+                using (var fs = File.Open(tmp, FileMode.CreateNew))
+                {
+                    created = true;
+                    using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, new UTF8Encoding(false), true, true, "  "))
+                        new DataContractJsonSerializer(typeof(LayoutConfig)).WriteObject(writer, Config);
+                }
+                byte[] written = File.ReadAllBytes(tmp);
+                if (File.Exists(Path)) File.Replace(tmp, Path, null);
+                else File.Move(tmp, Path);
+                savedContents = written;
+            }
+            catch
+            {
+                Config.SavedAt = previousSavedAt;
+                throw;
+            }
+            finally
+            {
+                try { if (created) File.Delete(tmp); }
+                catch (IOException) { }
+                catch (UnauthorizedAccessException) { }
+            }
+        }
+
+        static byte[] ReadFile(string path)
+        {
+            try
+            {
+                using (var file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
+                using (var bytes = new MemoryStream())
+                {
+                    file.CopyTo(bytes);
+                    return bytes.ToArray();
+                }
+            }
+            catch (FileNotFoundException) { return null; }
+            catch (DirectoryNotFoundException) { return null; }
+        }
+
+        static LayoutConfig Decode(byte[] contents)
+        {
+            LayoutConfig config;
+            using (var ms = new MemoryStream(contents))
+            using (var reader = new StreamReader(ms, Encoding.UTF8, true))
+            using (var json = new MemoryStream(Encoding.UTF8.GetBytes(reader.ReadToEnd())))
+                config = (LayoutConfig)new DataContractJsonSerializer(typeof(LayoutConfig)).ReadObject(json);
+            if (config == null) throw new SerializationException("Empty layout configuration.");
+            if (config.Apps == null) config.Apps = new List<AppEntry>();
+            config.Apps.RemoveAll(entry => entry == null);
+            if (config.IntervalSeconds < 1) config.IntervalSeconds = 2;
+            var ids = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var entry in config.Apps)
+            {
+                entry.EnsureId();
+                while (!ids.Add(entry.Id)) entry.Id = Guid.NewGuid().ToString("N");
+            }
+            return config;
         }
     }
 }

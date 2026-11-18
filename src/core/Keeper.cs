@@ -16,11 +16,13 @@ namespace AppLayout
     public class Keeper
     {
         readonly ConfigStore store;
+        readonly object placementSync = new object();
         readonly AutoResetEvent wake = new AutoResetEvent(false);
         Thread thread;
         volatile bool stopping;
         readonly bool startupMode;
         readonly Stopwatch uptime = Stopwatch.StartNew();
+        readonly HashSet<string> launchedAtStartup = new HashSet<string>();
         bool launchPassDone;
         public string LogPath;
 
@@ -55,16 +57,16 @@ namespace AppLayout
 
         int Tick()
         {
-            AppEntry[] apps; bool enabled, launchMissing; int interval;
+            List<AppEntry> apps; bool enabled, launchMissing; int interval;
             lock (store.Sync)
             {
-                apps = store.Config.Apps.ToArray();
+                apps = store.Config.Apps;
                 enabled = store.Config.Enabled;
                 launchMissing = store.Config.LaunchMissingAtStartup;
                 interval = store.Config.IntervalSeconds;
             }
             var result = new Dictionary<AppEntry, EntryStatus>();
-            var wins = apps.Length == 0 ? new List<WinInfo>() : WindowScanner.ReadAll();
+            var wins = apps.Count == 0 ? new List<WinInfo>() : WindowScanner.ReadAll();
             Dictionary<IntPtr, int> assignments;
             var matchesByEntry = WindowScanner.MatchLayouts(apps, wins, out assignments);
             bool doLaunch = !launchPassDone && uptime.Elapsed.TotalSeconds > 20;
@@ -83,7 +85,12 @@ namespace AppLayout
                         lock (store.Sync)
                         {
                             if (!stopping && store.Config.Enabled && store.Config.LaunchMissingAtStartup &&
-                                store.Config.Apps.Contains(a) && TryLaunch(a)) st.Text = "起動しました";
+                                store.Config.Apps == apps && !launchedAtStartup.Contains(a.Id) &&
+                                !WindowScanner.HasCloakedMatch(wins, a) && TryLaunch(a))
+                            {
+                                launchedAtStartup.Add(a.Id);
+                                st.Text = "起動しました";
+                            }
                         }
                     }
                 }
@@ -97,33 +104,51 @@ namespace AppLayout
                     if (w.Minimized) st = new EntryStatus { Text = "最小化中（そのまま）", Kind = 0 };
                     else
                     {
-                        int r;
-                        lock (store.Sync)
-                        {
-                            // 一覧取得の間に解除・編集・一時停止された登録は操作しない。
-                            if (stopping || !store.Config.Enabled || !store.Config.Apps.Contains(a)) continue;
-                            uint pid;
-                            Native.GetWindowThreadProcessId(w.Handle, out pid);
-                            r = pid == w.Pid ? WindowScanner.Apply(w.Handle, a.X, a.Y, a.Width, a.Height, a.Maximized) : -1;
-                        }
+                        int r = Apply(w, a, apps, true);
                         if (r == 1) st = new EntryStatus { Text = "位置を戻しました", Kind = 0 };
-                        else if (r == 0) st = new EntryStatus { Text = "配置中", Kind = 0 };
+                        else if (r == 0 || r == WindowScanner.PlacementDeferred) st = new EntryStatus { Text = "配置中", Kind = 0 };
                         else
                         {
                             var mons = WindowScanner.GetMonitors();
                             bool off = WindowScanner.MonitorLabel(a.X, a.Y, a.Width, a.Height, mons)== "なし";
                             st = off ? new EntryStatus { Text = "保存位置のモニタがありません", Kind = 1 }
-                                     : new EntryStatus { Text = "配置中", Kind = 0 };
+                                     : new EntryStatus { Text = "配置を変更できませんでした", Kind = 1 };
                         }
                     }
                 }
                 result[a] = st;
             }
-            if (doLaunch) launchPassDone = true;
+            if (doLaunch)
+            {
+                lock (store.Sync) launchPassDone = store.Config.Apps == apps;
+                if (launchPassDone) launchedAtStartup.Clear();
+            }
 
             var h = StatusUpdated;
             if (!stopping && h != null) h(result);
             return interval;
+        }
+
+        internal int Apply(WinInfo previous, AppEntry entry, List<AppEntry> matchedEntries, bool automatic)
+        {
+            lock (placementSync)
+            {
+                var window = WindowScanner.ReadCurrent(previous);
+                if (window == null || !entry.Matches(window) ||
+                    matchedEntries.Exists(other => other != entry && other.Matches(window))) return -1;
+                return WindowScanner.Apply(window.Handle, window.Pid, entry.X, entry.Y, entry.Width, entry.Height,
+                    entry.Maximized, delegate
+                    {
+                        lock (store.Sync)
+                            return !stopping && store.Config.Apps == matchedEntries && (!automatic || store.Config.Enabled);
+                    }, delegate
+                    {
+                        if (WindowScanner.HasOtherMatch(window, entry)) return false;
+                        var latest = WindowScanner.ReadCurrent(window);
+                        return latest != null && entry.Matches(latest) &&
+                            !matchedEntries.Exists(other => other != entry && other.Matches(latest));
+                    });
+            }
         }
 
         bool TryLaunch(AppEntry a)

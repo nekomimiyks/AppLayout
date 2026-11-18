@@ -21,6 +21,8 @@ namespace AppLayout {
  public class AppController {
   readonly ConfigStore store; readonly Keeper keeper; readonly SynchronizationContext context;
   Dictionary<AppEntry, EntryStatus> statuses = new Dictionary<AppEntry, EntryStatus>();
+  bool restorePending;
+  volatile bool stopped;
   public event EventHandler RowsChanged;
   public string LastMessage { get; private set; }
   public AppController(ConfigStore store, bool startupMode) {
@@ -39,12 +41,13 @@ namespace AppLayout {
     var matches=matchesByEntry[e];
     bool unique=matches.Count==1 && assignments[matches[0].Handle]==1;
     var row = new WindowRow { Key = "e:" + e.Id, Entry = e, Saved = true, Window = unique ? matches[0] : null, Name = e.Name, Process = e.Process, Position = e.X + ", " + e.Y, Size = e.Width + " × " + e.Height, Monitor = WindowScanner.MonitorLabel(e.X,e.Y,e.Width,e.Height,mons), TitleRule = e.TitleRuleText, Maximized = e.Maximized ? "はい" : "いいえ" };
-    EntryStatus st; if (matches.Count == 0) { row.Status = "未起動"; row.StatusKind = 2; }
+    EntryStatus st; if (matches.Count == 0) { row.Status = WindowScanner.HasCloakedMatch(all,e) ? "非表示中" : "未起動"; row.StatusKind = 2; }
     else if (!unique) { row.Status = "該当が複数"; row.StatusKind = 1; }
     else if (!Enabled) { row.Status = "一時停止中"; row.StatusKind = 2; }
     else if (row.Monitor == "なし") { row.Status = "モニタなし"; row.StatusKind = 1; }
     else if (row.Window.Minimized) { row.Status = "最小化中"; row.StatusKind = 0; }
-    else { row.Status = statuses.TryGetValue(e, out st) && st.Text == "位置を戻しました" ? st.Text : "配置中"; row.StatusKind = 0; }
+    else if (statuses.TryGetValue(e, out st) && (st.Text == "位置を戻しました" || st.Text == "配置を変更できませんでした")) { row.Status = st.Text; row.StatusKind = st.Kind; }
+    else { row.Status = "配置中"; row.StatusKind = 0; }
     result.Add(row);
    }
    foreach (var w in all) if (!assignments.ContainsKey(w.Handle) && WindowScanner.IsPickable(w)) {
@@ -53,15 +56,6 @@ namespace AppLayout {
    return result;
   }
   AppEntry NewEntry(WinInfo w) { var e = AppEntry.FromWindow(w); int count = 0; foreach (var other in WindowScanner.ReadAll()) if (!WindowScanner.IsOwn(other) && e.Matches(other)) count++; if (count > 1) { e.TitleMode = "exact"; e.Title = w.Title; } return e; }
-  static WinInfo ReadCurrentWindow(WinInfo previous) {
-   if(previous==null)return null;
-   var window=WindowScanner.Describe(previous.Handle,null);
-   if(window==null || window.Minimized || window.Pid!=previous.Pid ||
-    !string.Equals(window.ProcessName,previous.ProcessName,StringComparison.OrdinalIgnoreCase) ||
-    AppEntry.ClassKey(window.Class)!=AppEntry.ClassKey(previous.Class) ||
-    !string.Equals(window.AppId,previous.AppId,StringComparison.Ordinal))return null;
-   return window;
-  }
   public bool SetTarget(WindowRow row, bool enabled) {
    if(row==null)return false;
    lock(store.Sync) {
@@ -73,7 +67,7 @@ namespace AppLayout {
      next.RemoveAt(index);
     } else {
      if(index>=0)return true;
-     var window=ReadCurrentWindow(row.Window);
+     var window=WindowScanner.ReadCurrent(row.Window);
      if(window==null) {
       LastMessage=L.T("現在位置を取得できません。ウィンドウを開いて最小化を解除してからONにしてください。");Changed();return false;
      }
@@ -100,7 +94,7 @@ namespace AppLayout {
     foreach (var row in rows) {
      AppEntry entry = null;
      if (row.Saved && row.Entry != null) entry = next.Find(delegate(AppEntry e) { return e.Id == row.Entry.Id; });
-     var w = ReadCurrentWindow(row.Window);
+     var w = WindowScanner.ReadCurrent(row.Window);
      if (entry != null && w != null && !entry.Matches(w)) w = null;
      if (w == null) {
       if (entry != null) kept++;
@@ -144,26 +138,46 @@ namespace AppLayout {
    LastMessage=L.F("{0}件の保存を解除しました",removed);keeper.Kick();Changed();
   }
   public void RestoreNow(IList<WindowRow> rows) {
+   if(restorePending || stopped)return;
    var ids=new HashSet<string>();
    foreach(var row in rows)if(row.Saved && row.Entry!=null)ids.Add(row.Entry.Id);
-   int restored=0,skipped=0;
-   // 表示後に条件・登録・一致数が変わるので、現在も一意に一致する登録だけを操作する。
-   foreach(var row in GetRows()) {
-    var entry=row.Entry;
-    if(!row.Saved || (rows.Count!=0 && !ids.Contains(entry.Id)))continue;
-    var window=ReadCurrentWindow(row.Window);
-    if(window!=null && entry.Matches(window) &&
-     WindowScanner.Apply(window.Handle,entry.X,entry.Y,entry.Width,entry.Height,entry.Maximized)>=0)restored++;
-    else skipped++;
-   }
-   LastMessage=L.F("{0}件の配置を実行しました",restored)+(skipped>0?L.F("（未起動・最小化中など {0}件はそのまま）",skipped):"");
-   Changed();
+   bool all=rows.Count==0;
+   List<AppEntry> entries;
+   lock(store.Sync)entries=store.Config.Apps;
+   restorePending=true;
+   ThreadPool.QueueUserWorkItem(delegate {
+    int restored=0,skipped=0;
+    Exception error=null;
+    try {
+     Dictionary<IntPtr,int> assignments;
+     var matches=WindowScanner.MatchLayouts(entries,WindowScanner.ReadAll(),out assignments);
+     foreach(var entry in entries) {
+      if(stopped)return;
+      if(!all && !ids.Contains(entry.Id))continue;
+      var candidates=matches[entry];
+      if(candidates.Count==1 && assignments[candidates[0].Handle]==1 &&
+       keeper.Apply(candidates[0],entry,entries,false)>=0)restored++;
+      else skipped++;
+     }
+    } catch(Exception ex){error=ex;}
+    if(stopped)return;
+    try {
+     context.Post(delegate {
+      restorePending=false;
+      if(stopped)return;
+      LastMessage=error==null
+       ? L.F("{0}件の配置を実行しました",restored)+(skipped>0?L.F("（未起動・最小化中など {0}件はそのまま）",skipped):"")
+       : L.T("配置を変更できませんでした")+"\n"+error.Message;
+      Changed();
+     },null);
+    } catch(InvalidOperationException) {}
+   });
   }
   public bool Edit(WindowRow row, IWin32Window owner) {
    AppEntry e;
    if (row.Saved) e = row.Entry.Clone();
    else {
-    var window = ReadCurrentWindow(row.Window);
+    var window = WindowScanner.ReadCurrent(row.Window);
     if (window == null) {
      LastMessage = L.T("ウィンドウが閉じられたか最小化されています。ウィンドウを開いてから編集してください。"); Changed(); return false;
     }
@@ -192,14 +206,42 @@ namespace AppLayout {
   public bool LaunchMissing { get { return store.Config.LaunchMissingAtStartup; } set { SaveSetting(ref store.Config.LaunchMissingAtStartup,value);Changed(); } }
   public bool MinimizeToTrayOnClose { get { return store.Config.MinimizeToTrayOnClose; } set { SaveSetting(ref store.Config.MinimizeToTrayOnClose,value);Changed(); } }
   public bool AutoStart {
+#if STORE_BUILD
+   get {
+    try { return IsStartupEnabled(ReadStartupResult(Windows.ApplicationModel.StartupTask.GetAsync("AppLayoutStartup")).State); }
+    catch(System.Runtime.InteropServices.COMException){return false;}
+    catch(TimeoutException){return false;}
+   }
+   set {
+    var task=ReadStartupResult(Windows.ApplicationModel.StartupTask.GetAsync("AppLayoutStartup"));
+    if(value)ReadStartupResult(task.RequestEnableAsync());
+    else task.Disable();
+    Changed();
+   }
+#else
    get {
     try { using (var k = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run")) return k != null && k.GetValue("AppLayout") != null; }
     catch (System.Security.SecurityException) { return false; }
     catch (UnauthorizedAccessException) { return false; }
    }
    set { using (var k = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run")) { if (value) k.SetValue("AppLayout", "\"" + Application.ExecutablePath + "\" /startup"); else k.DeleteValue("AppLayout", false); } Changed(); }
+#endif
   }
-  public void Start() { keeper.Start(); } public void Stop() { keeper.Stop(); }
+#if STORE_BUILD
+  static bool IsStartupEnabled(Windows.ApplicationModel.StartupTaskState state) {
+   return state==Windows.ApplicationModel.StartupTaskState.Enabled ||
+          state==Windows.ApplicationModel.StartupTaskState.EnabledByPolicy;
+  }
+  static T ReadStartupResult<T>(Windows.Foundation.IAsyncOperation<T> operation) {
+   var watch=System.Diagnostics.Stopwatch.StartNew();
+   while(operation.Status==Windows.Foundation.AsyncStatus.Started) {
+    if(watch.ElapsedMilliseconds>=1500)throw new TimeoutException();
+    Thread.Sleep(10);
+   }
+   return operation.GetResults();
+  }
+#endif
+  public void Start() { keeper.Start(); } public void Stop() { stopped=true;keeper.Stop(); }
   public string Language {
    get {return L.NormalizeSelection(store.Config.Language);}
    set {

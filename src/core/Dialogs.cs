@@ -333,7 +333,7 @@ namespace AppLayout
                 var watch = System.Diagnostics.Stopwatch.StartNew();
                 foreach (var w in WindowScanner.ReadAll())
                 {
-                    if (WindowScanner.IsOwn(w)) continue;
+                    if (WindowScanner.IsOwn(w) || w.Cloaked) continue;
                     if (pattern == null) { if (p.Matches(w)) n++; }
                     else
                     {

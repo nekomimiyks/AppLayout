@@ -18,10 +18,17 @@ namespace AppLayout {
   [DllImport("user32.dll")] static extern int ReleaseDC(IntPtr handle,IntPtr dc);
   [DllImport("gdi32.dll")] static extern uint GetPixel(IntPtr dc,int x,int y);
   [DllImport("uxtheme.dll")] static extern IntPtr GetWindowTheme(IntPtr handle);
+  [DllImport("dwmapi.dll")] static extern int DwmSetWindowAttribute(IntPtr handle,int attribute,ref int value,int size);
   static void Pump(int milliseconds){var watch=Stopwatch.StartNew();while(watch.ElapsedMilliseconds<milliseconds){Application.DoEvents();Thread.Sleep(10);}}
   static Color LivePixel(Control control,int x,int y){IntPtr dc=GetWindowDC(control.Handle);try{return ColorTranslator.FromWin32((int)GetPixel(dc,x,y));}finally{ReleaseDC(control.Handle,dc);}}
   static void Assert(bool value, string message) { if (!value) throw new Exception(message); checks++; Console.WriteLine("PASS: " + message); }
   static AppEntry Entry(string name) { return new AppEntry { Id = Guid.NewGuid().ToString("N"), Name = name, Process = "applayout-verification-missing", Class = "missing", Width = 800, Height = 600 }; }
+  static ConfigStore SeedStore(string path,LayoutConfig config) {
+   var store=new ConfigStore(path);
+   if(File.Exists(path))store.Load();
+   store.Config=config;
+   return store;
+  }
   [STAThread] static int Main(string[] args) {
    try {
     Console.OutputEncoding = System.Text.Encoding.UTF8;
@@ -37,7 +44,7 @@ namespace AppLayout {
      TestEditor(); TestLedger();
      Console.WriteLine("Completed " + checks + " checks."); return 0;
     }
-    TestLocalization(); TestController(); TestRealtime(); TestRestoreGeometry(); TestInstance(args); TestEditor(); TestTrayTransition(); TestCloseToTray(); TestTrayPlacement(); TestScrollbars(); TestStartupSizing();
+    TestLocalization(); TestConfigProtection(); TestController(); TestRealtime(); TestRestoreGeometry(); TestInstance(args); TestEditor(); TestTrayTransition(); TestTrayColors(); TestCloseToTray(); TestTrayPlacement(); TestScrollbars(); TestStartupSizing();
     if (args.Length > 1 && args[1] == "ledger") TestLedger();
     if (args.Length > 0 && File.Exists(args[0])) TestShell(args[0]);
     Console.WriteLine("Completed " + checks + " checks."); return 0;
@@ -56,7 +63,7 @@ namespace AppLayout {
    }
    string legacyPath=Path.Combine(output,"legacy-language.json");File.WriteAllText(legacyPath,"{\"enabled\":false,\"apps\":[]}");
    var legacy=new ConfigStore(legacyPath);legacy.Load();Assert(legacy.Config.Language==null && legacy.Config.Apps.Count==0,"言語フィールドのない既存設定を読める");
-   var store=new ConfigStore(Path.Combine(output,"language-layout.json"));store.Config=new LayoutConfig{Enabled=false,Language="ja"};
+   var store=SeedStore(Path.Combine(output,"language-layout.json"),new LayoutConfig{Enabled=false,Language="ja"});
    var entry=Entry("My {0} 名前");entry.Process="sample-chat";entry.TitleMode="regex";entry.Title="My private title$";entry.X=-1234;entry.Y=567;
    store.Config.Apps.Add(entry);store.Save();var controller=new AppController(store,false);
    using(var form=UiFactory.CreateMainForm(controller))
@@ -100,6 +107,16 @@ namespace AppLayout {
    }
    L.SetLanguage("ja");
   }
+  sealed class FixedWindow : Form {
+   public bool Fixed;
+   protected override void WndProc(ref Message m) {
+    if(Fixed && m.Msg==0x0046 && m.LParam!=IntPtr.Zero) {
+     int flags=2*IntPtr.Size+4*sizeof(int);
+     Marshal.WriteInt32(m.LParam,flags,Marshal.ReadInt32(m.LParam,flags)|3);
+    }
+    base.WndProc(ref m);
+   }
+  }
   static void TestRestoreGeometry() {
    var first = Entry("First rule");
    var second = first.Clone();
@@ -122,8 +139,70 @@ namespace AppLayout {
      "同じモニタの最大化ウィンドウは再最大化しない");
     Assert(WindowScanner.Apply(target.Handle,normal.X,normal.Y,0,normal.Height,false)==-1,
      "不正な大きさの配置は適用しない");
+    foreach(var screen in Screen.AllScreens) {
+     var work=screen.WorkingArea;
+     var move=new Rectangle(work.Left+40,work.Top+40,420,280);
+     Assert(WindowScanner.Apply(target.Handle,move.X,move.Y,move.Width,move.Height,true)>=0 &&
+      Native.IsZoomed(target.Handle) && Screen.FromHandle(target.Handle).DeviceName==screen.DeviceName,
+      "最大化状態を保って指定モニタへ配置 "+screen.DeviceName);
+    }
+    Assert(WindowScanner.Apply(target.Handle,normal.X,normal.Y,normal.Width,normal.Height,false)==1 &&
+     !Native.IsZoomed(target.Handle) && target.Bounds==normal,
+     "最大化解除と通常位置への移動を同じ要求で行う");
     target.Close();
    }
+   using(var fixedWindow=new FixedWindow{StartPosition=FormStartPosition.Manual,Bounds=new Rectangle(area.Left+40,area.Top+40,420,280),ShowInTaskbar=false}) {
+    fixedWindow.Show();Pump(100);
+    var original=fixedWindow.Bounds;
+    fixedWindow.Fixed=true;
+    Assert(WindowScanner.Apply(fixedWindow.Handle,original.X+45,original.Y+32,original.Width+20,original.Height,false)==-1 &&
+     fixedWindow.Bounds==original,"移動を拒否したウィンドウを配置成功に数えない");
+    fixedWindow.Fixed=false;
+    Assert(WindowScanner.Apply(fixedWindow.Handle,original.X+45,original.Y+32,original.Width+20,original.Height,false)==1,
+     "位置と寸法の変化を確認して配置成功を返す");
+    int cloak=1;
+    Assert(DwmSetWindowAttribute(fixedWindow.Handle,13,ref cloak,4)==0,"DWMで検証窓を非表示にできる");
+    var cloaked=WindowScanner.Describe(fixedWindow.Handle,null);
+    Assert(cloaked!=null && cloaked.Cloaked && !WindowScanner.IsPickable(cloaked) &&
+     WindowScanner.Apply(fixedWindow.Handle,original.X,original.Y,original.Width,original.Height,false)==-1,
+     "DWMで非表示の窓は起動済みと判断できるが、配置は行わない");
+    cloak=0;DwmSetWindowAttribute(fixedWindow.Handle,13,ref cloak,4);
+    Assert(!WindowScanner.Describe(fixedWindow.Handle,null).Cloaked,"DWMで再表示された窓は配置候補へ戻る");
+   }
+  }
+  static void TestConfigProtection() {
+   string dir=Path.Combine(output,"shell-test","cfg-"+Path.GetRandomFileName());
+   string portable=Path.Combine(dir,"portable"), appData=Path.Combine(dir,"appdata");
+   Directory.CreateDirectory(portable);
+   var initial=ConfigStore.OpenDefault(portable,appData);initial.Load();
+   var other=ConfigStore.OpenDefault(portable,appData);other.Load();
+   initial.Config.Apps.Add(Entry("別セッションで登録"));initial.Save();
+   other.Config.Language="en";
+   bool conflict=false;try{other.Save();}catch(IOException){conflict=true;}
+   var persisted=new ConfigStore(initial.Path);persisted.Load();
+   Assert(conflict && persisted.Config.Apps.Count==1 && persisted.Config.Language==null,
+    "古いセッションからの保存が新しい配置を上書きしない");
+   other.Load();other.Config.Language="en";other.Save();
+   persisted.Load();
+   Assert(persisted.Config.Apps.Count==1 && persisted.Config.Language=="en","最新の設定を読み直すと保存できる");
+   using(File.Open(initial.Path,FileMode.Open,FileAccess.Read,FileShare.Read)) {
+    var reading=ConfigStore.OpenDefault(portable,appData);
+    reading.Load();
+    Assert(reading.Path==initial.Path && reading.Config.Language=="en","別プロセスの読み取り中に設定保存先を変更しない");
+   }
+   byte[] original=File.ReadAllBytes(initial.Path);
+   File.SetAttributes(initial.Path,FileAttributes.ReadOnly);
+   try {
+    var migrated=ConfigStore.OpenDefault(portable,appData);migrated.Load();
+    Assert(migrated.Path!=initial.Path && migrated.Config.Apps.Count==1 && migrated.Config.Language=="en",
+     "読み取り専用の設定をユーザー設定領域へ引き継ぐ");
+    migrated.Config.Language="ko";migrated.Save();
+    File.SetAttributes(initial.Path,FileAttributes.Normal);
+    var reopened=ConfigStore.OpenDefault(portable,appData);reopened.Load();
+    Assert(reopened.Path==migrated.Path && reopened.Config.Language=="ko" &&
+     Convert.ToBase64String(original)==Convert.ToBase64String(File.ReadAllBytes(initial.Path)),
+     "移行元を変更せず、書き込み可能に戻った後も移行先を使用");
+   } finally {File.SetAttributes(initial.Path,FileAttributes.Normal);}
   }
   static void TestController() {
    string oldPath = Path.Combine(output,"duplicate-layout-ids.json");
@@ -132,7 +211,7 @@ namespace AppLayout {
    Assert(oldStore.Config.Apps.Count==2 && oldStore.Config.Apps[0].Id=="same" &&
     oldStore.Config.Apps[1].Id!="same" && oldStore.Config.Apps[1].Name=="Second","空行やIDの重複がある既存設定でも有効な登録を保持");
    string path = Path.Combine(output,"test-layout.json");
-   var store = new ConfigStore(path); store.Config = new LayoutConfig { Enabled = false };
+   var store = SeedStore(path,new LayoutConfig { Enabled = false });
    AppEntry keep = Entry("未起動・保持"), remove = Entry("選択解除"), mini = Entry("最小化・保持");
    keep.X = 42; store.Config.Apps.AddRange(new[] { keep,remove,mini }); store.Save();
    var c = new AppController(store,false);
@@ -201,7 +280,7 @@ namespace AppLayout {
    }
   }
   static void TestRealtime() {
-   var store=new ConfigStore(Path.Combine(output,"realtime-layout.json"));store.Config=new LayoutConfig {Enabled=false};
+   var store=SeedStore(Path.Combine(output,"realtime-layout.json"),new LayoutConfig {Enabled=false});
    var other=Entry("別の登録");other.X=987;store.Config.Apps.Add(other);store.Save();
    var c=new AppController(store,false);
    using(var target=new Form {Text="Realtime isolated target",Bounds=new Rectangle(220,180,460,320),ShowInTaskbar=false}) {
@@ -259,7 +338,7 @@ namespace AppLayout {
   static void TestShell(string app) {
    string dir=Path.Combine(output,"shell-test");Directory.CreateDirectory(dir);
    string firstPath=Path.Combine(dir,"AppLayout.One.exe"),secondPath=Path.Combine(dir,"AppLayout.Two.exe");File.Copy(app,firstPath,true);File.Copy(app,secondPath,true);
-   var config=new ConfigStore(Path.Combine(dir,"layout.json"));config.Config=new LayoutConfig{Enabled=false,LaunchMissingAtStartup=false,MinimizeToTrayOnClose=false};config.Save();
+   var config=SeedStore(Path.Combine(dir,"layout.json"),new LayoutConfig{Enabled=false,LaunchMissingAtStartup=false,MinimizeToTrayOnClose=false});config.Save();
    byte[] before=File.ReadAllBytes(config.Path);
    using(var first=Process.Start(new ProcessStartInfo(firstPath,"/startup"){UseShellExecute=false,CreateNoWindow=true,WorkingDirectory=dir})) {
     try {
@@ -536,21 +615,80 @@ namespace AppLayout {
     Assert(effect==null || effect.IsDisposed,"短時間の演出後に写し画面を破棄");
     var image=new Bitmap(160,100);using(var g=Graphics.FromImage(image))g.Clear(AppTheme.ActiveRow);
     using(var preview=(TrayTransition)Activator.CreateInstance(typeof(TrayTransition),BindingFlags.NonPublic|BindingFlags.Instance,null,new object[]{image,start,end},null)) {
-     preview.Show();Application.DoEvents();Assert(!preview.ShowInTaskbar,"演出用の写しはタスクバーに追加しない");
+     Assert(preview.ShowFirstFrame(),"縮小を始める前に画像を描画できる");
+     preview.StartAnimation();Application.DoEvents();Assert(!preview.ShowInTaskbar,"演出用の写しはタスクバーに追加しない");
      watch.Restart();while(watch.ElapsedMilliseconds<700&&!preview.IsDisposed){Application.DoEvents();Thread.Sleep(10);}
      Assert(preview.IsDisposed,"アニメーション用タイマーが完了して自動終了");
     }
    }
   }
+  static Color DesktopPixel(Point point) {
+   using(var bitmap=new Bitmap(1,1)) {
+    using(var graphics=Graphics.FromImage(bitmap))
+     graphics.CopyFromScreen(point,Point.Empty,bitmap.Size,CopyPixelOperation.SourceCopy);
+    return bitmap.GetPixel(0,0);
+   }
+  }
+  static void TestTrayColors() {
+   if(!TrayTransition.MotionEnabled)return;
+   var snapshotField=typeof(TrayTransition).GetField("snapshot",BindingFlags.Instance|BindingFlags.NonPublic);
+   try {
+    foreach(bool dark in new[]{false,true}) {
+     using(var source=new Form{Text="Tray transition color test",Size=new Size(460,280),
+      StartPosition=FormStartPosition.CenterScreen,ShowInTaskbar=false,TopMost=true}) {
+      AppTheme.Apply(source);
+      source.Activated+=delegate {SetTheme(dark,dark);};
+      source.Show();source.Activate();Application.DoEvents();
+      // 実画面を比較するため、ウィンドウを表示した直後のWindowsの演出が終わるのを待つ。
+      SetTheme(dark,dark);source.Refresh();Pump(550);
+      var title=new Point(source.Left+source.Width/2,source.Top+(source.PointToScreen(Point.Empty).Y-source.Top)/2);
+      var body=source.PointToScreen(new Point(90,90));
+      Color beforeTitle=DesktopPixel(title),beforeBody=DesktopPixel(body);
+      string mode=dark?"ダーク":"ライト";
+      Assert(AppTheme.IsDark==dark && beforeBody.ToArgb()==AppTheme.Background.ToArgb(),
+       "元画面の配色を確認: "+mode+" ("+beforeBody+" / "+AppTheme.Background+")");
+      Color handoff=Color.Empty;
+      source.VisibleChanged+=delegate {if(!source.Visible)handoff=DesktopPixel(body);};
+      using(var transition=TrayTransition.HideToTray(source)) {
+       Assert(transition!=null && transition.Opacity==1,"縮小の初回は元の濃さで表示: "+mode);
+       Assert(handoff.ToArgb()==beforeBody.ToArgb(),"元画面を隠した瞬間も同じ位置に画像がある: "+mode);
+       var snapshot=(Bitmap)snapshotField.GetValue(transition);
+       var capturedTitle=snapshot.GetPixel(title.X-transition.Left,title.Y-transition.Top);
+       var capturedBody=snapshot.GetPixel(body.X-transition.Left,body.Y-transition.Top);
+       Assert(capturedTitle.ToArgb()==beforeTitle.ToArgb() && capturedBody.ToArgb()==beforeBody.ToArgb(),
+        "縮み始める画像のタイトルバーと本文が元画面と同色: "+mode+
+        " ("+beforeTitle+" → "+capturedTitle+" / "+beforeBody+" → "+capturedBody+")");
+       Pump(80);
+       Native.RECT frame;
+       Assert(!transition.IsDisposed && Native.GetWindowRect(transition.Handle,out frame) &&
+        frame.Right-frame.Left<snapshot.Width && transition.Opacity==1,
+        "縮小中も透過率を変えない: "+mode);
+      }
+     }
+    }
+    using(var source=new Form{Size=new Size(420,260),StartPosition=FormStartPosition.CenterScreen})
+    using(var overlap=new Form{Size=new Size(120,100),TopMost=true,StartPosition=FormStartPosition.Manual,ShowInTaskbar=false}) {
+     source.Show();overlap.Location=source.PointToScreen(new Point(20,20));overlap.Show();Pump(100);
+     using(var transition=TrayTransition.HideToTray(source))
+      Assert(transition==null && !source.Visible,"別のウィンドウが重なる場合は写り込みなしで収納");
+    }
+   } finally { AppTheme.RefreshFromWindows(); }
+  }
   static void TestCloseToTray() {
    var store=new ConfigStore(Path.Combine(output,"tray-layout.json"));store.Config=new LayoutConfig{Enabled=false,LaunchMissingAtStartup=false,MinimizeToTrayOnClose=true};
    var controller=new AppController(store,false);Exception failure=null;int phase=0;
+   IntPtr originalHandle=IntPtr.Zero;
    using(var form=new Form {Text="Isolated close-to-tray scenario",Bounds=new Rectangle(200,180,520,340)})
    using(var timer=new System.Windows.Forms.Timer {Interval=350}) {
     timer.Tick+=delegate {
      try {
-      if(phase++==0){form.Close();Assert(!form.Visible&&!form.IsDisposed,"×では終了せず演出付きのトレイ収納へ進む");return;}
-      Assert(!form.Visible&&!form.IsDisposed,"演出終了後もトレイで常駐を継続");
+      if(phase++==0){originalHandle=form.Handle;form.Close();Assert(!form.Visible&&!form.IsDisposed,"×では終了せず演出付きのトレイ収納へ進む");return;}
+      if(phase==2) {
+       Assert(!form.Visible&&!form.IsDisposed,"演出終了後もトレイで常駐を継続");
+       using(var showEvent=EventWaitHandle.OpenExisting(Program.ShowEventName))showEvent.Set();
+       return;
+      }
+      Assert(form.Visible && form.Handle==originalHandle,"トレイから再表示しても同じメインウィンドウを保持");
       timer.Stop();controller.MinimizeToTrayOnClose=false;form.Close();
      } catch(Exception e){failure=e;timer.Stop();store.Config.MinimizeToTrayOnClose=false;form.Close();}
     };
@@ -583,6 +721,17 @@ namespace AppLayout {
    }
   }
   static void TestScrollbars() {
+   using(var frame=new Form{ClientSize=new Size(420,360)})
+   using(var fitGrid=new DataGridView{AllowUserToAddRows=false,RowHeadersVisible=false,ColumnHeadersVisible=false,BorderStyle=BorderStyle.None}) {
+    fitGrid.Columns.Add(new DataGridViewTextBoxColumn{Width=300});
+    fitGrid.Rows.Add("フィット");fitGrid.Rows[0].Height=200;
+    var fitHost=new GridScrollHost(fitGrid){Size=new Size(260,160)};
+    frame.Controls.Add(fitHost);frame.Show();Application.DoEvents();
+    Assert(fitHost.Controls["GridVerticalScroll"].Visible && fitHost.Controls["GridHorizontalScroll"].Visible,"小さい表には縦横のバーが必要");
+    fitHost.Size=new Size(302,202);Application.DoEvents();
+    Assert(!fitHost.Controls["GridVerticalScroll"].Visible && !fitHost.Controls["GridHorizontalScroll"].Visible,
+     "表を内容が収まるサイズに広げると縦横両方のバーが消える");
+   }
    using(var form=new Form {Text="専用スクロールバー検証",ClientSize=new Size(730,470),StartPosition=FormStartPosition.CenterScreen}) {
     AppTheme.Apply(form);
     var grid=new DataGridView {AllowUserToAddRows=false,RowHeadersVisible=false,BackgroundColor=AppTheme.Surface};
@@ -625,7 +774,9 @@ namespace AppLayout {
     typeof(ThemedScrollBar).GetMethod("OnKeyDown",BindingFlags.Instance|BindingFlags.NonPublic).Invoke(vertical,new object[]{new KeyEventArgs(Keys.End)});
     Assert(vertical.Value==vertical.Maximum&&grid.Rows[grid.Rows.Count-1].Displayed,"Endキーで最後の行まで到達");
     int prior=vertical.Value;vertical.ScrollWheel(120);Assert(vertical.Value<prior,"ホイールでスクロール");
-    horizontal.Value=horizontal.Maximum;Assert(grid.HorizontalScrollingOffset>0,"横方向も末尾までスクロール");
+    horizontal.Value=horizontal.Maximum;
+    Assert(horizontal.Value==horizontal.Maximum && grid.HorizontalScrollingOffset==horizontal.Maximum,
+     "横方向もバーの末尾と表の表示位置が一致");
     AppTheme.RefreshFromWindows();form.Close();
    }
   }
@@ -640,7 +791,10 @@ namespace AppLayout {
     }
    var store=new ConfigStore(Path.Combine(output,"startup-size.json"));store.Config=new LayoutConfig{Enabled=false};
    using(var form=(LedgerForm)UiFactory.CreateMainForm(new AppController(store,false))) {
+    Rectangle firstVisible=Rectangle.Empty;
+    form.VisibleChanged+=delegate {if(form.Visible && firstVisible.IsEmpty)firstVisible=form.Bounds;};
     form.Show();Application.DoEvents();Assert(Screen.FromHandle(form.Handle).WorkingArea.Contains(form.Bounds),"初回表示でタイトルバーを含む全体が表示先画面内");
+    Assert(firstVisible==form.Bounds,"最初に表示した時点で位置とサイズが確定している");
     var requested=new Size(Math.Max(form.MinimumSize.Width,650),Math.Max(form.MinimumSize.Height,430));form.Size=requested;
     form.FitInitialWindow();Assert(form.Size==requested,"起動後の再表示・更新ではユーザーのサイズを上書きしない");
     form.Close();

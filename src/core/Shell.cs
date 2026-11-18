@@ -5,7 +5,6 @@ namespace AppLayout {
  public static class Shell {
   public static void Run(Form form, AppController controller, bool startupMode) {
    bool exiting = false;
-   bool showRequested = false;
    int languageRefreshPending = 0;
    var ui = SynchronizationContext.Current ?? new WindowsFormsSynchronizationContext();
    TrayTransition transition = null;
@@ -19,12 +18,12 @@ namespace AppLayout {
     };
     Action show = delegate {
      if(exiting || form.IsDisposed || form.Disposing)return;
-     showRequested=true;
      if(transition!=null && !transition.IsDisposed)transition.Close();
      transition=null;
      form.ShowInTaskbar=true;
+     if(!form.Visible)TrayTransition.SetWindowsTransitions(form.Handle,true);
      if(form.WindowState==FormWindowState.Minimized)form.WindowState=FormWindowState.Normal;
-     form.Opacity=1;form.Show();
+     form.Show();
      Form target=form;
      foreach(Form owned in form.OwnedForms)if(owned.Modal && owned.Visible)target=owned;
      target.Activate();target.BringToFront();Native.SetForegroundWindow(target.Handle);
@@ -49,11 +48,13 @@ namespace AppLayout {
     form.Activated+=delegate {refreshLanguage();};
     tray.Icon = icon; tray.Text = "AppLayout"; tray.ContextMenuStrip = menu; tray.Visible = true; tray.DoubleClick += delegate { show(); };
     form.Resize += delegate { if (form.WindowState == FormWindowState.Minimized) { form.Hide(); form.ShowInTaskbar = false; } };
-    form.FormClosing += delegate(object sender, FormClosingEventArgs e) { if (!exiting && e.CloseReason == CloseReason.UserClosing && controller.MinimizeToTrayOnClose) { e.Cancel = true; if(transition!=null && !transition.IsDisposed)transition.Close();transition=TrayTransition.HideToTray(form); } };
-    if(startupMode) {
-     form.ShowInTaskbar=false;form.Opacity=0;
-     form.Shown+=delegate {if(!showRequested)form.Hide();form.Opacity=1;};
-    }
+    form.FormClosing += delegate(object sender, FormClosingEventArgs e) {
+     if (exiting || e.CloseReason != CloseReason.UserClosing || !controller.MinimizeToTrayOnClose) return;
+     e.Cancel=true;
+     if (!form.Visible) return;
+     if (transition!=null && !transition.IsDisposed) transition.Close();
+     transition=TrayTransition.HideToTray(form);
+    };
     var thread=new Thread(delegate() {
      var events=new WaitHandle[]{stopEvent,showEvent};
      try{while(WaitHandle.WaitAny(events)==1)ui.Post(delegate {show();},null);}
@@ -62,7 +63,19 @@ namespace AppLayout {
     L.Changed+=languageChanged;
     Microsoft.Win32.SystemEvents.UserPreferenceChanged+=windowsLanguageChanged;
     thread.Start();
-    try {controller.Start();Application.Run(form);}
+    try {
+     controller.Start();
+     if (!startupMode) Application.Run(form);
+     else {
+      form.ShowInTaskbar=false;
+      // MainForm に渡すとメッセージループ開始時に表示されるため、通知領域からの要求まで隠しておく。
+      using(var context = new ApplicationContext()) {
+       form.FormClosed+=delegate {context.ExitThread();};
+       var handle=form.Handle;
+       Application.Run(context);
+      }
+     }
+    }
     finally {
      exiting=true;
      Microsoft.Win32.SystemEvents.UserPreferenceChanged-=windowsLanguageChanged;

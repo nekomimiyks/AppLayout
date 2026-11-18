@@ -91,11 +91,13 @@ OFFにすると、そのアプリの配置登録が即座に解除されます�
 
 ### 設定の保存・アップデート
 
-配置設定は通常、`AppLayout.exe` と同じフォルダの `layout.json` に保存します。書き込めない場合は `%APPDATA%\AppLayout` に保存します。
+配置設定は通常、`AppLayout.exe` と同じフォルダの `layout.json` に保存します。書き込めない場合は `%APPDATA%\AppLayout` を使います。読み取り専用の設定ファイルを引き継いだ場合は、その配下の `portable` に保存します。別のセッションが先に設定を変更した場合は、AppLayoutを再起動して最新の設定を読み込んでから変更してください。
 
 アップデートするときは、トレイメニューからAppLayoutを終了し、使用中のフォルダの `AppLayout.exe` を新版に置き換えてください。`layout.json` を残すことで設定を引き継げます。
 
 詳しい説明は [使い方.txt](使い方.txt)、動作の仕様は [仕様書](docs/仕様書.md) を参照してください。
+
+[プライバシーポリシー](docs/PRIVACY.md)
 
 ## ビルド
 
@@ -106,6 +108,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1
 ```
 
 画面のソースは `src/ui`、共通処理は `src/core` にあります。ビルドすると `AppLayout.exe` を生成します。
+
+Microsoft Store用のMSIXを作成するには、Windows SDKのMakeAppxを用意して `.\store\pack.ps1 -Out .\AppLayout-x64.msix` を実行します。
 
 ## 検証
 

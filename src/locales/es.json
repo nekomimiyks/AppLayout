@@ -630,5 +630,13 @@
   {
     "Key": "例: Discord$ は、タイトルの末尾が Discord のウィンドウです。",
     "Value": "Ejemplo: Discord$ coincide con ventanas cuyo título termina en Discord."
+  },
+  {
+    "Key": "設定が別の場所で変更されました。AppLayoutを再起動して最新の設定を読み込んでください。",
+    "Value": "La configuración se modificó en otro lugar. Reinicia AppLayout para cargar la configuración más reciente."
+  },
+  {
+    "Key": "非表示中",
+    "Value": "Oculta"
   }
 ]

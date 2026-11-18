@@ -1,4 +1,4 @@
-﻿param([string]$Out = 'AppLayout.exe')
+﻿param([string]$Out = 'AppLayout.exe', [switch]$Store)
 # Windows標準の .NET Framework 4 C# コンパイラだけでビルドする。
 $ErrorActionPreference = 'Stop'
 $here = $PSScriptRoot
@@ -51,8 +51,17 @@ $uiDir = Join-Path $here 'src\ui'
 $src = @(Get-ChildItem -LiteralPath (Join-Path $here 'src\core') -Filter '*.cs' | ForEach-Object { $_.FullName })
 $src += @(Get-ChildItem -LiteralPath $uiDir -Filter '*.cs' | ForEach-Object { $_.FullName })
 $resources = @(Get-ChildItem -LiteralPath (Join-Path $here 'src\locales') -Filter '*.json' | ForEach-Object { '/resource:' + $_.FullName + ',AppLayout.Locales.' + $_.Name })
+$storeArgs = @()
+if ($Store) {
+    $metadata = Join-Path $env:WINDIR 'System32\WinMetadata'
+    $runtime = Join-Path (Split-Path -Parent $csc) 'System.Runtime.WindowsRuntime.dll'
+    $storeArgs = @('/define:STORE_BUILD', "/r:$runtime",
+        ('/r:' + (Join-Path $env:WINDIR 'Microsoft.NET\assembly\GAC_MSIL\System.Runtime\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.Runtime.dll')),
+        ('/r:' + (Join-Path $metadata 'Windows.ApplicationModel.winmd')),
+        ('/r:' + (Join-Path $metadata 'Windows.Foundation.winmd')))
+}
 & $csc /nologo /target:winexe /optimize+ /platform:anycpu "/out:$outPath" "/win32icon:$ico" "/resource:$ico,AppLayout.AppIcon.ico" `
   /r:System.dll /r:System.Core.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll `
-  /r:System.Runtime.Serialization.dll $resources $src
+  /r:System.Runtime.Serialization.dll $storeArgs $resources $src
 if ($LASTEXITCODE -ne 0) { throw 'Build failed' }
 Write-Output "Build complete: $outPath"

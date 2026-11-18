@@ -11,9 +11,9 @@ namespace AppLayout
         readonly ThemedScrollBar vertical = new ThemedScrollBar();
         readonly ThemedScrollBar horizontal = new ThemedScrollBar { Orientation = Orientation.Horizontal };
         readonly List<int> scrollRows = new List<int>();
-        bool syncing, verticalNeeded, horizontalNeeded, syncPending;
+        bool syncing, horizontalNeeded, syncPending;
         int updateDepth;
-        public bool HorizontalScrollVisible { get { return horizontal.Visible; } }
+        internal bool HorizontalScrollNeeded { get { return horizontalNeeded; } }
         public int ScrollBarThickness { get { return horizontal.PreferredThickness; } }
         public GridScrollHost(DataGridView grid)
         {
@@ -60,16 +60,21 @@ namespace AppLayout
             {
                 Grid.ScrollBars = ScrollBars.None;
                 int thickness = vertical.PreferredThickness;
-                bool needVertical = verticalNeeded, needHorizontal = horizontalNeeded;
+                bool needVertical = false, needHorizontal = false;
                 int contentHeight = Grid.Rows.GetRowsHeight(DataGridViewElementStates.Visible);
+                int contentWidth = 0;
+                foreach (DataGridViewColumn column in Grid.Columns)
+                    if (column.Visible)
+                        contentWidth += column.InheritedAutoSizeMode == DataGridViewAutoSizeColumnMode.Fill ?
+                            column.MinimumWidth : column.Width;
                 // 一方のバーで表示領域が減ることを含めて、レイアウトを収束させる。
                 for (int pass = 0; pass < 3; pass++)
                 {
                     int width = Math.Max(0, ClientSize.Width - (needVertical ? thickness : 0));
                     int height = Math.Max(0, ClientSize.Height - (needHorizontal ? thickness : 0));
-                    Grid.Bounds = new Rectangle(0, 0, width, height);
-                    bool nextHorizontal = Grid.Columns.GetColumnsWidth(DataGridViewElementStates.Visible) > ViewWidth();
-                    bool nextVertical = contentHeight > ViewHeight();
+                    // 判定中に表を一時拡大すると、WinForms がスクロール位置を先頭側へ戻す。
+                    bool nextHorizontal = contentWidth > ViewWidth(width);
+                    bool nextVertical = contentHeight > ViewHeight(height);
                     if (nextHorizontal == needHorizontal && nextVertical == needVertical) break;
                     needHorizontal = nextHorizontal; needVertical = nextVertical;
                 }
@@ -77,11 +82,11 @@ namespace AppLayout
                     Math.Max(0, ClientSize.Height - (needHorizontal ? thickness : 0)));
                 vertical.Bounds = new Rectangle(Grid.Right, 0, thickness, Grid.Height);
                 horizontal.Bounds = new Rectangle(0, Grid.Bottom, Grid.Width, thickness);
-                verticalNeeded = needVertical; horizontalNeeded = needHorizontal;
+                horizontalNeeded = needHorizontal;
                 vertical.Visible = needVertical; horizontal.Visible = needHorizontal;
 
                 scrollRows.Clear();
-                int available = ViewHeight();
+                int available = ViewHeight(Grid.ClientSize.Height);
                 foreach (DataGridViewRow row in Grid.Rows)
                 {
                     if (!row.Visible) continue;
@@ -101,7 +106,8 @@ namespace AppLayout
                 vertical.SetRange(0, lastPage, Math.Max(1, pageRows), 1);
                 vertical.Value = position;
                 int widthTotal = Grid.Columns.GetColumnsWidth(DataGridViewElementStates.Visible);
-                horizontal.SetRange(0, Math.Max(0, widthTotal - ViewWidth()), Math.Max(1, ViewWidth()), Math.Max(1, thickness));
+                int viewWidth = ViewWidth(Grid.ClientSize.Width);
+                horizontal.SetRange(0, Math.Max(0, widthTotal - viewWidth), viewWidth, Math.Max(1, thickness));
                 horizontal.Value = Grid.HorizontalScrollingOffset;
             }
             finally { syncing = false; }
@@ -115,15 +121,15 @@ namespace AppLayout
                 used += grid.Rows[visibleRows[--start]].Height;
             return start;
         }
-        int ViewWidth()
+        int ViewWidth(int width)
         {
             int border = Grid.BorderStyle == BorderStyle.None ? 0 : 2;
-            return Math.Max(1, Grid.ClientSize.Width - (Grid.RowHeadersVisible ? Grid.RowHeadersWidth : 0) - border);
+            return Math.Max(1, width - (Grid.RowHeadersVisible ? Grid.RowHeadersWidth : 0) - border);
         }
-        int ViewHeight()
+        int ViewHeight(int height)
         {
             int border = Grid.BorderStyle == BorderStyle.None ? 0 : 2;
-            return Math.Max(1, Grid.ClientSize.Height - (Grid.ColumnHeadersVisible ? Grid.ColumnHeadersHeight : 0) - border);
+            return Math.Max(1, height - (Grid.ColumnHeadersVisible ? Grid.ColumnHeadersHeight : 0) - border);
         }
         void VerticalChanged(object sender, EventArgs e)
         {

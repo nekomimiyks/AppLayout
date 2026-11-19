@@ -1,0 +1,39 @@
+# AppLayout
+
+[日本語](README.md) · **English** · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português (Brasil)](README.pt.md)
+
+AppLayout saves the position and size of Windows application windows and restores your saved layouts. It supports multiple monitors and maximized windows.
+
+## Download
+
+[Download the latest release](https://github.com/nekomimiyks/AppLayout/releases/latest)
+
+Extract the ZIP, then open `AppLayout.exe`.
+
+## Getting started
+
+1. Move and resize the window you want to save.
+2. Turn its row **ON** in AppLayout to save the layout.
+3. Click **Apply layout** to restore the saved positions. Keep **Enable layouts** on for automatic restoration.
+
+Turn a row **OFF** to remove its saved layout. Use **Edit** to adjust the position or matching rule, and select **Open settings** to choose the display language.
+
+## Screenshots
+
+![Main window in dark mode](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/en/main-dark.png)
+
+![Main window in light mode](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/en/main-light.png)
+
+![Edit layout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/en/edit.png)
+
+## Build from source
+
+Run the following command in PowerShell on Windows. The Windows .NET Framework compiler generates `AppLayout.exe`.
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1
+```
+
+## License
+
+[MIT License](LICENSE) · [Privacy Policy](docs/PRIVACY.md)

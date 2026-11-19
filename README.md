@@ -1,12 +1,14 @@
 # AppLayout
 
-Windowsのウィンドウの位置とサイズを保存し、登録した配置に戻すアプリです。複数モニターと最大化に対応しています。
+**日本語** · [English](README.en.md) · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português (Brasil)](README.pt.md)
+
+Windowsのウィンドウの位置とサイズを保存し、登録した配置に戻すアプリです。複数のモニターと最大化に対応しています。
 
 ## ダウンロード
 
 [GitHub Releasesから最新版をダウンロード](https://github.com/nekomimiyks/AppLayout/releases/latest)
 
-ZIPを展開して `AppLayout.exe` を開きます。ZIPには詳しい使い方も入っています。
+ZIPを展開して `AppLayout.exe` を開きます。
 
 ## はじめての使い方
 
@@ -18,15 +20,15 @@ ZIPを展開して `AppLayout.exe` を開きます。ZIPには詳しい使い方
 
 ## スクリーンショット
 
-![メイン画面（ダーク）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/v1.1.2/docs/images/main-dark.png)
+![メイン画面（ダーク）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/ja/main-dark.png)
 
-![メイン画面（ライト）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/v1.1.2/docs/images/main-light.png)
+![メイン画面（ライト）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/ja/main-light.png)
 
-![配置の編集](https://raw.githubusercontent.com/nekomimiyks/AppLayout/v1.1.2/docs/images/edit-dialog.png)
+![配置の編集](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/ja/edit.png)
 
 ## ソースからビルド
 
-WindowsのPowerShellで次を実行します。Windowsの.NET Frameworkコンパイラを使い、`AppLayout.exe` が生成されます。
+WindowsのPowerShellで次を実行します。Windowsの.NET Frameworkコンパイラで `AppLayout.exe` が生成されます。
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1

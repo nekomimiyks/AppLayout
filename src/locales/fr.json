@@ -1,0 +1,642 @@
+[
+  {
+    "Key": "\r\nアプリID: ",
+    "Value": "\r\nID de l’application : "
+  },
+  {
+    "Key": "\r\nクラス: ",
+    "Value": "\r\nClasse : "
+  },
+  {
+    "Key": " 件",
+    "Value": " éléments"
+  },
+  {
+    "Key": " 件をすべて解除しますか？",
+    "Value": " dispositions enregistrées ?"
+  },
+  {
+    "Key": "・既存の配置を保持 ",
+    "Value": " · Conserver les dispositions existantes : "
+  },
+  {
+    "Key": "・既存の配置を保持 {0}件（未起動・最小化中など）",
+    "Value": " · {0} dispositions existantes conservées (applications fermées ou réduites, entre autres)"
+  },
+  {
+    "Key": "。登録できませんでした: ",
+    "Value": ". Enregistrement impossible : "
+  },
+  {
+    "Key": "。登録できませんでした: {0}",
+    "Value": ". Enregistrement impossible : {0}"
+  },
+  {
+    "Key": "（最小化中）",
+    "Value": "(Réduite)"
+  },
+  {
+    "Key": "（未起動・最小化中など ",
+    "Value": "(Sans modification pour les applications fermées ou réduites, entre autres : "
+  },
+  {
+    "Key": "（未起動・最小化中など {0}件はそのまま）",
+    "Value": "({0} laissées inchangées, dont les applications fermées ou réduites)"
+  },
+  {
+    "Key": "{0} 件",
+    "Value": "{0} éléments"
+  },
+  {
+    "Key": "{0}の配置を登録しました",
+    "Value": "Disposition de {0} enregistrée"
+  },
+  {
+    "Key": "{0}をOFFにしました。配置の登録を解除しました。",
+    "Value": "{0} est sur OFF. Sa disposition enregistrée a été supprimée."
+  },
+  {
+    "Key": "{0}をONにしました。現在の配置を保存しました。",
+    "Value": "{0} est sur ON. Sa disposition actuelle a été enregistrée."
+  },
+  {
+    "Key": "{0}件に一致。1件に絞り込むまで配置は実行しません。",
+    "Value": "{0} correspondances. La disposition ne sera appliquée que lorsqu’une seule fenêtre correspondra."
+  },
+  {
+    "Key": "{0}件の配置を実行しました",
+    "Value": "{0} dispositions appliquées"
+  },
+  {
+    "Key": "{0}件の保存を解除しました",
+    "Value": "{0} dispositions enregistrées supprimées"
+  },
+  {
+    "Key": "×ボタンで閉じたとき、終了せずにタスクトレイに入ります。オフのときは×で終了します。",
+    "Value": "À la fermeture avec ×, l’application reste dans la zone de notification. Si cette option est désactivée, × quitte l’application."
+  },
+  {
+    "Key": "1件に一致。この条件で配置できます。",
+    "Value": "1 correspondance. Cette disposition peut être appliquée."
+  },
+  {
+    "Key": "AppLayout のメニュー",
+    "Value": "Menu AppLayout"
+  },
+  {
+    "Key": "Windowsにサインインしたとき、画面を出さずにタスクトレイに常駐した状態で起動します。",
+    "Value": "Démarre l’application dans la zone de notification, sans afficher sa fenêtre, à la connexion à Windows."
+  },
+  {
+    "Key": "X 座標（px）",
+    "Value": "Coordonnée X (px)"
+  },
+  {
+    "Key": "Y 座標（px）",
+    "Value": "Coordonnée Y (px)"
+  },
+  {
+    "Key": "アプリ（プロセス）",
+    "Value": "Application (processus)"
+  },
+  {
+    "Key": "アプリ（プロセス名）",
+    "Value": "Application (nom du processus)"
+  },
+  {
+    "Key": "アプリで判定",
+    "Value": "Identifier par l’application"
+  },
+  {
+    "Key": "アプリを開く",
+    "Value": "Ouvrir l’application"
+  },
+  {
+    "Key": "アプリを終了する",
+    "Value": "Quitter l’application"
+  },
+  {
+    "Key": "アプリ自動起動",
+    "Value": "Lancer les applications automatiquement"
+  },
+  {
+    "Key": "アプリ終了時自動縮小",
+    "Value": "Réduire dans la zone de notification à la fermeture"
+  },
+  {
+    "Key": "いいえ",
+    "Value": "Non"
+  },
+  {
+    "Key": "ウィンドウが閉じられたか最小化されています。ウィンドウを開いてから編集してください。",
+    "Value": "La fenêtre est fermée ou réduite. Ouvrez-la avant de la modifier."
+  },
+  {
+    "Key": "ウィンドウのタイトル",
+    "Value": "Titre de la fenêtre"
+  },
+  {
+    "Key": "ウィンドウの見分け方",
+    "Value": "Identification de la fenêtre"
+  },
+  {
+    "Key": "ウィンドウを1つ選んでください。",
+    "Value": "Sélectionnez une fenêtre."
+  },
+  {
+    "Key": "オンの間、保存したウィンドウを約2秒ごとに保存位置へ戻します。オフにするとウィンドウを自由に動かせます。",
+    "Value": "Sur ON, replace les fenêtres enregistrées toutes les 2 secondes environ. Sur OFF, vous pouvez les déplacer librement."
+  },
+  {
+    "Key": "キャンセル",
+    "Value": "Annuler"
+  },
+  {
+    "Key": "この配置はすでに解除されています。",
+    "Value": "Cette disposition a déjà été supprimée."
+  },
+  {
+    "Key": "サイズ",
+    "Value": "Taille"
+  },
+  {
+    "Key": "サイズ(幅×高さ)",
+    "Value": "Taille (largeur × hauteur)"
+  },
+  {
+    "Key": "すべての配置を解除しました（",
+    "Value": "Toutes les dispositions ont été supprimées ("
+  },
+  {
+    "Key": "すべての配置を解除しました（{0}件）",
+    "Value": "Toutes les dispositions ont été supprimées ({0})"
+  },
+  {
+    "Key": "すべての配置を解除する",
+    "Value": "Supprimer toutes les dispositions"
+  },
+  {
+    "Key": "タイトルが完全に一致",
+    "Value": "Le titre correspond exactement"
+  },
+  {
+    "Key": "タイトルに含まれる文字を指定します。大文字・小文字は区別しません。",
+    "Value": "Indiquez le texte que le titre doit contenir. La casse n’est pas prise en compte."
+  },
+  {
+    "Key": "タイトルに含む",
+    "Value": "Le titre contient"
+  },
+  {
+    "Key": "タイトルを含む: ",
+    "Value": "Le titre contient : "
+  },
+  {
+    "Key": "タイトル一致: ",
+    "Value": "Titre exact : "
+  },
+  {
+    "Key": "タイトル条件",
+    "Value": "Condition sur le titre"
+  },
+  {
+    "Key": "タイトル条件を入力するか、「アプリで判定」を選んでください。",
+    "Value": "Saisissez une condition sur le titre ou sélectionnez « Identifier par l’application »."
+  },
+  {
+    "Key": "タイトル全体を指定します。大文字・小文字も区別します。",
+    "Value": "Indiquez le titre complet. La casse est prise en compte."
+  },
+  {
+    "Key": "なし",
+    "Value": "Aucun"
+  },
+  {
+    "Key": "の配置を登録しました",
+    "Value": " : disposition enregistrée"
+  },
+  {
+    "Key": "はい",
+    "Value": "Oui"
+  },
+  {
+    "Key": "プロセス: ",
+    "Value": "Processus : "
+  },
+  {
+    "Key": "モニタ",
+    "Value": "Écran"
+  },
+  {
+    "Key": "モニタ ",
+    "Value": "Écran "
+  },
+  {
+    "Key": "モニタ {0}",
+    "Value": "Écran {0}"
+  },
+  {
+    "Key": "モニタ 1",
+    "Value": "Écran 1"
+  },
+  {
+    "Key": "モニタ{0}",
+    "Value": "Écran : {0}"
+  },
+  {
+    "Key": "モニタなし",
+    "Value": "Aucun écran"
+  },
+  {
+    "Key": "モニタ別の配置台帳",
+    "Value": "Dispositions par écran"
+  },
+  {
+    "Key": "ログイン時に自動起動",
+    "Value": "Démarrer à la connexion"
+  },
+  {
+    "Key": "ログイン時の自動起動のとき、保存済みのアプリが起動していなければ起動します。",
+    "Value": "Au démarrage automatique à la connexion, lance les applications enregistrées qui ne sont pas encore ouvertes."
+  },
+  {
+    "Key": "をOFFにしました。配置の登録を解除しました。",
+    "Value": " est sur OFF. Sa disposition enregistrée a été supprimée."
+  },
+  {
+    "Key": "をONにしました。現在の配置を保存しました。",
+    "Value": " est sur ON. Sa disposition actuelle a été enregistrée."
+  },
+  {
+    "Key": "位置 ／ サイズ",
+    "Value": "Position / Taille"
+  },
+  {
+    "Key": "位置 X, Y",
+    "Value": "Position X, Y"
+  },
+  {
+    "Key": "位置(X, Y)",
+    "Value": "Position (X, Y)"
+  },
+  {
+    "Key": "位置を戻しました",
+    "Value": "Position restaurée"
+  },
+  {
+    "Key": "一時停止中",
+    "Value": "En pause"
+  },
+  {
+    "Key": "一致するウィンドウはありません。未起動でも登録できます。",
+    "Value": "Aucune fenêtre correspondante. Vous pouvez enregistrer la disposition même si l’application n’est pas ouverte."
+  },
+  {
+    "Key": "一覧を更新",
+    "Value": "Actualiser la liste"
+  },
+  {
+    "Key": "横スクロール",
+    "Value": "Défilement horizontal"
+  },
+  {
+    "Key": "該当が",
+    "Value": "Correspondances : "
+  },
+  {
+    "Key": "該当が複数",
+    "Value": "Plusieurs correspondances"
+  },
+  {
+    "Key": "記憶したいウィンドウを選んで「追加」を押してください（ダブルクリックでも追加できます）。",
+    "Value": "Sélectionnez la fenêtre à enregistrer et cliquez sur « Ajouter ». Vous pouvez aussi double-cliquer."
+  },
+  {
+    "Key": "起動しました",
+    "Value": "Application lancée"
+  },
+  {
+    "Key": "起動と終了の",
+    "Value": "Démarrage et fermeture : "
+  },
+  {
+    "Key": "起動と終了の設定を開く",
+    "Value": "Ouvrir les paramètres de démarrage et de fermeture"
+  },
+  {
+    "Key": "起動失敗 ",
+    "Value": "Échec du lancement : "
+  },
+  {
+    "Key": "起動中のウィンドウから追加",
+    "Value": "Ajouter depuis les fenêtres ouvertes"
+  },
+  {
+    "Key": "件",
+    "Value": " éléments"
+  },
+  {
+    "Key": "件・登録を解除 ",
+    "Value": " ; supprimées : "
+  },
+  {
+    "Key": "件（未起動・最小化中など）",
+    "Value": " (applications fermées ou réduites, entre autres)"
+  },
+  {
+    "Key": "件）",
+    "Value": " éléments)"
+  },
+  {
+    "Key": "件に一致。1件に絞り込むまで配置は実行しません。",
+    "Value": " correspondances. La disposition ne sera appliquée que lorsqu’une seule fenêtre correspondra."
+  },
+  {
+    "Key": "件の配置を実行しました",
+    "Value": " dispositions appliquées"
+  },
+  {
+    "Key": "件の保存を解除しました",
+    "Value": " dispositions enregistrées supprimées"
+  },
+  {
+    "Key": "件はそのまま）",
+    "Value": " sans modification)"
+  },
+  {
+    "Key": "見分け方",
+    "Value": "Identification"
+  },
+  {
+    "Key": "現在位置を取得できません。ウィンドウを開いて最小化を解除してからONにしてください。",
+    "Value": "Impossible d’obtenir la position actuelle. Ouvrez la fenêtre et restaurez-la si elle est réduite avant de passer sur ON."
+  },
+  {
+    "Key": "現在位置を登録 ",
+    "Value": "Positions actuelles enregistrées : "
+  },
+  {
+    "Key": "現在位置を登録 {0}件・登録を解除 {1}件",
+    "Value": "Positions actuelles enregistrées : {0} ; dispositions supprimées : {1}"
+  },
+  {
+    "Key": "言語",
+    "Value": "Langue"
+  },
+  {
+    "Key": "個（条件を絞ってください）",
+    "Value": " (affinez les critères)"
+  },
+  {
+    "Key": "高さ（px）",
+    "Value": "Hauteur (px)"
+  },
+  {
+    "Key": "今の位置で配置",
+    "Value": "Enregistrer la position actuelle"
+  },
+  {
+    "Key": "最小化中",
+    "Value": "Réduite"
+  },
+  {
+    "Key": "最小化中（そのまま）",
+    "Value": "Réduite (inchangée)"
+  },
+  {
+    "Key": "最大化",
+    "Value": "Agrandie"
+  },
+  {
+    "Key": "最大化して配置",
+    "Value": "Appliquer en agrandissant"
+  },
+  {
+    "Key": "自動（Windowsの表示言語）",
+    "Value": "Automatique (langue d’affichage de Windows)"
+  },
+  {
+    "Key": "自動復元を一時停止中",
+    "Value": "Restauration automatique en pause"
+  },
+  {
+    "Key": "識別情報を表示",
+    "Value": "Afficher les identifiants"
+  },
+  {
+    "Key": "識別情報を閉じる",
+    "Value": "Masquer les identifiants"
+  },
+  {
+    "Key": "縦スクロール",
+    "Value": "Défilement vertical"
+  },
+  {
+    "Key": "条件の確認に時間がかかっています。条件を短くしてください。",
+    "Value": "La vérification prend trop de temps. Raccourcissez la condition."
+  },
+  {
+    "Key": "条件を確認しています…",
+    "Value": "Vérification de la condition…"
+  },
+  {
+    "Key": "状態",
+    "Value": "État"
+  },
+  {
+    "Key": "正規表現",
+    "Value": "Expression régulière"
+  },
+  {
+    "Key": "正規表現: ",
+    "Value": "Expression régulière : "
+  },
+  {
+    "Key": "正規表現の確認を中断しました。条件を簡単にしてください。",
+    "Value": "La vérification de l’expression régulière a été interrompue. Simplifiez la condition."
+  },
+  {
+    "Key": "正規表現の書き方が正しくありません",
+    "Value": "L’expression régulière n’est pas valide"
+  },
+  {
+    "Key": "正規表現の書き方が正しくありません。",
+    "Value": "L’expression régulière n’est pas valide."
+  },
+  {
+    "Key": "設定ファイルを読み込めませんでした。\n",
+    "Value": "Impossible de charger le fichier de configuration.\n"
+  },
+  {
+    "Key": "設定を開く",
+    "Value": "Ouvrir les paramètres"
+  },
+  {
+    "Key": "設定を閉じる",
+    "Value": "Fermer les paramètres"
+  },
+  {
+    "Key": "設定を変更できませんでした",
+    "Value": "Impossible de modifier les paramètres"
+  },
+  {
+    "Key": "対象",
+    "Value": "Actif"
+  },
+  {
+    "Key": "対象アプリ  /  ",
+    "Value": "Application cible  /  "
+  },
+  {
+    "Key": "対象アプリ  /  {0}",
+    "Value": "Application cible  /  {0}"
+  },
+  {
+    "Key": "対象を ON にすると現在位置を登録し、OFF にすると登録を解除します。",
+    "Value": "Passez sur ON pour enregistrer la position actuelle, ou sur OFF pour supprimer la disposition enregistrée."
+  },
+  {
+    "Key": "追加",
+    "Value": "Ajouter"
+  },
+  {
+    "Key": "登録 ／ 状態",
+    "Value": "Enregistrement / État"
+  },
+  {
+    "Key": "登録を確定",
+    "Value": "Enregistrer la disposition"
+  },
+  {
+    "Key": "登録済み",
+    "Value": "Enregistrée"
+  },
+  {
+    "Key": "登録済みの ",
+    "Value": "Supprimer les "
+  },
+  {
+    "Key": "登録済みの {0} 件をすべて解除しますか？",
+    "Value": "Supprimer les {0} dispositions enregistrées ?"
+  },
+  {
+    "Key": "登録済みの配置",
+    "Value": "Dispositions enregistrées"
+  },
+  {
+    "Key": "同じアプリのウィンドウが複数ある場合は、タイトル条件で絞り込みます。",
+    "Value": "Si une application possède plusieurs fenêtres, utilisez une condition sur le titre pour les distinguer."
+  },
+  {
+    "Key": "配置",
+    "Value": "Disposition"
+  },
+  {
+    "Key": "配置 Ag",
+    "Value": "Disposition Ag"
+  },
+  {
+    "Key": "配置を実行",
+    "Value": "Appliquer la disposition"
+  },
+  {
+    "Key": "配置を登録",
+    "Value": "Enregistrer la disposition"
+  },
+  {
+    "Key": "配置を変更できませんでした",
+    "Value": "Impossible de modifier la disposition"
+  },
+  {
+    "Key": "配置を編集",
+    "Value": "Modifier la disposition"
+  },
+  {
+    "Key": "配置を有効",
+    "Value": "Activer les dispositions"
+  },
+  {
+    "Key": "配置先: モニタ ",
+    "Value": "Destination : écran "
+  },
+  {
+    "Key": "配置先: モニタ {0}",
+    "Value": "Destination : écran {0}"
+  },
+  {
+    "Key": "配置先: 該当するモニタがありません",
+    "Value": "Destination : aucun écran correspondant"
+  },
+  {
+    "Key": "配置中",
+    "Value": "Maintien de la position"
+  },
+  {
+    "Key": "不明",
+    "Value": "Inconnu"
+  },
+  {
+    "Key": "幅（px）",
+    "Value": "Largeur (px)"
+  },
+  {
+    "Key": "編集",
+    "Value": "Modifier"
+  },
+  {
+    "Key": "保存位置のモニタがありません",
+    "Value": "L’écran de la position enregistrée n’est pas disponible"
+  },
+  {
+    "Key": "未起動",
+    "Value": "Non ouverte"
+  },
+  {
+    "Key": "未起動（ウィンドウなし）",
+    "Value": "Non ouverte (aucune fenêtre)"
+  },
+  {
+    "Key": "未接続",
+    "Value": "Déconnecté"
+  },
+  {
+    "Key": "未登録",
+    "Value": "Non enregistrée"
+  },
+  {
+    "Key": "未保存",
+    "Value": "Non sauvegardée"
+  },
+  {
+    "Key": "名前",
+    "Value": "Nom"
+  },
+  {
+    "Key": "名前 ／ プロセス",
+    "Value": "Nom / Processus"
+  },
+  {
+    "Key": "名前を入力してください。",
+    "Value": "Saisissez un nom."
+  },
+  {
+    "Key": "約2秒ごとに自動復元",
+    "Value": "Restaurer toutes les 2 secondes environ"
+  },
+  {
+    "Key": "例: Chat$ は、タイトルの末尾が Chat のウィンドウです。",
+    "Value": "Exemple : Chat$ correspond aux fenêtres dont le titre se termine par Chat."
+  },
+  {
+    "Key": "例: Discord$ は、タイトルの末尾が Discord のウィンドウです。",
+    "Value": "Exemple : Discord$ correspond aux fenêtres dont le titre se termine par Discord."
+  },
+  {
+    "Key": "設定が別の場所で変更されました。AppLayoutを再起動して最新の設定を読み込んでください。",
+    "Value": "Les paramètres ont été modifiés ailleurs. Redémarrez AppLayout pour charger les paramètres les plus récents."
+  },
+  {
+    "Key": "非表示中",
+    "Value": "Masquée"
+  }
+]

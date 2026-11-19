@@ -1,0 +1,7 @@
+/AppLayout.exe
+/src/app.ico
+/layout.json
+/layout.json.tmp
+/layout.json.lock
+/.layout-*.tmp
+/error.log

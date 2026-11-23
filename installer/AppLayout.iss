@@ -25,8 +25,12 @@ Source: "{#AppLayoutPayload}\AppLayout.exe"; DestDir: "{app}"; Flags: ignorevers
 Source: "{#AppLayoutPayload}\CloseRunning.exe"; Flags: dontcopy
 Source: "..\LICENSE"; DestDir: "{app}"
 
+[Tasks]
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
+
 [Icons]
 Name: "{autoprograms}\AppLayout"; Filename: "{app}\AppLayout.exe"; WorkingDir: "{app}"
+Name: "{autodesktop}\AppLayout"; Filename: "{app}\AppLayout.exe"; WorkingDir: "{app}"; Tasks: desktopicon
 
 [CustomMessages]
 english.ConfirmLaunch=Installation is complete. Start AppLayout now?

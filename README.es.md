@@ -9,6 +9,7 @@ AppLayout guarda la posición y el tamaño de las ventanas de Windows y restaura
 [Descargar la última versión de GitHub Releases](https://github.com/nekomimiyks/AppLayout/releases/latest)
 
 Ejecuta `AppLayout-Setup.exe` y abre AppLayout desde el menú Inicio. Guarda y restaura la configuración con un archivo JSON.
+El instalador puede crear un acceso directo en el escritorio. Activa la búsqueda automática de actualizaciones en los ajustes para recibir avisos de nuevas versiones de GitHub. El botón de actualización inicia el instalador.
 
 ## Primeros pasos
 
@@ -24,11 +25,13 @@ Abre la configuración en el PC anterior y guarda la copia en JSON. Copia el arc
 
 ## Capturas de pantalla
 
-![Ventana principal en modo oscuro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/es/main-dark.png)
+![Ventana principal en modo oscuro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/es/main-dark.png)
 
-![Ventana principal en modo claro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/es/main-light.png)
+![Ventana principal en modo claro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/es/main-light.png)
 
-![Edición de una disposición](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/es/edit.png)
+![Edición de una disposición](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/es/edit.png)
+
+![Ajustes y copia de seguridad](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/es/settings-backup.png)
 
 ## Compilar desde el código fuente
 

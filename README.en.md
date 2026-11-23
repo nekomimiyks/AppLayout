@@ -9,6 +9,7 @@ AppLayout saves the position and size of Windows application windows and restore
 [Download the latest release](https://github.com/nekomimiyks/AppLayout/releases/latest)
 
 Run `AppLayout-Setup.exe`, then open AppLayout from the Start menu. Use **Back up settings** and **Restore from backup** to migrate your settings as a JSON file.
+The installer can create a desktop shortcut. Turn on automatic update checks in settings to get notified about new GitHub releases. The update button starts the installer.
 
 ## Getting started
 
@@ -24,11 +25,13 @@ On the old PC, open settings and choose **Back up settings**. Copy the JSON file
 
 ## Screenshots
 
-![Main window in dark mode](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/en/main-dark.png)
+![Main window in dark mode](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/en/main-dark.png)
 
-![Main window in light mode](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/en/main-light.png)
+![Main window in light mode](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/en/main-light.png)
 
-![Edit layout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/en/edit.png)
+![Edit layout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/en/edit.png)
+
+![Settings and backup](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/en/settings-backup.png)
 
 ## Build from source
 

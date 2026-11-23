@@ -10,7 +10,9 @@ Windowsのウィンドウの位置とサイズを保存し、登録した配置�
 
 `AppLayout-Setup.exe` を実行します。インストールの「完了」を押すと、すぐに AppLayout を起動するか確認されます。「いいえ」を選んだ場合は、後でスタートメニューから開けます。
 
-アップデートも同じ手順です。更新先のAppLayoutが起動中なら、インストーラーが終了させてから更新します。設定は引き継がれます。
+アップデートも同じ手順です。更新先のAppLayoutが起動中なら、インストーラーが終了させてから更新します。設定は引き継がれます。インストール時にデスクトップへのショートカットを作成できます。
+
+GitHub版の「設定を開く」で「更新を自動で確認」をONにすると、新版が見つかったときに更新ボタンが表示されます。ボタンを押すとインストーラーが起動します。Microsoft Store版はStoreから更新されます。
 
 ## はじめての使い方
 
@@ -18,13 +20,13 @@ Windowsのウィンドウの位置とサイズを保存し、登録した配置�
 2. AppLayoutの一覧でその行を **ON** にすると配置が保存されます。
 3. 「配置を実行」で保存した配置に戻します。「配置を有効」がONの間は自動で戻ります。
 
-登録を解除するには行を **OFF** にします。「編集」で座標やウィンドウの見分け方を変更できます。「設定を開く」から表示言語を切り替えられます。
+登録を解除するには行を **OFF** にします。全件を解除する場合は「すべての配置を解除」を選び、確認します。「編集」で座標やウィンドウの見分け方を変更できます。「設定を開く」から表示言語を切り替えられます。
 
 ## 設定のバックアップと復元
 
 右上の **「設定を開く」** を押すと、バックアップと復元のボタンが表示されます。
 
-![設定画面。「設定をバックアップ」と「バックアップから復元」のボタン](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/ja/settings-backup.png)
+![設定画面。「設定をバックアップ」と「バックアップから復元」のボタン](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/ja/settings-backup.png)
 
 1. 元のPCで **「設定をバックアップ」** を押し、JSONファイルを保存します。
 2. USBメモリやOneDriveなどで、保存したJSONを新しいPCにコピーします。
@@ -35,15 +37,15 @@ Windowsのウィンドウの位置とサイズを保存し、登録した配置�
 
 ## スクリーンショット
 
-![メイン画面（ダーク）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/ja/main-dark.png)
+![メイン画面（ダーク）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/ja/main-dark.png)
 
-![メイン画面（ライト）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/ja/main-light.png)
+![メイン画面（ライト）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/ja/main-light.png)
 
-![配置の編集](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/ja/edit.png)
+![配置の編集](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/ja/edit.png)
 
 ## ソースからビルド
 
-インストーラーを作る場合は、Inno Setup の `ISCC.exe` のパスを `-Compiler` に指定して `installer\pack.ps1 -Version 1.2.2 -OutDir .\dist` を実行します。
+インストーラーを作る場合は、Inno Setup の `ISCC.exe` のパスを `-Compiler` に指定して `installer\pack.ps1 -Version 1.3.0 -OutDir .\dist` を実行します。
 
 WindowsのPowerShellで次を実行します。Windowsの.NET Frameworkコンパイラで `AppLayout.exe` が生成されます。
 

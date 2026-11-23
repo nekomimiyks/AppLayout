@@ -172,7 +172,7 @@
     "Value": "Todos os layouts foram removidos ({0})"
   },
   {
-    "Key": "すべての配置を解除する",
+    "Key": "すべての配置を解除",
     "Value": "Remover todos os layouts"
   },
   {
@@ -662,5 +662,29 @@
   {
     "Key": "バックアップを保存しました。",
     "Value": "Backup salvo."
+  },
+  {
+    "Key": "更新を自動で確認",
+    "Value": "Verificar atualizações automaticamente"
+  },
+  {
+    "Key": "GitHubで新しいバージョンが見つかると通知します。",
+    "Value": "Receba um aviso quando houver uma nova versão no GitHub."
+  },
+  {
+    "Key": "v{0} に更新",
+    "Value": "Atualizar para v{0}"
+  },
+  {
+    "Key": "新しいバージョン v{0} があります。設定から更新できます。",
+    "Value": "A versão v{0} está disponível. Atualize nas configurações."
+  },
+  {
+    "Key": "更新を準備中…",
+    "Value": "Preparando atualização…"
+  },
+  {
+    "Key": "アップデートを開始できませんでした。時間をおいて再試行してください。",
+    "Value": "Não foi possível iniciar a atualização. Tente novamente mais tarde."
   }
 ]

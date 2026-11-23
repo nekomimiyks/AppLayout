@@ -9,6 +9,7 @@ AppLayout 可以保存 Windows 窗口的位置和大小，并将窗口恢复到�
 [从 GitHub Releases 下载最新版本](https://github.com/nekomimiyks/AppLayout/releases/latest)
 
 运行 `AppLayout-Setup.exe` 安装，然后从开始菜单打开 AppLayout。设置可备份为 JSON 文件并还原。
+安装程序可以创建桌面快捷方式。在设置中开启自动检查更新，即可收到 GitHub 新版本通知。点击更新按钮即可启动安装程序。
 
 ## 快速开始
 
@@ -24,11 +25,13 @@ AppLayout 可以保存 Windows 窗口的位置和大小，并将窗口恢复到�
 
 ## 界面截图
 
-![主界面（深色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/zh-Hans/main-dark.png)
+![主界面（深色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/zh-Hans/main-dark.png)
 
-![主界面（浅色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/zh-Hans/main-light.png)
+![主界面（浅色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/zh-Hans/main-light.png)
 
-![编辑布局](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/zh-Hans/edit.png)
+![编辑布局](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/zh-Hans/edit.png)
+
+![设置与备份](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/zh-Hans/settings-backup.png)
 
 ## 从源代码构建
 

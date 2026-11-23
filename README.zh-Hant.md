@@ -9,6 +9,7 @@ AppLayout 可以儲存 Windows 視窗的位置和大小，並將視窗還原到�
 [從 GitHub Releases 下載最新版本](https://github.com/nekomimiyks/AppLayout/releases/latest)
 
 執行 `AppLayout-Setup.exe` 安裝，再從開始功能表開啟 AppLayout。設定可備份為 JSON 檔案並還原。
+安裝程式可以建立桌面捷徑。在設定中開啟自動檢查更新，即可收到 GitHub 新版本通知。按下更新按鈕即可啟動安裝程式。
 
 ## 快速開始
 
@@ -24,11 +25,13 @@ AppLayout 可以儲存 Windows 視窗的位置和大小，並將視窗還原到�
 
 ## 介面截圖
 
-![主介面（深色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/zh-Hant/main-dark.png)
+![主介面（深色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/zh-Hant/main-dark.png)
 
-![主介面（淺色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/zh-Hant/main-light.png)
+![主介面（淺色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/zh-Hant/main-light.png)
 
-![編輯配置](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/zh-Hant/edit.png)
+![編輯配置](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/zh-Hant/edit.png)
+
+![設定與備份](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/zh-Hant/settings-backup.png)
 
 ## 從原始碼建置
 

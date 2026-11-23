@@ -172,7 +172,7 @@
     "Value": "Se eliminaron todas las disposiciones ({0})"
   },
   {
-    "Key": "すべての配置を解除する",
+    "Key": "すべての配置を解除",
     "Value": "Eliminar todas las disposiciones"
   },
   {
@@ -662,5 +662,29 @@
   {
     "Key": "バックアップを保存しました。",
     "Value": "Copia guardada."
+  },
+  {
+    "Key": "更新を自動で確認",
+    "Value": "Buscar actualizaciones automáticamente"
+  },
+  {
+    "Key": "GitHubで新しいバージョンが見つかると通知します。",
+    "Value": "Recibe un aviso si hay una versión nueva en GitHub."
+  },
+  {
+    "Key": "v{0} に更新",
+    "Value": "Actualizar a v{0}"
+  },
+  {
+    "Key": "新しいバージョン v{0} があります。設定から更新できます。",
+    "Value": "La versión v{0} está disponible. Actualiza desde la configuración."
+  },
+  {
+    "Key": "更新を準備中…",
+    "Value": "Preparando la actualización…"
+  },
+  {
+    "Key": "アップデートを開始できませんでした。時間をおいて再試行してください。",
+    "Value": "No se pudo iniciar la actualización. Inténtalo de nuevo más tarde."
   }
 ]

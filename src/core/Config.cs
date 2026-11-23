@@ -126,6 +126,7 @@ namespace AppLayout
         [DataMember(Name = "minimizeToTrayOnClose", Order = 5)] public bool MinimizeToTrayOnClose;
         [DataMember(Name = "apps", Order = 6)] public List<AppEntry> Apps;
         [DataMember(Name = "language", Order = 7, EmitDefaultValue = false)] public string Language;
+        [DataMember(Name = "checkForUpdates", Order = 8, EmitDefaultValue = false)] public bool CheckForUpdates;
 
         public LayoutConfig() { Defaults(); }
         [OnDeserializing] void OnDeserializing(StreamingContext c) { Defaults(); }
@@ -247,6 +248,7 @@ namespace AppLayout
             {
                 var settings = Decode(savedContents);
                 RemoveLaunchTargets(settings);
+                settings.CheckForUpdates = false;
                 var backup = new SettingsBackup { Format = BackupFormat, Version = BackupVersion, Settings = settings };
                 string temporary = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(destination),
                     ".applayout-" + System.IO.Path.GetRandomFileName() + ".tmp");
@@ -298,6 +300,7 @@ namespace AppLayout
                 {
                     VerifyUnchanged();
                     var previous = Config;
+                    settings.CheckForUpdates = previous.CheckForUpdates;
                     Config = settings;
                     try { WriteFile(Path + ".before-restore"); }
                     catch { Config = previous; throw; }

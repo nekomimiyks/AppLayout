@@ -9,6 +9,7 @@ AppLayout enregistre la position et la taille de vos fenêtres Windows et restau
 [Télécharger la dernière version depuis GitHub Releases](https://github.com/nekomimiyks/AppLayout/releases/latest)
 
 Exécutez `AppLayout-Setup.exe`, puis ouvrez AppLayout depuis le menu Démarrer. Sauvegardez et restaurez les paramètres avec un fichier JSON.
+Le programme d’installation peut créer un raccourci sur le bureau. Activez la recherche automatique de mises à jour dans les paramètres pour être averti des nouvelles versions sur GitHub. Le bouton de mise à jour lance le programme d’installation.
 
 ## Premiers pas
 
@@ -24,11 +25,13 @@ Sur l’ancien PC, ouvrez les paramètres et créez une sauvegarde JSON. Copiez 
 
 ## Captures d’écran
 
-![Fenêtre principale en mode sombre](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/fr/main-dark.png)
+![Fenêtre principale en mode sombre](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/fr/main-dark.png)
 
-![Fenêtre principale en mode clair](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/fr/main-light.png)
+![Fenêtre principale en mode clair](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/fr/main-light.png)
 
-![Modification d’une disposition](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/fr/edit.png)
+![Modification d’une disposition](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/fr/edit.png)
+
+![Paramètres et sauvegarde](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/fr/settings-backup.png)
 
 ## Compiler à partir du code source
 

@@ -11,7 +11,7 @@ New-Item -ItemType Directory -Path $out -Force | Out-Null
 $stage = Join-Path $out ('installer-stage-' + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $stage | Out-Null
 try {
-    & (Join-Path $root 'build.ps1') -Out (Join-Path $stage 'AppLayout.exe')
+    & (Join-Path $root 'build.ps1') -Out (Join-Path $stage 'AppLayout.exe') -Version $Version
     $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
     if (-not (Test-Path -LiteralPath $csc)) {
         $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework\v4.0.30319\csc.exe'

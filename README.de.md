@@ -9,6 +9,7 @@ AppLayout speichert die Position und Größe von Windows-Fenstern und stellt ges
 [Neueste Version von GitHub Releases herunterladen](https://github.com/nekomimiyks/AppLayout/releases/latest)
 
 Führen Sie `AppLayout-Setup.exe` aus und öffnen Sie AppLayout über das Startmenü. Einstellungen können als JSON-Datei gesichert und wiederhergestellt werden.
+Das Installationsprogramm kann eine Desktopverknüpfung erstellen. Aktiviere die automatische Update-Suche in den Einstellungen, um Hinweise auf neue GitHub-Versionen zu erhalten. Die Update-Schaltfläche startet das Installationsprogramm.
 
 ## Erste Schritte
 
@@ -24,11 +25,13 @@ Schalten Sie die Zeile auf **OFF**, um das gespeicherte Layout zu entfernen. Üb
 
 ## Screenshots
 
-![Hauptfenster im Dunkelmodus](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/de/main-dark.png)
+![Hauptfenster im Dunkelmodus](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/de/main-dark.png)
 
-![Hauptfenster im Hellmodus](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/de/main-light.png)
+![Hauptfenster im Hellmodus](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/de/main-light.png)
 
-![Layout bearbeiten](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/de/edit.png)
+![Layout bearbeiten](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/de/edit.png)
+
+![Einstellungen und Sicherung](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/de/settings-backup.png)
 
 ## Aus dem Quellcode erstellen
 

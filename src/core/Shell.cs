@@ -12,7 +12,8 @@ namespace AppLayout {
    using (var stopEvent = new ManualResetEvent(false))
    using (var icon = AppIcon.Create())
    using (var tray = new NotifyIcon())
-   using (var menu = new TrayMenu()) {
+   using (var menu = new TrayMenu())
+   using (var updateTimer = new System.Windows.Forms.Timer { Interval = 24 * 60 * 60 * 1000 }) {
     Action refreshLanguage = delegate {
      if(!form.IsDisposed && !form.Disposing && L.Selection=="auto")L.SetLanguage("auto");
     };
@@ -34,10 +35,90 @@ namespace AppLayout {
      catch(Exception ex){MessageBox.Show(ex.Message,L.T("配置を変更できませんでした"),MessageBoxButtons.OK,MessageBoxIcon.Error);}
     });
     menu.Items.Add(new ToolStripSeparator());
-    menu.Items.Add(L.T("アプリを終了する"), null, delegate { exiting = true; form.Close(); });
+    var exitItem = menu.Items.Add(L.T("アプリを終了する"), null, delegate { exiting = true; form.Close(); });
+    ReleaseCheck.Update available = null;
+    Version notified = null;
+    bool checking = false, installing = false;
+    var updateItem = new ToolStripMenuItem { Visible = false };
+    menu.Items.Insert(2,updateItem);
+    tray.BalloonTipClicked += delegate { show(); };
+    Action refreshUpdate = delegate {
+     updateItem.Visible = controller.CheckForUpdates && available!=null;
+     updateItem.Enabled = !installing;
+     var version=controller.CheckForUpdates && available!=null ? available.Version : null;
+     if(version!=null)updateItem.Text=L.F("v{0} に更新",version);
+     controller.SetUpdateStatus(version,installing);
+    };
+    EventHandler installRelease = delegate {
+     if(exiting || installing || available==null || !controller.CheckForUpdates)return;
+     var selected=available;
+     installing=true;
+     refreshUpdate();
+     ThreadPool.QueueUserWorkItem(delegate {
+      string path=null;
+      try { path=ReleaseCheck.Download(selected); }
+      catch(System.Net.WebException) { }
+      catch(System.IO.IOException) { }
+      catch(UnauthorizedAccessException) { }
+      try { ui.Post(delegate {
+       if(exiting || !controller.CheckForUpdates) {
+        installing=false;
+        if(path!=null)ReleaseCheck.RemoveDownload(path);
+        return;
+       }
+       if(path!=null) {
+        try {
+         var setup=System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(path) { UseShellExecute = true });
+         setup.Exited+=delegate {
+          setup.Dispose();
+          ReleaseCheck.RemoveDownload(path);
+          try { ui.Post(delegate { if(!exiting){installing=false;refreshUpdate();} },null); }
+          catch(InvalidOperationException) { }
+         };
+         setup.EnableRaisingEvents=true;
+         return;
+        } catch(System.ComponentModel.Win32Exception) { ReleaseCheck.RemoveDownload(path); }
+       }
+       installing=false;
+       refreshUpdate();
+       MessageBox.Show(form,L.T("アップデートを開始できませんでした。時間をおいて再試行してください。"),
+        "AppLayout",MessageBoxButtons.OK,MessageBoxIcon.Error);
+      },null); } catch(InvalidOperationException) { if(path!=null)ReleaseCheck.RemoveDownload(path); }
+     });
+    };
+    updateItem.Click += installRelease;
+    Action checkRelease = delegate {
+     if(exiting || checking || ReleaseCheck.InstalledVersion==null || !controller.CheckForUpdates)return;
+     checking=true;
+     ThreadPool.QueueUserWorkItem(delegate {
+      ReleaseCheck.Update latest=null;
+      try { latest=ReleaseCheck.CheckLatest(); }
+      catch(System.Net.WebException) { }
+      catch(System.IO.IOException) { }
+      catch(System.Runtime.Serialization.SerializationException) { }
+      try { ui.Post(delegate {
+       checking=false;
+       if(exiting || !controller.CheckForUpdates || latest==null)return;
+       available=latest;
+       refreshUpdate();
+       if(latest.Version==notified)return;
+       notified=latest.Version;
+       tray.ShowBalloonTip(6500,"AppLayout",L.F("新しいバージョン v{0} があります。設定から更新できます。",latest.Version),ToolTipIcon.Info);
+      },null); } catch(InvalidOperationException) { }
+     });
+    };
+    EventHandler updateSettingChanged = delegate {
+     refreshUpdate();
+     if(ReleaseCheck.InstalledVersion!=null && controller.CheckForUpdates) {
+      updateTimer.Start();
+      checkRelease();
+     } else updateTimer.Stop();
+    };
+    updateTimer.Tick += delegate { checkRelease(); };
     EventHandler languageChanged=delegate {
-     menu.Items[0].Text=L.T("アプリを開く");menu.Items[1].Text=Texts.Restore;menu.Items[3].Text=L.T("アプリを終了する");
+     menu.Items[0].Text=L.T("アプリを開く");menu.Items[1].Text=Texts.Restore;exitItem.Text=L.T("アプリを終了する");
      menu.AccessibleName=L.T("AppLayout のメニュー");
+     refreshUpdate();
     };
     Microsoft.Win32.UserPreferenceChangedEventHandler windowsLanguageChanged=delegate {
      if(Interlocked.Exchange(ref languageRefreshPending,1)!=0)return;
@@ -61,10 +142,13 @@ namespace AppLayout {
      catch(InvalidOperationException){} // UIスレッドの終了中
     }){IsBackground=true};
     L.Changed+=languageChanged;
+    controller.UpdateCheckingChanged+=updateSettingChanged;
+    controller.UpdateRequested+=installRelease;
     Microsoft.Win32.SystemEvents.UserPreferenceChanged+=windowsLanguageChanged;
     thread.Start();
     try {
      controller.Start();
+     updateSettingChanged(null,EventArgs.Empty);
      if (!startupMode) Application.Run(form);
      else {
       form.ShowInTaskbar=false;
@@ -80,6 +164,9 @@ namespace AppLayout {
      exiting=true;
      Microsoft.Win32.SystemEvents.UserPreferenceChanged-=windowsLanguageChanged;
      L.Changed-=languageChanged;
+     controller.UpdateCheckingChanged-=updateSettingChanged;
+     controller.UpdateRequested-=installRelease;
+     updateTimer.Stop();
      stopEvent.Set();thread.Join();
      if(transition!=null && !transition.IsDisposed)transition.Close();
      controller.Stop();tray.Visible=false;

@@ -35,7 +35,7 @@ namespace AppLayout
         readonly Icon windowIcon;
         Font heading, bold, secondary;
         int rowHeight, bandHeight, bodyLineHeight, secondaryLineHeight;
-        readonly TableLayoutPanel command, options;
+        readonly TableLayoutPanel command;
         readonly FlowLayoutPanel title, commands, automatic;
         readonly Button settings;
         bool arranging;
@@ -43,6 +43,8 @@ namespace AppLayout
         readonly Button execute, clear;
         readonly FlowLayoutPanel preferences;
         readonly CheckBox enabled, login, launch, tray;
+        readonly CheckBox updateCheck;
+        readonly Button installUpdate;
         long nextOrder;
         int savedTotal;
         bool busy, readingSettings;
@@ -75,38 +77,42 @@ namespace AppLayout
             page.Content.Controls.Add(root);
             Controls.Add(page);
 
-            command = Strip(AppTheme.Surface, 13, 3);
+            command = Strip(AppTheme.Surface, 13, 8);
             title = Flow();
             title.Controls.Add(Caption(L.T("登録済みの配置"), heading, AppTheme.Foreground));
             savedCount = Caption("", bold, AppTheme.Accent);
             title.Controls.Add(savedCount);
             commands = Flow();
             execute = AppTheme.Button(Texts.Restore, true);
-            clear = QuietButton(Texts.Unsave);
-            commands.Controls.AddRange(new Control[] { execute, clear });
-            command.Controls.Add(title, 0, 0); command.Controls.Add(commands, 1, 0);
-            root.Controls.Add(command, 0, 0);
-
-            options = Strip(AppTheme.Surface, 2, 6);
-            automatic = Flow();
-            enabled = Check(Texts.Enabled, Texts.EnabledTip);
-            autoStatus = Caption("", secondary, AppTheme.Muted);
-            automatic.Controls.AddRange(new Control[] { enabled, autoStatus });
+            clear = new ClearLayoutsButton(Texts.Unsave);
+            execute.Margin = Pad(0, 0, 8, 4);
+            clear.Margin = Pad(0, 0, 16, 4);
             settings = AppTheme.Button(L.T("設定を開く"), false);
             settings.Name = "SettingsButton";
             settings.AccessibleName = settings.Text;
             settings.MinimumSize = Ui.Sz(120, 36);
+            settings.Margin = Pad(0, 0, 0, 4);
             settings.BackColor = AppTheme.Background;
             settings.FlatAppearance.BorderColor = AppTheme.Muted;
-            settings.Anchor = AnchorStyles.Right;
-            options.Controls.Add(automatic, 0, 0); options.Controls.Add(settings, 1, 0);
-            root.Controls.Add(options, 0, 1);
+            commands.Controls.AddRange(new Control[] { execute, clear, settings });
+            command.Controls.Add(title, 0, 0); command.Controls.Add(commands, 1, 0);
+            root.Controls.Add(command, 0, 0);
+
+            automatic = Flow();
+            automatic.Dock = DockStyle.Fill;
+            automatic.WrapContents = true;
+            automatic.Padding = Pad(18, 0, 18, 8);
+            enabled = Check(Texts.Enabled, Texts.EnabledTip);
+            autoStatus = Caption("", secondary, AppTheme.Muted);
+            automatic.Controls.AddRange(new Control[] { enabled, autoStatus });
+            root.Controls.Add(automatic, 0, 1);
 
             preferences = Flow(); preferences.Dock = DockStyle.Fill; preferences.WrapContents = true;
             preferences.Padding = Pad(19, 7, 19, 7); preferences.BackColor = AppTheme.Background;
             login = Check(Texts.AutoStart, Texts.AutoStartTip); launch = Check(Texts.LaunchMissing, Texts.LaunchMissingTip);
             tray = Check(Texts.MinimizeToTrayOnClose, Texts.MinimizeToTrayOnCloseTip);
             preferences.Controls.AddRange(new Control[] { login, launch, tray });
+            preferences.SetFlowBreak(tray, true);
             var languageLabel=Caption(L.T("言語"),secondary,AppTheme.Muted);
             languageLabel.Margin=Pad(0,6,8,4);
             language=new ThemedSelect { Name="LanguageSelector",Width=Ui.S(240),Margin=Pad(0,3,0,3),AccessibleName=L.T("言語") };
@@ -115,9 +121,25 @@ namespace AppLayout
             preferences.SetFlowBreak(languageGroup, true);
             var backup = AppTheme.Button(L.T("設定をバックアップ"), false);
             var restoreBackup = AppTheme.Button(L.T("バックアップから復元"), false);
+            backup.Margin = Pad(0, 8, 8, 0);
+            restoreBackup.Margin = Pad(0, 8, 0, 0);
             L.BindText(backup, "設定をバックアップ");
             L.BindText(restoreBackup, "バックアップから復元");
             preferences.Controls.AddRange(new Control[] { backup, restoreBackup });
+            preferences.SetFlowBreak(restoreBackup, true);
+            if (ReleaseCheck.InstalledVersion != null)
+            {
+                updateCheck = Check(L.T("更新を自動で確認"), L.T("GitHubで新しいバージョンが見つかると通知します。"));
+                updateCheck.Margin = Pad(0, 8, 12, 0);
+                L.BindText(updateCheck, "更新を自動で確認");
+                installUpdate = AppTheme.Button("", false);
+                installUpdate.Margin = Pad(0, 8, 0, 0);
+                installUpdate.Visible = false;
+                installUpdate.Click += delegate { controller.RequestUpdate(); };
+                preferences.Controls.AddRange(new Control[] { updateCheck, installUpdate });
+                controller.UpdateStatusChanged += UpdateStatusChanged;
+                Disposed += delegate { controller.UpdateStatusChanged -= UpdateStatusChanged; };
+            }
             backup.Click += delegate { ManageBackup(false); };
             restoreBackup.Click += delegate { ManageBackup(true); };
             language.SelectedIndexChanged+=delegate {
@@ -164,10 +186,10 @@ namespace AppLayout
             BindSetting(login, delegate(bool value) { controller.AutoStart = value; });
             BindSetting(launch, delegate(bool value) { controller.LaunchMissing = value; });
             BindSetting(tray, delegate(bool value) { controller.MinimizeToTrayOnClose = value; });
+            if (updateCheck != null) BindSetting(updateCheck, delegate(bool value) { controller.CheckForUpdates = value; });
             ReadSettings();
             MeasureGrid();
             command.SizeChanged += delegate { ArrangeCommands(); };
-            options.SizeChanged += delegate { ArrangeCommands(); };
             ArrangeCommands();
             controller.RowsChanged += RowsChanged;
             bool firstShow = true;
@@ -183,6 +205,8 @@ namespace AppLayout
                 settings.AccessibleName=settings.Text;
                 tips.SetToolTip(enabled,Texts.EnabledTip);tips.SetToolTip(login,Texts.AutoStartTip);
                 tips.SetToolTip(launch,Texts.LaunchMissingTip);tips.SetToolTip(tray,Texts.MinimizeToTrayOnCloseTip);
+                if (updateCheck != null) tips.SetToolTip(updateCheck,L.T("GitHubで新しいバージョンが見つかると通知します。"));
+                UpdateStatusChanged(null, EventArgs.Empty);
                 ReadSettings();RefreshLedger();MeasureGrid();ArrangeCommands();
             });
         }
@@ -236,7 +260,7 @@ namespace AppLayout
             MeasureGrid();
             int width = PreferredGridWidth();
             int commandsWidth = title.PreferredSize.Width + commands.PreferredSize.Width + command.Padding.Horizontal;
-            int optionsWidth = automatic.PreferredSize.Width + settings.PreferredSize.Width + settings.Margin.Horizontal + options.Padding.Horizontal;
+            int optionsWidth = automatic.PreferredSize.Width;
             width = Math.Max(width, Math.Max(commandsWidth, optionsWidth));
             Size frame = Size - ClientSize;
             Size fit = FitStartupSize(new Size(width, Pixel(420)), frame, work, Pixel(14));
@@ -296,36 +320,32 @@ namespace AppLayout
         void ArrangeCommands()
         {
             if (arranging || settings == null || autoStatus == null) return;
-            arranging = true;
-            try
-            {
-                ArrangeStrip(command, title, commands);
-                ArrangeStrip(options, automatic, settings);
-            }
-            finally { arranging = false; }
-        }
-        static void ArrangeStrip(TableLayoutPanel strip, FlowLayoutPanel left, Control right)
-        {
-            int available = strip.ClientSize.Width - strip.Padding.Horizontal;
+            int available = command.ClientSize.Width - command.Padding.Horizontal;
             if (available <= 0) return;
-            var rightFlow = right as FlowLayoutPanel;
-            int leftWidth = left.Controls.Cast<Control>().Sum(c => c.GetPreferredSize(Size.Empty).Width + c.Margin.Horizontal);
-            int rightWidth = rightFlow == null ? right.GetPreferredSize(Size.Empty).Width :
-                rightFlow.Controls.Cast<Control>().Sum(c => c.GetPreferredSize(Size.Empty).Width + c.Margin.Horizontal);
-            bool stacked = leftWidth + rightWidth + right.Margin.Horizontal > available;
-            left.MaximumSize = new Size(available, 0); left.WrapContents = leftWidth > available;
-            if (rightFlow != null) { rightFlow.MaximumSize = new Size(available, 0); rightFlow.WrapContents = rightWidth > available; }
-            if (stacked == (strip.GetRow(right) == 1)) return;
-            strip.SuspendLayout();
+            int titleWidth = FlowWidth(title);
+            int commandsWidth = FlowWidth(commands);
+            bool stacked = titleWidth + commandsWidth > available;
+            arranging = true;
+            command.SuspendLayout();
             try
             {
-                if (stacked) strip.RowCount = 2;
-                strip.SetCellPosition(right, new TableLayoutPanelCellPosition(stacked ? 0 : 1, stacked ? 1 : 0));
-                strip.SetColumnSpan(left, stacked ? 2 : 1); strip.SetColumnSpan(right, stacked ? 2 : 1);
-                right.Anchor = stacked ? AnchorStyles.Left : AnchorStyles.Right;
-                if (!stacked) strip.RowCount = 1;
+                title.MaximumSize = commands.MaximumSize = new Size(available, 0);
+                title.WrapContents = titleWidth > available;
+                commands.WrapContents = commandsWidth > available;
+                commands.Margin = new Padding(0, stacked ? Pixel(6) : 0, 0, 0);
+                if (stacked == (command.GetRow(commands) == 1)) return;
+                if (stacked) command.RowCount = 2;
+                command.SetCellPosition(commands, new TableLayoutPanelCellPosition(stacked ? 0 : 1, stacked ? 1 : 0));
+                command.SetColumnSpan(title, stacked ? 2 : 1);
+                command.SetColumnSpan(commands, stacked ? 2 : 1);
+                commands.Anchor = stacked ? AnchorStyles.Left : AnchorStyles.Right;
+                if (!stacked) command.RowCount = 1;
             }
-            finally { strip.ResumeLayout(true); }
+            finally { command.ResumeLayout(true); arranging = false; }
+        }
+        static int FlowWidth(FlowLayoutPanel group)
+        {
+            return group.Controls.Cast<Control>().Sum(c => c.GetPreferredSize(Size.Empty).Width + c.Margin.Horizontal);
         }
         static FlowLayoutPanel Flow()
         {
@@ -344,16 +364,57 @@ namespace AppLayout
             return new Label { AutoSize = true, Text = value, Font = font, ForeColor = color, Anchor = AnchorStyles.Left,
                 Margin = Pad(0, 0, 10, 0), TextAlign = ContentAlignment.MiddleLeft };
         }
-        static Button QuietButton(string text)
+        sealed class ClearLayoutsButton : Button
         {
-            var b = AppTheme.Button(text, false); b.MinimumSize = Ui.Sz(55, 30); b.FlatAppearance.BorderSize = 0;
-            b.ForeColor = AppTheme.Muted; b.Padding = Pad(6, 3, 6, 3); return b;
+            public ClearLayoutsButton(string text)
+            {
+                Text = text;
+                AutoSize = true;
+                AutoSizeMode = AutoSizeMode.GrowAndShrink;
+                MinimumSize = Ui.Sz(96, 36);
+                Padding = Pad(12, 5, 12, 5);
+                FlatStyle = FlatStyle.Flat;
+                UseVisualStyleBackColor = false;
+                BackColor = AppTheme.Surface;
+                ForeColor = AppTheme.Foreground;
+                FlatAppearance.BorderColor = AppTheme.Border;
+                FlatAppearance.BorderSize = 1;
+                FlatAppearance.MouseOverBackColor = AppTheme.Band;
+                FlatAppearance.MouseDownBackColor = AppTheme.Band;
+            }
+
+            protected override void OnPaint(PaintEventArgs e)
+            {
+                if (Enabled)
+                {
+                    base.OnPaint(e);
+                    return;
+                }
+
+                // WinForms の無効文字色は ForeColor を使わないため、配色に合わせて描画する。
+                using (var background = new SolidBrush(BackColor))
+                    e.Graphics.FillRectangle(background, ClientRectangle);
+                ControlPaint.DrawBorder(e.Graphics, ClientRectangle, FlatAppearance.BorderColor, ButtonBorderStyle.Solid);
+                TextRenderer.DrawText(e.Graphics, Text, Font, ClientRectangle, AppTheme.Muted,
+                    TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter |
+                    TextFormatFlags.SingleLine | TextFormatFlags.EndEllipsis);
+            }
         }
         CheckBox Check(string text, string tip)
         {
             var check = new ToggleSwitch { Text = text, AutoSize = true, Anchor = AnchorStyles.Left, Margin = Pad(0, 4, 13, 4) };
             tips.SetToolTip(check, tip); return check;
         }
+        void UpdateStatusChanged(object sender, EventArgs e)
+        {
+            if (installUpdate == null || IsDisposed) return;
+            var version = controller.AvailableUpdate;
+            installUpdate.Visible = version != null;
+            installUpdate.Enabled = !controller.Updating;
+            if (version != null)
+                installUpdate.Text = controller.Updating ? L.T("更新を準備中…") : L.F("v{0} に更新",version);
+        }
+
         void ReadSettings()
         {
             readingSettings = true;
@@ -361,6 +422,7 @@ namespace AppLayout
             {
                 enabled.Checked = controller.Enabled; login.Checked = controller.AutoStart; launch.Checked = controller.LaunchMissing;
                 tray.Checked = controller.MinimizeToTrayOnClose;
+                if (updateCheck != null) updateCheck.Checked = controller.CheckForUpdates;
                 autoStatus.Text = enabled.Checked ? L.T("約2秒ごとに自動復元") : L.T("自動復元を一時停止中");
                 ArrangeCommands();
             }
@@ -781,6 +843,7 @@ namespace AppLayout
             savedTotal = views.Values.Select(v => v.Tag as WindowRow).Count(r => r != null && r.Saved);
             savedCount.Text = L.F("{0} 件",savedTotal);
             execute.Enabled = clear.Enabled = savedTotal > 0;
+            ArrangeCommands();
         }
         protected override void Dispose(bool disposing)
         {

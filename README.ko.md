@@ -9,6 +9,7 @@ AppLayout은 Windows 창의 위치와 크기를 저장하고 저장된 배치로
 [GitHub Releases에서 최신 버전 다운로드](https://github.com/nekomimiyks/AppLayout/releases/latest)
 
 `AppLayout-Setup.exe`를 실행한 뒤 시작 메뉴에서 AppLayout을 엽니다. 설정은 JSON 파일로 백업하고 복원할 수 있습니다.
+설치 프로그램에서 바탕 화면 바로 가기를 만들 수 있습니다. 설정에서 자동 업데이트 확인을 켜면 GitHub의 새 버전 알림을 받을 수 있습니다. 업데이트 버튼을 누르면 설치 프로그램이 시작됩니다.
 
 ## 시작하기
 
@@ -24,11 +25,13 @@ AppLayout은 Windows 창의 위치와 크기를 저장하고 저장된 배치로
 
 ## 스크린샷
 
-![기본 화면(어두운 모드)](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/ko/main-dark.png)
+![기본 화면(어두운 모드)](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/ko/main-dark.png)
 
-![기본 화면(밝은 모드)](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/ko/main-light.png)
+![기본 화면(밝은 모드)](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/ko/main-light.png)
 
-![배치 편집](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/ko/edit.png)
+![배치 편집](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/ko/edit.png)
+
+![설정 및 백업](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/ko/settings-backup.png)
 
 ## 소스에서 빌드
 

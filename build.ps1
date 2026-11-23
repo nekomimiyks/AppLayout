@@ -1,4 +1,4 @@
-﻿param([string]$Out = 'AppLayout.exe', [switch]$Store)
+﻿param([string]$Out = 'AppLayout.exe', [switch]$Store, [ValidatePattern('^\d+\.\d+\.\d+$')][string]$Version)
 # Windows標準の .NET Framework 4 C# コンパイラだけでビルドする。
 $ErrorActionPreference = 'Stop'
 $here = $PSScriptRoot
@@ -60,8 +60,18 @@ if ($Store) {
         ('/r:' + (Join-Path $metadata 'Windows.ApplicationModel.winmd')),
         ('/r:' + (Join-Path $metadata 'Windows.Foundation.winmd')))
 }
-& $csc /nologo /target:winexe /optimize+ /platform:anycpu "/out:$outPath" "/win32icon:$ico" "/resource:$ico,AppLayout.AppIcon.ico" `
-  /r:System.dll /r:System.Core.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll `
-  /r:System.Runtime.Serialization.dll $storeArgs $resources $src
-if ($LASTEXITCODE -ne 0) { throw 'Build failed' }
+$versionResource = $null
+try {
+    if ($Version -and -not $Store) {
+        $versionResource = Join-Path ([IO.Path]::GetDirectoryName($outPath)) ('.appversion-' + [Guid]::NewGuid().ToString('N'))
+        [IO.File]::WriteAllText($versionResource, $Version, [Text.Encoding]::ASCII)
+        $resources += "/resource:$versionResource,AppLayout.ReleaseVersion"
+    }
+    & $csc /nologo /target:winexe /optimize+ /platform:anycpu "/out:$outPath" "/win32icon:$ico" "/resource:$ico,AppLayout.AppIcon.ico" `
+      /r:System.dll /r:System.Core.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll `
+      /r:System.Runtime.Serialization.dll $storeArgs $resources $src
+    if ($LASTEXITCODE -ne 0) { throw 'Build failed' }
+} finally {
+    if ($versionResource) { Remove-Item -LiteralPath $versionResource -ErrorAction SilentlyContinue }
+}
 Write-Output "Build complete: $outPath"

@@ -15,7 +15,7 @@ namespace AppLayout {
   public static string AutoStartTip { get { return L.T("Windowsにサインインしたとき、画面を出さずにタスクトレイに常駐した状態で起動します。"); } }
   public static string LaunchMissingTip { get { return L.T("ログイン時の自動起動のとき、保存済みのアプリが起動していなければ起動します。"); } }
   public static string MinimizeToTrayOnCloseTip { get { return L.T("×ボタンで閉じたとき、終了せずにタスクトレイに入ります。オフのときは×で終了します。"); } }
-  public static string Save { get { return L.T("今の位置で配置"); } } public static string Unsave { get { return L.T("すべての配置を解除する"); } } public static string Restore { get { return L.T("配置を実行"); } } public static string Edit { get { return L.T("編集"); } }
+  public static string Save { get { return L.T("今の位置で配置"); } } public static string Unsave { get { return L.T("すべての配置を解除"); } } public static string Restore { get { return L.T("配置を実行"); } } public static string Edit { get { return L.T("編集"); } }
   public static string Name { get { return L.T("名前"); } } public static string Process { get { return L.T("アプリ（プロセス名）"); } } public static string Position { get { return L.T("位置(X, Y)"); } } public static string Size { get { return L.T("サイズ(幅×高さ)"); } } public static string Monitor { get { return L.T("モニタ"); } } public static string TitleRule { get { return L.T("ウィンドウの見分け方"); } } public static string Maximized { get { return L.T("最大化"); } } public static string Status { get { return L.T("状態"); } }
  }
  public class AppController {
@@ -214,6 +214,28 @@ namespace AppLayout {
   public bool Enabled { get { return store.Config.Enabled; } set { SaveSetting(ref store.Config.Enabled,value);keeper.Kick();Changed(); } }
   public bool LaunchMissing { get { return store.Config.LaunchMissingAtStartup; } set { SaveSetting(ref store.Config.LaunchMissingAtStartup,value);Changed(); } }
   public bool MinimizeToTrayOnClose { get { return store.Config.MinimizeToTrayOnClose; } set { SaveSetting(ref store.Config.MinimizeToTrayOnClose,value);Changed(); } }
+  internal event EventHandler UpdateCheckingChanged;
+  internal event EventHandler UpdateStatusChanged, UpdateRequested;
+  internal Version AvailableUpdate { get; private set; }
+  internal bool Updating { get; private set; }
+  internal void SetUpdateStatus(Version available, bool updating) {
+   AvailableUpdate=available;Updating=updating;
+   var handler=UpdateStatusChanged;
+   if(handler!=null)handler(this,EventArgs.Empty);
+  }
+  internal void RequestUpdate() {
+   var handler=UpdateRequested;
+   if(handler!=null)handler(this,EventArgs.Empty);
+  }
+  internal bool CheckForUpdates {
+   get { return store.Config.CheckForUpdates; }
+   set {
+    if(value==store.Config.CheckForUpdates)return;
+    SaveSetting(ref store.Config.CheckForUpdates,value);
+    var handler=UpdateCheckingChanged;
+    if(handler!=null)handler(this,EventArgs.Empty);
+   }
+  }
   public bool AutoStart {
 #if STORE_BUILD
    get {

@@ -10,6 +10,8 @@ Windowsのウィンドウの位置とサイズを保存し、登録した配置�
 
 `AppLayout-Setup.exe` を実行します。インストールの「完了」を押すと、すぐに AppLayout を起動するか確認されます。「いいえ」を選んだ場合は、後でスタートメニューから開けます。
 
+アップデートも同じ手順です。更新先のAppLayoutが起動中なら、インストーラーが終了させてから更新します。設定は引き継がれます。
+
 ## はじめての使い方
 
 1. 保存したいウィンドウを希望の位置とサイズに動かします。
@@ -41,7 +43,7 @@ Windowsのウィンドウの位置とサイズを保存し、登録した配置�
 
 ## ソースからビルド
 
-インストーラーを作る場合は、Inno Setup の `ISCC.exe` のパスを `-Compiler` に指定して `installer\pack.ps1 -Version 1.2.1 -OutDir .\dist` を実行します。
+インストーラーを作る場合は、Inno Setup の `ISCC.exe` のパスを `-Compiler` に指定して `installer\pack.ps1 -Version 1.2.2 -OutDir .\dist` を実行します。
 
 WindowsのPowerShellで次を実行します。Windowsの.NET Frameworkコンパイラで `AppLayout.exe` が生成されます。
 

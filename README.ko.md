@@ -18,13 +18,17 @@ AppLayout은 Windows 창의 위치와 크기를 저장하고 저장된 배치로
 
 해당 행을 **OFF**로 전환하면 등록이 해제됩니다. 「편집」에서 좌표나 창 일치 규칙을 바꾸고 「설정 열기」에서 표시 언어를 선택할 수 있습니다.
 
+## 설정 백업 및 복원
+
+기존 PC에서 설정을 열고 **설정 백업**을 선택해 JSON 파일을 저장합니다. 새 PC로 복사한 뒤 **백업에서 복원**을 선택합니다. 자동 배치를 다시 켜기 전에 모니터를 확인하세요.
+
 ## 스크린샷
 
-![기본 화면(어두운 모드)](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/ko/main-dark.png)
+![기본 화면(어두운 모드)](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/ko/main-dark.png)
 
-![기본 화면(밝은 모드)](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/ko/main-light.png)
+![기본 화면(밝은 모드)](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/ko/main-light.png)
 
-![배치 편집](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/ko/edit.png)
+![배치 편집](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/ko/edit.png)
 
 ## 소스에서 빌드
 

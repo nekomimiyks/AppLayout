@@ -18,13 +18,17 @@ Execute `AppLayout-Setup.exe` e abra o AppLayout pelo menu Iniciar. Faça backup
 
 Desative a linha (**OFF**) para remover o layout salvo. Use **Editar** para ajustar as coordenadas ou a regra de correspondência e selecione **Abrir configurações** para escolher o idioma.
 
+## Backup e restauração das configurações
+
+No PC antigo, abra as configurações e faça um backup em JSON. Copie o arquivo para o novo PC e selecione **Restaurar backup**. Confira os monitores antes de reativar o layout automático.
+
 ## Capturas de tela
 
-![Janela principal no modo escuro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/pt/main-dark.png)
+![Janela principal no modo escuro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/pt/main-dark.png)
 
-![Janela principal no modo claro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/pt/main-light.png)
+![Janela principal no modo claro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/pt/main-light.png)
 
-![Edição de layout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/pt/edit.png)
+![Edição de layout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/pt/edit.png)
 
 ## Compilar a partir do código-fonte
 

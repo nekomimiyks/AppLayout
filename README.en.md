@@ -18,13 +18,17 @@ Run `AppLayout-Setup.exe`, then open AppLayout from the Start menu. Use **Back u
 
 Turn a row **OFF** to remove its saved layout. Use **Edit** to adjust the position or matching rule, and select **Open settings** to choose the display language.
 
+## Back up and restore settings
+
+On the old PC, open settings and choose **Back up settings**. Copy the JSON file to the new PC and select **Restore from backup**. Check the monitor layout before turning automatic layout back on.
+
 ## Screenshots
 
-![Main window in dark mode](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/en/main-dark.png)
+![Main window in dark mode](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/en/main-dark.png)
 
-![Main window in light mode](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/en/main-light.png)
+![Main window in light mode](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/en/main-light.png)
 
-![Edit layout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/en/edit.png)
+![Edit layout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/en/edit.png)
 
 ## Build from source
 

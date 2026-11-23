@@ -18,13 +18,17 @@ AppLayout 可以保存 Windows 窗口的位置和大小，并将窗口恢复到�
 
 将对应行设为 **OFF** 即可取消登记。使用「编辑」调整坐标或窗口匹配规则，「打开设置」即可切换显示语言。
 
+## 备份和还原设置
+
+在旧电脑上打开设置，选择**备份设置**并保存 JSON 文件。将文件复制到新电脑，选择**从备份还原**。重新启用自动布局前，请检查显示器。
+
 ## 界面截图
 
-![主界面（深色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/zh-Hans/main-dark.png)
+![主界面（深色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/zh-Hans/main-dark.png)
 
-![主界面（浅色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/zh-Hans/main-light.png)
+![主界面（浅色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/zh-Hans/main-light.png)
 
-![编辑布局](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/zh-Hans/edit.png)
+![编辑布局](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/zh-Hans/edit.png)
 
 ## 从源代码构建
 

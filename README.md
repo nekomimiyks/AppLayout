@@ -22,7 +22,7 @@ Windowsのウィンドウの位置とサイズを保存し、登録した配置�
 
 右上の **「設定を開く」** を押すと、バックアップと復元のボタンが表示されます。
 
-![設定画面。「設定をバックアップ」と「バックアップから復元」のボタン](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/ja/settings-backup.png)
+![設定画面。「設定をバックアップ」と「バックアップから復元」のボタン](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/ja/settings-backup.png)
 
 1. 元のPCで **「設定をバックアップ」** を押し、JSONファイルを保存します。
 2. USBメモリやOneDriveなどで、保存したJSONを新しいPCにコピーします。
@@ -33,11 +33,11 @@ Windowsのウィンドウの位置とサイズを保存し、登録した配置�
 
 ## スクリーンショット
 
-![メイン画面（ダーク）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/ja/main-dark.png)
+![メイン画面（ダーク）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/ja/main-dark.png)
 
-![メイン画面（ライト）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/ja/main-light.png)
+![メイン画面（ライト）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/ja/main-light.png)
 
-![配置の編集](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/ja/edit.png)
+![配置の編集](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/ja/edit.png)
 
 ## ソースからビルド
 

@@ -18,13 +18,17 @@ Exécutez `AppLayout-Setup.exe`, puis ouvrez AppLayout depuis le menu Démarrer.
 
 Désactivez une ligne (**OFF**) pour supprimer sa disposition enregistrée. Utilisez **Modifier** pour ajuster les coordonnées ou la règle de correspondance, et sélectionnez **Ouvrir les paramètres** pour choisir la langue.
 
+## Sauvegarder et restaurer les paramètres
+
+Sur l’ancien PC, ouvrez les paramètres et créez une sauvegarde JSON. Copiez le fichier sur le nouveau PC et choisissez **Restaurer une sauvegarde**. Vérifiez les écrans avant de réactiver la disposition automatique.
+
 ## Captures d’écran
 
-![Fenêtre principale en mode sombre](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/fr/main-dark.png)
+![Fenêtre principale en mode sombre](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/fr/main-dark.png)
 
-![Fenêtre principale en mode clair](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/fr/main-light.png)
+![Fenêtre principale en mode clair](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/fr/main-light.png)
 
-![Modification d’une disposition](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/fr/edit.png)
+![Modification d’une disposition](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/fr/edit.png)
 
 ## Compiler à partir du code source
 

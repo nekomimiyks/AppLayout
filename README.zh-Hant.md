@@ -18,13 +18,17 @@ AppLayout 可以儲存 Windows 視窗的位置和大小，並將視窗還原到�
 
 將對應列切換為 **OFF** 即可取消登錄。使用「編輯」調整座標或視窗比對規則，「開啟設定」即可切換顯示語言。
 
+## 備份和還原設定
+
+在舊電腦上開啟設定，選擇**備份設定**並儲存 JSON 檔案。將檔案複製到新電腦，選擇**從備份還原**。重新啟用自動配置前，請檢查螢幕。
+
 ## 介面截圖
 
-![主介面（深色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/zh-Hant/main-dark.png)
+![主介面（深色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/zh-Hant/main-dark.png)
 
-![主介面（淺色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/zh-Hant/main-light.png)
+![主介面（淺色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/zh-Hant/main-light.png)
 
-![編輯配置](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/zh-Hant/edit.png)
+![編輯配置](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/zh-Hant/edit.png)
 
 ## 從原始碼建置
 

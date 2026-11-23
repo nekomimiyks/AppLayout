@@ -18,13 +18,17 @@ Führen Sie `AppLayout-Setup.exe` aus und öffnen Sie AppLayout über das Startm
 
 Schalten Sie die Zeile auf **OFF**, um das gespeicherte Layout zu entfernen. Über **Bearbeiten** passen Sie Koordinaten oder die Zuordnungsregel an. Über **Einstellungen öffnen** ändern Sie die Anzeigesprache.
 
+## Einstellungen sichern und wiederherstellen
+
+Öffnen Sie auf dem alten PC die Einstellungen und sichern Sie sie als JSON-Datei. Kopieren Sie die Datei auf den neuen PC und wählen Sie **Aus Sicherung wiederherstellen**. Prüfen Sie die Bildschirme, bevor Sie die automatische Anordnung wieder aktivieren.
+
 ## Screenshots
 
-![Hauptfenster im Dunkelmodus](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/de/main-dark.png)
+![Hauptfenster im Dunkelmodus](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/de/main-dark.png)
 
-![Hauptfenster im Hellmodus](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/de/main-light.png)
+![Hauptfenster im Hellmodus](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/de/main-light.png)
 
-![Layout bearbeiten](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/de/edit.png)
+![Layout bearbeiten](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/de/edit.png)
 
 ## Aus dem Quellcode erstellen
 

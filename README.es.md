@@ -18,13 +18,17 @@ Ejecuta `AppLayout-Setup.exe` y abre AppLayout desde el menú Inicio. Guarda y r
 
 Desactiva la fila (**OFF**) para eliminar su disposición guardada. Usa **Editar** para ajustar las coordenadas o la regla de identificación y pulsa **Abrir ajustes** para elegir el idioma.
 
+## Copia de seguridad y restauración
+
+Abre la configuración en el PC anterior y guarda la copia en JSON. Copia el archivo al nuevo PC y selecciona **Restaurar desde una copia**. Revisa los monitores antes de reactivar la disposición automática.
+
 ## Capturas de pantalla
 
-![Ventana principal en modo oscuro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/es/main-dark.png)
+![Ventana principal en modo oscuro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/es/main-dark.png)
 
-![Ventana principal en modo claro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/es/main-light.png)
+![Ventana principal en modo claro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/es/main-light.png)
 
-![Edición de una disposición](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/es/edit.png)
+![Edición de una disposición](https://raw.githubusercontent.com/nekomimiyks/AppLayout/3bb33386aef93c943afb70069484bbf876605ae3/es/edit.png)
 
 ## Compilar desde el código fuente
 

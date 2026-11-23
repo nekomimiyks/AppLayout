@@ -112,6 +112,7 @@ namespace AppLayout
             language=new ThemedSelect { Name="LanguageSelector",Width=Ui.S(240),Margin=Pad(0,3,0,3),AccessibleName=L.T("言語") };
             var languageGroup=Flow();languageGroup.Controls.Add(languageLabel);languageGroup.Controls.Add(language);
             preferences.Controls.Add(languageGroup);
+            preferences.SetFlowBreak(languageGroup, true);
             var backup = AppTheme.Button(L.T("設定をバックアップ"), false);
             var restoreBackup = AppTheme.Button(L.T("バックアップから復元"), false);
             L.BindText(backup, "設定をバックアップ");

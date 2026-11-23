@@ -27,10 +27,26 @@ Source: "..\LICENSE"; DestDir: "{app}"
 [Icons]
 Name: "{autoprograms}\AppLayout"; Filename: "{app}\AppLayout.exe"; WorkingDir: "{app}"
 
-[Run]
-Filename: "{app}\AppLayout.exe"; Description: "{cm:LaunchProgram,AppLayout}"; Flags: nowait postinstall skipifsilent unchecked
+[CustomMessages]
+english.ConfirmLaunch=Installation is complete. Start AppLayout now?
+japanese.ConfirmLaunch=インストールが完了しました。今すぐ AppLayout を起動しますか？
+english.LaunchFailed=AppLayout could not start. You can try opening it from the Start menu.
+japanese.LaunchFailed=AppLayout を起動できませんでした。スタートメニューから起動してください。
 
 [Code]
+procedure CurStepChanged(CurStep: TSetupStep);
+var
+  ErrorCode: Integer;
+begin
+  if (CurStep <> ssDone) or WizardSilent then
+    Exit;
+  if MsgBox(CustomMessage('ConfirmLaunch'), mbConfirmation, MB_YESNO or MB_DEFBUTTON2) <> IDYES then
+    Exit;
+  if not ExecAsOriginalUser(ExpandConstant('{app}\AppLayout.exe'), '', ExpandConstant('{app}'),
+    SW_SHOWNORMAL, ewNoWait, ErrorCode) then
+    MsgBox(CustomMessage('LaunchFailed') + #13#10 + SysErrorMessage(ErrorCode), mbError, MB_OK);
+end;
+
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
   RunKey, Command: String;

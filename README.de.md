@@ -8,7 +8,7 @@ AppLayout speichert die Position und Größe von Windows-Fenstern und stellt ges
 
 [Neueste Version von GitHub Releases herunterladen](https://github.com/nekomimiyks/AppLayout/releases/latest)
 
-Entpacken Sie die ZIP-Datei und öffnen Sie `AppLayout.exe`.
+Führen Sie `AppLayout-Setup.exe` aus und öffnen Sie AppLayout über das Startmenü. Einstellungen können als JSON-Datei gesichert und wiederhergestellt werden.
 
 ## Erste Schritte
 

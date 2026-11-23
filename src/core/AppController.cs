@@ -194,6 +194,15 @@ namespace AppLayout {
    }
    LastMessage = L.F("{0}の配置を登録しました",e.Name); keeper.Kick(); Changed(); return true;
   }
+  internal void ExportSettings(string destination) { store.ExportSettings(destination); }
+
+  internal void RestoreSettings(LayoutConfig settings) {
+   store.RestoreBackup(settings);
+   L.SetLanguage(settings.Language);
+   keeper.Kick();
+   Changed();
+  }
+
   void SaveSetting(ref bool setting,bool value) {
    lock(store.Sync) {
     bool previous=setting;

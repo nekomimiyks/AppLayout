@@ -8,7 +8,7 @@ AppLayout은 Windows 창의 위치와 크기를 저장하고 저장된 배치로
 
 [GitHub Releases에서 최신 버전 다운로드](https://github.com/nekomimiyks/AppLayout/releases/latest)
 
-ZIP 파일의 압축을 풀고 `AppLayout.exe`를 실행하세요.
+`AppLayout-Setup.exe`를 실행한 뒤 시작 메뉴에서 AppLayout을 엽니다. 설정은 JSON 파일로 백업하고 복원할 수 있습니다.
 
 ## 시작하기
 

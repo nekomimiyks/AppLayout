@@ -8,7 +8,7 @@ AppLayout saves the position and size of Windows application windows and restore
 
 [Download the latest release](https://github.com/nekomimiyks/AppLayout/releases/latest)
 
-Extract the ZIP, then open `AppLayout.exe`.
+Run `AppLayout-Setup.exe`, then open AppLayout from the Start menu. Use **Back up settings** and **Restore from backup** to migrate your settings as a JSON file.
 
 ## Getting started
 

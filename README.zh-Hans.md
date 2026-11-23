@@ -8,7 +8,7 @@ AppLayout 可以保存 Windows 窗口的位置和大小，并将窗口恢复到�
 
 [从 GitHub Releases 下载最新版本](https://github.com/nekomimiyks/AppLayout/releases/latest)
 
-解压 ZIP 文件，然后打开 `AppLayout.exe`。
+运行 `AppLayout-Setup.exe` 安装，然后从开始菜单打开 AppLayout。设置可备份为 JSON 文件并还原。
 
 ## 快速开始
 

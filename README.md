@@ -8,7 +8,7 @@ Windowsのウィンドウの位置とサイズを保存し、登録した配置�
 
 [GitHub Releasesから最新版をダウンロード](https://github.com/nekomimiyks/AppLayout/releases/latest)
 
-ZIPを展開して `AppLayout.exe` を開きます。
+`AppLayout-Setup.exe` を実行し、インストール後はスタートメニューから開きます。設定の移行には「設定をバックアップ」で JSON を書き出し、移行先で「バックアップから復元」を選びます。
 
 ## はじめての使い方
 
@@ -27,6 +27,8 @@ ZIPを展開して `AppLayout.exe` を開きます。
 ![配置の編集](https://raw.githubusercontent.com/nekomimiyks/AppLayout/release-screenshots/ja/edit.png)
 
 ## ソースからビルド
+
+インストーラーを作る場合は、Inno Setup の `ISCC.exe` のパスを `-Compiler` に指定して `installer\pack.ps1 -Version 1.2.0 -OutDir .\dist` を実行します。
 
 WindowsのPowerShellで次を実行します。Windowsの.NET Frameworkコンパイラで `AppLayout.exe` が生成されます。
 

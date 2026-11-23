@@ -94,7 +94,7 @@ namespace AppLayout
             automatic.Controls.AddRange(new Control[] { enabled, autoStatus });
             settings = AppTheme.Button(L.T("設定を開く"), false);
             settings.Name = "SettingsButton";
-            settings.AccessibleName = L.T("起動と終了の設定を開く");
+            settings.AccessibleName = settings.Text;
             settings.MinimumSize = Ui.Sz(120, 36);
             settings.BackColor = AppTheme.Background;
             settings.FlatAppearance.BorderColor = AppTheme.Muted;
@@ -112,6 +112,13 @@ namespace AppLayout
             language=new ThemedSelect { Name="LanguageSelector",Width=Ui.S(240),Margin=Pad(0,3,0,3),AccessibleName=L.T("言語") };
             var languageGroup=Flow();languageGroup.Controls.Add(languageLabel);languageGroup.Controls.Add(language);
             preferences.Controls.Add(languageGroup);
+            var backup = AppTheme.Button(L.T("設定をバックアップ"), false);
+            var restoreBackup = AppTheme.Button(L.T("バックアップから復元"), false);
+            L.BindText(backup, "設定をバックアップ");
+            L.BindText(restoreBackup, "バックアップから復元");
+            preferences.Controls.AddRange(new Control[] { backup, restoreBackup });
+            backup.Click += delegate { ManageBackup(false); };
+            restoreBackup.Click += delegate { ManageBackup(true); };
             language.SelectedIndexChanged+=delegate {
                 if(readingLanguage || language.SelectedItem==null)return;
                 try{controller.Language=L.Languages[language.SelectedIndex].Code;}
@@ -172,7 +179,7 @@ namespace AppLayout
                 controller.ClearMessage();
                 ReadLanguage();
                 settings.Text=L.T(preferences.Visible?"設定を閉じる":"設定を開く");
-                settings.AccessibleName=L.T("起動と終了の設定を開く");
+                settings.AccessibleName=settings.Text;
                 tips.SetToolTip(enabled,Texts.EnabledTip);tips.SetToolTip(login,Texts.AutoStartTip);
                 tips.SetToolTip(launch,Texts.LaunchMissingTip);tips.SetToolTip(tray,Texts.MinimizeToTrayOnCloseTip);
                 ReadSettings();RefreshLedger();MeasureGrid();ArrangeCommands();
@@ -579,6 +586,44 @@ namespace AppLayout
             if (data == null || busy) return;
             Perform(delegate { controller.Edit(data, this); });
         }
+        void ManageBackup(bool restore)
+        {
+            string title = L.T(restore ? "バックアップから復元" : "設定をバックアップ");
+            const string filter = "AppLayout backup (*.json)|*.json";
+            try
+            {
+                if (!restore)
+                {
+                    using (var dialog = new SaveFileDialog { Title = title, Filter = filter, DefaultExt = "json", OverwritePrompt = false,
+                        FileName = "AppLayout-backup-" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".json", RestoreDirectory = true })
+                    {
+                        if (dialog.ShowDialog(this) != DialogResult.OK) return;
+                        controller.ExportSettings(dialog.FileName);
+                    }
+                }
+                else
+                {
+                    using (var dialog = new OpenFileDialog { Title = title, Filter = filter, RestoreDirectory = true })
+                    {
+                        if (dialog.ShowDialog(this) != DialogResult.OK) return;
+                        var replacement = ConfigStore.ReadBackup(dialog.FileName);
+                        if (MessageBox.Show(this, L.F("バックアップの配置 {0} 件で現在の設定を置き換えますか？\n自動配置とアプリの自動起動は一時停止します。復元後にモニタと配置を確認してください。",
+                            replacement.Apps.Count), title, MessageBoxButtons.YesNo, MessageBoxIcon.Question,
+                            MessageBoxDefaultButton.Button2) != DialogResult.Yes) return;
+                        controller.RestoreSettings(replacement);
+                        ReadSettings();
+                        RefreshLedger();
+                    }
+                }
+                MessageBox.Show(this, L.T(restore ? "設定を復元しました。" : "バックアップを保存しました。"),
+                    title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, ex.Message, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         void Perform(Action action)
         {
             if (busy) return;

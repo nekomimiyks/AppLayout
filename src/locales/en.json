@@ -638,5 +638,29 @@
   {
     "Key": "非表示中",
     "Value": "Hidden"
+  },
+  {
+    "Key": "設定をバックアップ",
+    "Value": "Back up settings"
+  },
+  {
+    "Key": "バックアップから復元",
+    "Value": "Restore from backup"
+  },
+  {
+    "Key": "AppLayoutの対応する設定バックアップファイルを選んでください。",
+    "Value": "Select a supported AppLayout settings backup file."
+  },
+  {
+    "Key": "バックアップの配置 {0} 件で現在の設定を置き換えますか？\n自動配置とアプリの自動起動は一時停止します。復元後にモニタと配置を確認してください。",
+    "Value": "Replace current settings with the {0} layouts in the backup?\nAutomatic layout and app launching will be paused. Review your monitors and layouts after restoring."
+  },
+  {
+    "Key": "設定を復元しました。",
+    "Value": "Settings restored."
+  },
+  {
+    "Key": "バックアップを保存しました。",
+    "Value": "Backup saved."
   }
 ]

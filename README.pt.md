@@ -8,7 +8,7 @@ O AppLayout salva a posição e o tamanho das janelas do Windows e restaura o la
 
 [Baixar a versão mais recente no GitHub Releases](https://github.com/nekomimiyks/AppLayout/releases/latest)
 
-Extraia o arquivo ZIP e abra `AppLayout.exe`.
+Execute `AppLayout-Setup.exe` e abra o AppLayout pelo menu Iniciar. Faça backup e restaure as configurações com um arquivo JSON.
 
 ## Primeiros passos
 

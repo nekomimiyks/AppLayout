@@ -134,6 +134,17 @@ namespace AppLayout
 
     public class ConfigStore
     {
+        [DataContract]
+        sealed class SettingsBackup
+        {
+            [DataMember(Name = "format", IsRequired = true)] public string Format;
+            [DataMember(Name = "version", IsRequired = true)] public int Version;
+            [DataMember(Name = "settings", IsRequired = true)] public LayoutConfig Settings;
+        }
+
+        const string BackupFormat = "AppLayout.Settings";
+        const int BackupVersion = 1;
+        const int MaxBackupBytes = 8 * 1024 * 1024;
         public readonly string Path;
         public LayoutConfig Config;
         public readonly object Sync = new object();
@@ -224,13 +235,93 @@ namespace AppLayout
             {
                 using (LockFile())
                 {
-                    byte[] current = ReadFile(Path);
-                    if (current != savedContents &&
-                        (current == null || savedContents == null || !current.SequenceEqual(savedContents)))
-                        throw new IOException(L.T("設定が別の場所で変更されました。AppLayoutを再起動して最新の設定を読み込んでください。"));
+                    VerifyUnchanged();
                     WriteFile();
                 }
             }
+        }
+
+        internal void ExportSettings(string destination)
+        {
+            lock (Sync)
+            {
+                var settings = Decode(savedContents);
+                RemoveLaunchTargets(settings);
+                var backup = new SettingsBackup { Format = BackupFormat, Version = BackupVersion, Settings = settings };
+                string temporary = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(destination),
+                    ".applayout-" + System.IO.Path.GetRandomFileName() + ".tmp");
+                bool created = false;
+                try
+                {
+                    using (var file = File.Open(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                    {
+                        created = true;
+                        WriteJson(file, backup);
+                        if (file.Length > MaxBackupBytes) throw InvalidBackup();
+                    }
+                    File.Move(temporary, destination);
+                }
+                finally { if (created) DeleteTemporary(temporary); }
+            }
+        }
+
+        internal static LayoutConfig ReadBackup(string source)
+        {
+            SettingsBackup backup;
+            try
+            {
+                using (var file = File.Open(source, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    if (file.Length > MaxBackupBytes) throw InvalidBackup();
+                    backup = (SettingsBackup)new DataContractJsonSerializer(typeof(SettingsBackup)).ReadObject(file);
+                }
+            }
+            catch (SerializationException) { throw InvalidBackup(); }
+            if (backup == null || backup.Format != BackupFormat || backup.Version != BackupVersion ||
+                backup.Settings == null || backup.Settings.Apps == null ||
+                backup.Settings.Apps.Any(entry => entry == null || entry.Width <= 0 || entry.Height <= 0 ||
+                    (long)entry.X + entry.Width > int.MaxValue || (long)entry.Y + entry.Height > int.MaxValue ||
+                    string.IsNullOrWhiteSpace(entry.Process)))
+                throw InvalidBackup();
+            Normalize(backup.Settings);
+            RemoveLaunchTargets(backup.Settings);
+            backup.Settings.Enabled = false;
+            backup.Settings.LaunchMissingAtStartup = false;
+            return backup.Settings;
+        }
+
+        internal void RestoreBackup(LayoutConfig settings)
+        {
+            lock (Sync)
+            {
+                using (LockFile())
+                {
+                    VerifyUnchanged();
+                    var previous = Config;
+                    Config = settings;
+                    try { WriteFile(Path + ".before-restore"); }
+                    catch { Config = previous; throw; }
+                }
+            }
+        }
+
+        static void RemoveLaunchTargets(LayoutConfig settings)
+        {
+            foreach (var entry in settings.Apps)
+                entry.LaunchId = entry.Shortcut = entry.ExePath = "";
+        }
+
+        static IOException InvalidBackup()
+        {
+            return new IOException(L.T("AppLayoutの対応する設定バックアップファイルを選んでください。"));
+        }
+
+        void VerifyUnchanged()
+        {
+            byte[] current = ReadFile(Path);
+            if (current != savedContents &&
+                (current == null || savedContents == null || !current.SequenceEqual(savedContents)))
+                throw new IOException(L.T("設定が別の場所で変更されました。AppLayoutを再起動して最新の設定を読み込んでください。"));
         }
 
         FileStream LockFile()
@@ -248,7 +339,7 @@ namespace AppLayout
             }
         }
 
-        void WriteFile()
+        void WriteFile(string backup = null)
         {
             string previousSavedAt = Config.SavedAt;
             string tmp = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(Path)),
@@ -260,11 +351,10 @@ namespace AppLayout
                 using (var fs = File.Open(tmp, FileMode.CreateNew))
                 {
                     created = true;
-                    using (var writer = JsonReaderWriterFactory.CreateJsonWriter(fs, new UTF8Encoding(false), true, true, "  "))
-                        new DataContractJsonSerializer(typeof(LayoutConfig)).WriteObject(writer, Config);
+                    WriteJson(fs, Config);
                 }
                 byte[] written = File.ReadAllBytes(tmp);
-                if (File.Exists(Path)) File.Replace(tmp, Path, null);
+                if (File.Exists(Path)) File.Replace(tmp, Path, backup);
                 else File.Move(tmp, Path);
                 savedContents = written;
             }
@@ -275,10 +365,21 @@ namespace AppLayout
             }
             finally
             {
-                try { if (created) File.Delete(tmp); }
-                catch (IOException) { }
-                catch (UnauthorizedAccessException) { }
+                if (created) DeleteTemporary(tmp);
             }
+        }
+
+        static void WriteJson<T>(Stream stream, T value)
+        {
+            using (var writer = JsonReaderWriterFactory.CreateJsonWriter(stream, new UTF8Encoding(false), false, true, "  "))
+                new DataContractJsonSerializer(typeof(T)).WriteObject(writer, value);
+        }
+
+        static void DeleteTemporary(string path)
+        {
+            try { File.Delete(path); }
+            catch (IOException) { }
+            catch (UnauthorizedAccessException) { }
         }
 
         static byte[] ReadFile(string path)
@@ -304,6 +405,12 @@ namespace AppLayout
             using (var json = new MemoryStream(Encoding.UTF8.GetBytes(reader.ReadToEnd())))
                 config = (LayoutConfig)new DataContractJsonSerializer(typeof(LayoutConfig)).ReadObject(json);
             if (config == null) throw new SerializationException("Empty layout configuration.");
+            Normalize(config);
+            return config;
+        }
+
+        static void Normalize(LayoutConfig config)
+        {
             if (config.Apps == null) config.Apps = new List<AppEntry>();
             config.Apps.RemoveAll(entry => entry == null);
             if (config.IntervalSeconds < 1) config.IntervalSeconds = 2;
@@ -313,7 +420,6 @@ namespace AppLayout
                 entry.EnsureId();
                 while (!ids.Add(entry.Id)) entry.Id = Guid.NewGuid().ToString("N");
             }
-            return config;
         }
     }
 }

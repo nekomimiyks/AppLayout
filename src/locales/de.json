@@ -638,5 +638,29 @@
   {
     "Key": "非表示中",
     "Value": "Ausgeblendet"
+  },
+  {
+    "Key": "設定をバックアップ",
+    "Value": "Einstellungen sichern"
+  },
+  {
+    "Key": "バックアップから復元",
+    "Value": "Aus Sicherung wiederherstellen"
+  },
+  {
+    "Key": "AppLayoutの対応する設定バックアップファイルを選んでください。",
+    "Value": "Wählen Sie eine unterstützte AppLayout-Sicherungsdatei."
+  },
+  {
+    "Key": "バックアップの配置 {0} 件で現在の設定を置き換えますか？\n自動配置とアプリの自動起動は一時停止します。復元後にモニタと配置を確認してください。",
+    "Value": "Aktuelle Einstellungen durch die {0} Anordnungen aus der Sicherung ersetzen?\nDie automatische Anordnung und der automatische App-Start werden pausiert. Prüfen Sie danach Ihre Bildschirme und Anordnungen."
+  },
+  {
+    "Key": "設定を復元しました。",
+    "Value": "Einstellungen wiederhergestellt."
+  },
+  {
+    "Key": "バックアップを保存しました。",
+    "Value": "Sicherung gespeichert."
   }
 ]

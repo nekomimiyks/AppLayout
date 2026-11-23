@@ -8,7 +8,7 @@ AppLayout 可以儲存 Windows 視窗的位置和大小，並將視窗還原到�
 
 [從 GitHub Releases 下載最新版本](https://github.com/nekomimiyks/AppLayout/releases/latest)
 
-解壓縮 ZIP 檔案後，開啟 `AppLayout.exe`。
+執行 `AppLayout-Setup.exe` 安裝，再從開始功能表開啟 AppLayout。設定可備份為 JSON 檔案並還原。
 
 ## 快速開始
 

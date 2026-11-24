@@ -27,13 +27,17 @@ On the old PC, open settings and choose **Back up settings**. Copy the JSON file
 
 ## Screenshots
 
-![Main window in dark mode](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/en/main-dark.png)
+![Main window in dark mode](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/en/main-dark.png)
 
-![Main window in light mode](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/en/main-light.png)
+![Main window in light mode](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/en/main-light.png)
 
-![Edit layout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/en/edit.png)
+![Edit layout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/en/edit.png)
 
-![Settings and backup](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/en/settings-backup.png)
+![Settings and backup](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/en/settings-backup.png)
+
+Select About AppLayout in the lower-right corner to see the running version and links to the developer’s published apps. If the Microsoft Store app cannot open, the link opens in your default browser.
+
+![About AppLayout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/en/about.png)
 
 ## Build from source
 

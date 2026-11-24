@@ -698,5 +698,33 @@
   {
     "Key": "ディスプレイ構成が変わりました。表示が更新されてから操作してください。",
     "Value": "La configuración de pantallas ha cambiado. Espera a que se actualice la lista y vuelve a intentarlo."
+  },
+  {
+    "Key": "アプリについて",
+    "Value": "Acerca de AppLayout"
+  },
+  {
+    "Key": "バージョン: {0}",
+    "Value": "Versión: {0}"
+  },
+  {
+    "Key": "GitHubの公開アプリ",
+    "Value": "Aplicaciones en GitHub"
+  },
+  {
+    "Key": "Microsoft Storeの公開アプリ",
+    "Value": "Aplicaciones en Microsoft Store"
+  },
+  {
+    "Key": "閉じる",
+    "Value": "Cerrar"
+  },
+  {
+    "Key": "開発ビルド",
+    "Value": "Compilación de desarrollo"
+  },
+  {
+    "Key": "ブラウザーを開けませんでした。",
+    "Value": "No se pudo abrir el navegador."
   }
 ]

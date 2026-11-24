@@ -27,13 +27,17 @@ AppLayout 可以儲存 Windows 視窗的位置和大小，並將視窗還原到�
 
 ## 介面截圖
 
-![主介面（深色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/zh-Hant/main-dark.png)
+![主介面（深色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/zh-Hant/main-dark.png)
 
-![主介面（淺色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/zh-Hant/main-light.png)
+![主介面（淺色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/zh-Hant/main-light.png)
 
-![編輯配置](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/zh-Hant/edit.png)
+![編輯配置](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/zh-Hant/edit.png)
 
-![設定與備份](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/zh-Hant/settings-backup.png)
+![設定與備份](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/zh-Hant/settings-backup.png)
+
+點選主視窗右下角的「關於 AppLayout」即可查看目前版本及開發者發佈的應用程式。若無法開啟 Microsoft Store 應用程式，會在預設瀏覽器中開啟清單。
+
+![關於 AppLayout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/zh-Hant/about.png)
 
 ## 從原始碼建置
 

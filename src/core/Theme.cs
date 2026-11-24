@@ -136,6 +136,10 @@ namespace AppLayout {
    // 子を先に更新し、親から継承していた色も旧パレットで判定する。
    foreach(Control child in control.Controls)Recolor(child,a,b);
    control.BackColor=Back(control.BackColor,a,b);control.ForeColor=Fore(control.ForeColor,a,b);
+   var link=control as LinkLabel;
+   if(link!=null) {
+    link.LinkColor=Fore(link.LinkColor,a,b);link.ActiveLinkColor=Fore(link.ActiveLinkColor,a,b);
+   }
    var button=control as Button;
    if(button!=null) {
     button.FlatAppearance.BorderColor=Line(button.FlatAppearance.BorderColor,a,b);
@@ -154,6 +158,10 @@ namespace AppLayout {
      foreach(DataGridViewCell cell in row.Cells)if(cell.HasStyle)RecolorStyle(cell.Style,a,b);
     }
    }
+  }
+  internal static LinkLabel Link(string text,Color color) {
+   return new LinkLabel { Text=text, AutoSize=true, TabStop=true, LinkColor=color,
+    ActiveLinkColor=Foreground, LinkBehavior=LinkBehavior.HoverUnderline, UseMnemonic=false };
   }
   public static Button Button(string text,bool primary) {
    var button=new Button {

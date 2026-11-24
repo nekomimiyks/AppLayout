@@ -698,5 +698,33 @@
   {
     "Key": "ディスプレイ構成が変わりました。表示が更新されてから操作してください。",
     "Value": "The display setup changed. Wait for the list to refresh, then try again."
+  },
+  {
+    "Key": "アプリについて",
+    "Value": "About AppLayout"
+  },
+  {
+    "Key": "バージョン: {0}",
+    "Value": "Version: {0}"
+  },
+  {
+    "Key": "GitHubの公開アプリ",
+    "Value": "Apps on GitHub"
+  },
+  {
+    "Key": "Microsoft Storeの公開アプリ",
+    "Value": "Apps on Microsoft Store"
+  },
+  {
+    "Key": "閉じる",
+    "Value": "Close"
+  },
+  {
+    "Key": "開発ビルド",
+    "Value": "Development build"
+  },
+  {
+    "Key": "ブラウザーを開けませんでした。",
+    "Value": "Could not open the browser."
   }
 ]

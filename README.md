@@ -28,7 +28,7 @@ GitHub版の「設定を開く」で「更新を自動で確認」をONにする
 
 右上の **「設定を開く」** を押すと、バックアップと復元のボタンが表示されます。
 
-![設定画面。「設定をバックアップ」と「バックアップから復元」のボタン](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/ja/settings-backup.png)
+![設定画面。「設定をバックアップ」と「バックアップから復元」のボタン](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/ja/settings-backup.png)
 
 1. 元のPCで **「設定をバックアップ」** を押し、JSONファイルを保存します。
 2. USBメモリやOneDriveなどで、保存したJSONを新しいPCにコピーします。
@@ -39,15 +39,19 @@ GitHub版の「設定を開く」で「更新を自動で確認」をONにする
 
 ## スクリーンショット
 
-![メイン画面（ダーク）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/ja/main-dark.png)
+![メイン画面（ダーク）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/ja/main-dark.png)
 
-![メイン画面（ライト）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/ja/main-light.png)
+![メイン画面（ライト）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/ja/main-light.png)
 
-![配置の編集](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/ja/edit.png)
+![配置の編集](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/ja/edit.png)
+
+メイン画面の右下にある「アプリについて」から、実行中のバージョンと開発元の公開アプリ一覧を確認できます。Microsoft StoreのリンクはStoreアプリを優先し、開けない場合は既定のブラウザーで表示します。
+
+![アプリについて](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/ja/about.png)
 
 ## ソースからビルド
 
-インストーラーを作る場合は、Inno Setup の `ISCC.exe` のパスを `-Compiler` に指定して `installer\pack.ps1 -Version 1.4.0 -OutDir .\dist` を実行します。
+インストーラーを作る場合は、Inno Setup の `ISCC.exe` のパスを `-Compiler` に指定して `installer\pack.ps1 -Version 1.4.1 -OutDir .\dist` を実行します。
 
 WindowsのPowerShellで次を実行します。Windowsの.NET Frameworkコンパイラで `AppLayout.exe` が生成されます。
 

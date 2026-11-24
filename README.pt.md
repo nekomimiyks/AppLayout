@@ -27,13 +27,17 @@ No PC antigo, abra as configurações e faça um backup em JSON. Copie o arquivo
 
 ## Capturas de tela
 
-![Janela principal no modo escuro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/pt/main-dark.png)
+![Janela principal no modo escuro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/pt/main-dark.png)
 
-![Janela principal no modo claro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/pt/main-light.png)
+![Janela principal no modo claro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/pt/main-light.png)
 
-![Edição de layout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/pt/edit.png)
+![Edição de layout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/pt/edit.png)
 
-![Configurações e backup](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/pt/settings-backup.png)
+![Configurações e backup](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/pt/settings-backup.png)
+
+No canto inferior direito, abra Sobre o AppLayout para ver a versão em uso e os links para os aplicativos publicados. Se o aplicativo Microsoft Store não puder ser aberto, o link abrirá no navegador padrão.
+
+![Sobre o AppLayout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/pt/about.png)
 
 ## Compilar a partir do código-fonte
 

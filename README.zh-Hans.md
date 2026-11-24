@@ -27,13 +27,17 @@ AppLayout 可以保存 Windows 窗口的位置和大小，并将窗口恢复到�
 
 ## 界面截图
 
-![主界面（深色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/zh-Hans/main-dark.png)
+![主界面（深色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/zh-Hans/main-dark.png)
 
-![主界面（浅色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/zh-Hans/main-light.png)
+![主界面（浅色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/zh-Hans/main-light.png)
 
-![编辑布局](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/zh-Hans/edit.png)
+![编辑布局](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/zh-Hans/edit.png)
 
-![设置与备份](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/zh-Hans/settings-backup.png)
+![设置与备份](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/zh-Hans/settings-backup.png)
+
+点击主窗口右下角的“关于 AppLayout”可查看当前版本和开发者发布的应用。无法打开 Microsoft Store 应用时，将在默认浏览器中打开列表。
+
+![关于 AppLayout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/zh-Hans/about.png)
 
 ## 从源代码构建
 

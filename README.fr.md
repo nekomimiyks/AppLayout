@@ -27,13 +27,17 @@ Sur l’ancien PC, ouvrez les paramètres et créez une sauvegarde JSON. Copiez 
 
 ## Captures d’écran
 
-![Fenêtre principale en mode sombre](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/fr/main-dark.png)
+![Fenêtre principale en mode sombre](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/fr/main-dark.png)
 
-![Fenêtre principale en mode clair](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/fr/main-light.png)
+![Fenêtre principale en mode clair](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/fr/main-light.png)
 
-![Modification d’une disposition](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/fr/edit.png)
+![Modification d’une disposition](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/fr/edit.png)
 
-![Paramètres et sauvegarde](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/fr/settings-backup.png)
+![Paramètres et sauvegarde](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/fr/settings-backup.png)
+
+En bas à droite, ouvrez À propos d’AppLayout pour voir la version en cours et les liens vers les applications publiées. Si l’application Microsoft Store ne peut pas s’ouvrir, le lien s’ouvre dans le navigateur par défaut.
+
+![À propos d’AppLayout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/fr/about.png)
 
 ## Compiler à partir du code source
 

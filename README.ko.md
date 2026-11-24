@@ -27,13 +27,17 @@ AppLayout은 Windows 창의 위치와 크기를 저장하고 저장된 배치로
 
 ## 스크린샷
 
-![기본 화면(어두운 모드)](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/ko/main-dark.png)
+![기본 화면(어두운 모드)](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/ko/main-dark.png)
 
-![기본 화면(밝은 모드)](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/ko/main-light.png)
+![기본 화면(밝은 모드)](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/ko/main-light.png)
 
-![배치 편집](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/ko/edit.png)
+![배치 편집](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/ko/edit.png)
 
-![설정 및 백업](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/ko/settings-backup.png)
+![설정 및 백업](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/ko/settings-backup.png)
+
+오른쪽 아래의 AppLayout 정보에서 실행 중인 버전과 개발자가 공개한 앱의 링크를 볼 수 있습니다. Microsoft Store 앱을 열 수 없으면 기본 브라우저에서 목록을 엽니다.
+
+![AppLayout 정보](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/ko/about.png)
 
 ## 소스에서 빌드
 

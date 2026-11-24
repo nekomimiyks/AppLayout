@@ -170,7 +170,13 @@ namespace AppLayout
             var footer = Strip(AppTheme.Background, 10, 10);
             var hint = Caption(L.T("対象を ON にすると現在位置を登録し、OFF にすると登録を解除します。"), secondary, AppTheme.Muted);
             hint.Dock = DockStyle.Fill;
-            footer.Controls.Add(hint, 0, 0); footer.SetColumnSpan(hint, 2);
+            footer.Controls.Add(hint, 0, 0);
+            var about = AppTheme.Link(L.T("アプリについて"), AppTheme.Muted);
+            about.Name = "AboutAppLink";
+            about.Anchor = AnchorStyles.Right;
+            about.Margin = Pad(12, 0, 0, 0);
+            about.LinkClicked += delegate { using (var dialog = new AboutDialog()) dialog.ShowDialog(this); };
+            footer.Controls.Add(about, 1, 0);
             root.Controls.Add(footer, 0, 4);
             message = new Label { AutoSize = false, Dock = DockStyle.Fill, AutoEllipsis = true, Margin = Padding.Empty,
                 Padding = Pad(19, 3, 12, 3), Height = Ui.S(27), MinimumSize = Ui.Sz(0, 27), Font = secondary,

@@ -27,13 +27,17 @@ Abre la configuración en el PC anterior y guarda la copia en JSON. Copia el arc
 
 ## Capturas de pantalla
 
-![Ventana principal en modo oscuro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/es/main-dark.png)
+![Ventana principal en modo oscuro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/es/main-dark.png)
 
-![Ventana principal en modo claro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/es/main-light.png)
+![Ventana principal en modo claro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/es/main-light.png)
 
-![Edición de una disposición](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/es/edit.png)
+![Edición de una disposición](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/es/edit.png)
 
-![Ajustes y copia de seguridad](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/es/settings-backup.png)
+![Ajustes y copia de seguridad](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/es/settings-backup.png)
+
+En la esquina inferior derecha, selecciona Acerca de AppLayout para ver la versión en uso y los enlaces a las aplicaciones del desarrollador. Si no se puede abrir la aplicación Microsoft Store, se abre el navegador predeterminado.
+
+![Acerca de AppLayout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/es/about.png)
 
 ## Compilar desde el código fuente
 

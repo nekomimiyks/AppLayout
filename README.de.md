@@ -27,13 +27,17 @@ Speichern Sie Anordnungen separat für jede Bildschirmkonfiguration. Warten Sie 
 
 ## Screenshots
 
-![Hauptfenster im Dunkelmodus](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/de/main-dark.png)
+![Hauptfenster im Dunkelmodus](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/de/main-dark.png)
 
-![Hauptfenster im Hellmodus](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/de/main-light.png)
+![Hauptfenster im Hellmodus](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/de/main-light.png)
 
-![Layout bearbeiten](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/de/edit.png)
+![Layout bearbeiten](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/de/edit.png)
 
-![Einstellungen und Sicherung](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/de/settings-backup.png)
+![Einstellungen und Sicherung](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/de/settings-backup.png)
+
+Unter „Über AppLayout“ unten rechts finden Sie die laufende Version und Links zu den veröffentlichten Apps. Falls die Microsoft Store-App nicht geöffnet werden kann, öffnet sich die Seite im Standardbrowser.
+
+![Über AppLayout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/f22d6ca16201e8fa248ccc52a35a26e46c5fc451/de/about.png)
 
 ## Aus dem Quellcode erstellen
 

@@ -19,19 +19,21 @@ El instalador puede crear un acceso directo en el escritorio. Activa la búsqued
 
 Desactiva la fila (**OFF**) para eliminar su disposición guardada. Usa **Editar** para ajustar las coordenadas o la regla de identificación y pulsa **Abrir ajustes** para elegir el idioma.
 
+Guarda disposiciones distintas para cada configuración de pantallas. Después de conectar o desconectar un monitor, espera a que se actualice la configuración, ordena las ventanas y activa las filas correspondientes. Al volver a la misma configuración, AppLayout selecciona sus disposiciones. La copia de seguridad incluye todas las configuraciones. Las disposiciones anteriores se asignan a la primera configuración detectada tras actualizar.
+
 ## Copia de seguridad y restauración
 
 Abre la configuración en el PC anterior y guarda la copia en JSON. Copia el archivo al nuevo PC y selecciona **Restaurar desde una copia**. Revisa los monitores antes de reactivar la disposición automática.
 
 ## Capturas de pantalla
 
-![Ventana principal en modo oscuro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/es/main-dark.png)
+![Ventana principal en modo oscuro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/es/main-dark.png)
 
-![Ventana principal en modo claro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/es/main-light.png)
+![Ventana principal en modo claro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/es/main-light.png)
 
-![Edición de una disposición](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/es/edit.png)
+![Edición de una disposición](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/es/edit.png)
 
-![Ajustes y copia de seguridad](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/es/settings-backup.png)
+![Ajustes y copia de seguridad](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/es/settings-backup.png)
 
 ## Compilar desde el código fuente
 

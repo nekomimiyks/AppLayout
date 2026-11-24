@@ -19,19 +19,21 @@ Le programme d’installation peut créer un raccourci sur le bureau. Activez la
 
 Désactivez une ligne (**OFF**) pour supprimer sa disposition enregistrée. Utilisez **Modifier** pour ajuster les coordonnées ou la règle de correspondance, et sélectionnez **Ouvrir les paramètres** pour choisir la langue.
 
+Enregistrez des dispositions différentes pour chaque configuration d’écran. Après avoir connecté ou déconnecté un écran, attendez la mise à jour de la configuration, puis placez vos fenêtres et activez leurs lignes. AppLayout sélectionne les dispositions enregistrées lorsque cette configuration revient. La sauvegarde inclut toutes les configurations. Les anciennes dispositions sont associées à la première configuration détectée.
+
 ## Sauvegarder et restaurer les paramètres
 
 Sur l’ancien PC, ouvrez les paramètres et créez une sauvegarde JSON. Copiez le fichier sur le nouveau PC et choisissez **Restaurer une sauvegarde**. Vérifiez les écrans avant de réactiver la disposition automatique.
 
 ## Captures d’écran
 
-![Fenêtre principale en mode sombre](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/fr/main-dark.png)
+![Fenêtre principale en mode sombre](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/fr/main-dark.png)
 
-![Fenêtre principale en mode clair](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/fr/main-light.png)
+![Fenêtre principale en mode clair](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/fr/main-light.png)
 
-![Modification d’une disposition](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/fr/edit.png)
+![Modification d’une disposition](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/fr/edit.png)
 
-![Paramètres et sauvegarde](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/fr/settings-backup.png)
+![Paramètres et sauvegarde](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/fr/settings-backup.png)
 
 ## Compiler à partir du code source
 

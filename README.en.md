@@ -19,19 +19,21 @@ The installer can create a desktop shortcut. Turn on automatic update checks in 
 
 Turn a row **OFF** to remove its saved layout. Use **Edit** to adjust the position or matching rule, and select **Open settings** to choose the display language.
 
+Save layouts separately for each display setup. After connecting or disconnecting a monitor, wait for the display setup to update, arrange your windows, and turn the relevant rows **ON**. AppLayout selects those saved layouts when the same setup returns. Automatic restoration follows **Enable layouts**. Backups include all setups. Existing layouts move to the first setup detected after upgrading.
+
 ## Back up and restore settings
 
 On the old PC, open settings and choose **Back up settings**. Copy the JSON file to the new PC and select **Restore from backup**. Check the monitor layout before turning automatic layout back on.
 
 ## Screenshots
 
-![Main window in dark mode](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/en/main-dark.png)
+![Main window in dark mode](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/en/main-dark.png)
 
-![Main window in light mode](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/en/main-light.png)
+![Main window in light mode](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/en/main-light.png)
 
-![Edit layout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/en/edit.png)
+![Edit layout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/en/edit.png)
 
-![Settings and backup](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/en/settings-backup.png)
+![Settings and backup](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/en/settings-backup.png)
 
 ## Build from source
 

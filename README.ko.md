@@ -19,19 +19,21 @@ AppLayout은 Windows 창의 위치와 크기를 저장하고 저장된 배치로
 
 해당 행을 **OFF**로 전환하면 등록이 해제됩니다. 「편집」에서 좌표나 창 일치 규칙을 바꾸고 「설정 열기」에서 표시 언어를 선택할 수 있습니다.
 
+디스플레이 구성별로 배치를 저장할 수 있습니다. 모니터를 연결하거나 분리한 뒤 구성이 갱신되면 창을 원하는 위치에 놓고 해당 행을 **ON**으로 전환하세요. 같은 구성으로 돌아오면 저장된 배치가 선택됩니다. 백업에는 모든 구성이 포함됩니다. 기존 배치는 업데이트 후 처음 감지된 구성으로 이전됩니다.
+
 ## 설정 백업 및 복원
 
 기존 PC에서 설정을 열고 **설정 백업**을 선택해 JSON 파일을 저장합니다. 새 PC로 복사한 뒤 **백업에서 복원**을 선택합니다. 자동 배치를 다시 켜기 전에 모니터를 확인하세요.
 
 ## 스크린샷
 
-![기본 화면(어두운 모드)](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/ko/main-dark.png)
+![기본 화면(어두운 모드)](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/ko/main-dark.png)
 
-![기본 화면(밝은 모드)](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/ko/main-light.png)
+![기본 화면(밝은 모드)](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/ko/main-light.png)
 
-![배치 편집](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/ko/edit.png)
+![배치 편집](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/ko/edit.png)
 
-![설정 및 백업](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/ko/settings-backup.png)
+![설정 및 백업](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/ko/settings-backup.png)
 
 ## 소스에서 빌드
 

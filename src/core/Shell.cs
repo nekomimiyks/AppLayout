@@ -6,7 +6,7 @@ namespace AppLayout {
   public static void Run(Form form, AppController controller, bool startupMode) {
    bool exiting = false;
    int languageRefreshPending = 0;
-   var ui = SynchronizationContext.Current ?? new WindowsFormsSynchronizationContext();
+   var ui = SynchronizationContext.Current as WindowsFormsSynchronizationContext ?? new WindowsFormsSynchronizationContext();
    TrayTransition transition = null;
    using (var showEvent = new EventWaitHandle(false, EventResetMode.AutoReset, Program.ShowEventName))
    using (var stopEvent = new ManualResetEvent(false))

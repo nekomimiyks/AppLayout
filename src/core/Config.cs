@@ -117,6 +117,13 @@ namespace AppLayout
     }
 
     [DataContract]
+    internal sealed class DisplayLayout
+    {
+        [DataMember(Name = "key", IsRequired = true)] public string Key;
+        [DataMember(Name = "apps", IsRequired = true)] public List<AppEntry> Apps;
+    }
+
+    [DataContract]
     public class LayoutConfig
     {
         [DataMember(Name = "enabled", Order = 1)] public bool Enabled;
@@ -127,6 +134,19 @@ namespace AppLayout
         [DataMember(Name = "apps", Order = 6)] public List<AppEntry> Apps;
         [DataMember(Name = "language", Order = 7, EmitDefaultValue = false)] public string Language;
         [DataMember(Name = "checkForUpdates", Order = 8, EmitDefaultValue = false)] public bool CheckForUpdates;
+        [DataMember(Name = "displayLayouts", Order = 9, EmitDefaultValue = false)] internal List<DisplayLayout> DisplayLayouts;
+
+        internal IEnumerable<List<AppEntry>> Layouts
+        {
+            get
+            {
+                yield return Apps;
+                if (DisplayLayouts != null)
+                    foreach (var layout in DisplayLayouts) yield return layout.Apps;
+            }
+        }
+
+        internal int PlacementCount { get { return Layouts.Sum(apps => apps.Count); } }
 
         public LayoutConfig() { Defaults(); }
         [OnDeserializing] void OnDeserializing(StreamingContext c) { Defaults(); }
@@ -144,13 +164,19 @@ namespace AppLayout
         }
 
         const string BackupFormat = "AppLayout.Settings";
-        const int BackupVersion = 1;
+        const int BackupVersion = 2;
         const int MaxBackupBytes = 8 * 1024 * 1024;
         public readonly string Path;
         public LayoutConfig Config;
         public readonly object Sync = new object();
         readonly string importPath;
         byte[] savedContents;
+        internal DisplayLayout ActiveDisplay { get; private set; }
+        internal List<AppEntry> Apps
+        {
+            get { return ActiveDisplay == null ? Config.Apps : ActiveDisplay.Apps; }
+            set { if (ActiveDisplay == null) Config.Apps = value; else ActiveDisplay.Apps = value; }
+        }
         const int SharingViolation = 32;
 
         public ConfigStore(string path) : this(path, null) { }
@@ -160,6 +186,7 @@ namespace AppLayout
         {
             lock (Sync)
             {
+                ActiveDisplay = null;
                 byte[] contents = ReadFile(Path);
                 if (contents != null)
                 {
@@ -242,6 +269,36 @@ namespace AppLayout
             }
         }
 
+        internal void SelectDisplay(string key)
+        {
+            lock (Sync)
+            {
+                if (ActiveDisplay != null && ActiveDisplay.Key == key) return;
+                var previousLayouts = Config.DisplayLayouts;
+                var previousApps = Config.Apps;
+                var next = SelectDisplay(Config, key);
+                if (previousApps.Count != 0)
+                {
+                    try { Save(); }
+                    catch { Config.DisplayLayouts = previousLayouts; Config.Apps = previousApps; throw; }
+                }
+                ActiveDisplay = next;
+            }
+        }
+
+        static DisplayLayout SelectDisplay(LayoutConfig config, string key)
+        {
+            var layouts = config.DisplayLayouts == null ? new List<DisplayLayout>() : config.DisplayLayouts.Where(layout => layout.Apps.Count > 0).ToList();
+            int index = layouts.FindIndex(layout => layout.Key == key);
+            var apps = new List<AppEntry>(index < 0 ? config.Apps : layouts[index].Apps);
+            var selected = new DisplayLayout { Key = key, Apps = apps };
+            if (index < 0) layouts.Add(selected);
+            else layouts[index] = selected;
+            config.DisplayLayouts = layouts;
+            config.Apps = new List<AppEntry>();
+            return selected;
+        }
+
         internal void ExportSettings(string destination)
         {
             lock (Sync)
@@ -279,9 +336,9 @@ namespace AppLayout
                 }
             }
             catch (SerializationException) { throw InvalidBackup(); }
-            if (backup == null || backup.Format != BackupFormat || backup.Version != BackupVersion ||
-                backup.Settings == null || backup.Settings.Apps == null ||
-                backup.Settings.Apps.Any(entry => entry == null || entry.Width <= 0 || entry.Height <= 0 ||
+            if (backup == null || backup.Format != BackupFormat || (backup.Version != 1 && backup.Version != BackupVersion) ||
+                backup.Settings == null || !ValidProfiles(backup.Settings) || backup.Settings.Apps == null ||
+                backup.Settings.Layouts.SelectMany(apps => apps).Any(entry => entry == null || entry.Width <= 0 || entry.Height <= 0 ||
                     (long)entry.X + entry.Width > int.MaxValue || (long)entry.Y + entry.Height > int.MaxValue ||
                     string.IsNullOrWhiteSpace(entry.Process)))
                 throw InvalidBackup();
@@ -300,17 +357,29 @@ namespace AppLayout
                 {
                     VerifyUnchanged();
                     var previous = Config;
+                    var backupApps = settings.Apps;
+                    var backupLayouts = settings.DisplayLayouts;
+                    bool backupUpdates = settings.CheckForUpdates;
                     settings.CheckForUpdates = previous.CheckForUpdates;
+                    var selected = ActiveDisplay == null ? null : SelectDisplay(settings, ActiveDisplay.Key);
                     Config = settings;
                     try { WriteFile(Path + ".before-restore"); }
-                    catch { Config = previous; throw; }
+                    catch
+                    {
+                        Config = previous;
+                        settings.Apps = backupApps;
+                        settings.DisplayLayouts = backupLayouts;
+                        settings.CheckForUpdates = backupUpdates;
+                        throw;
+                    }
+                    ActiveDisplay = selected;
                 }
             }
         }
 
         static void RemoveLaunchTargets(LayoutConfig settings)
         {
-            foreach (var entry in settings.Apps)
+            foreach (var entry in settings.Layouts.SelectMany(apps => apps))
                 entry.LaunchId = entry.Shortcut = entry.ExePath = "";
         }
 
@@ -415,14 +484,26 @@ namespace AppLayout
         static void Normalize(LayoutConfig config)
         {
             if (config.Apps == null) config.Apps = new List<AppEntry>();
-            config.Apps.RemoveAll(entry => entry == null);
+            if (!ValidProfiles(config)) throw new SerializationException("Invalid display layouts.");
             if (config.IntervalSeconds < 1) config.IntervalSeconds = 2;
-            var ids = new HashSet<string>(StringComparer.Ordinal);
-            foreach (var entry in config.Apps)
+            foreach (var apps in config.Layouts)
             {
-                entry.EnsureId();
-                while (!ids.Add(entry.Id)) entry.Id = Guid.NewGuid().ToString("N");
+                apps.RemoveAll(entry => entry == null);
+                var ids = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var entry in apps)
+                {
+                    entry.EnsureId();
+                    while (!ids.Add(entry.Id)) entry.Id = Guid.NewGuid().ToString("N");
+                }
             }
+        }
+
+        static bool ValidProfiles(LayoutConfig config)
+        {
+            if (config.DisplayLayouts == null || config.DisplayLayouts.Count == 0) return true;
+            var keys = new HashSet<string>(StringComparer.Ordinal);
+            return (config.Apps == null || config.Apps.Count == 0) && config.DisplayLayouts.All(layout =>
+                layout != null && !string.IsNullOrWhiteSpace(layout.Key) && layout.Apps != null && keys.Add(layout.Key));
         }
     }
 }

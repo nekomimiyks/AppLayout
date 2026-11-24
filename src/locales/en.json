@@ -516,8 +516,8 @@
     "Value": "Saved "
   },
   {
-    "Key": "登録済みの {0} 件をすべて解除しますか？",
-    "Value": "Remove all {0} saved layouts?"
+    "Key": "このディスプレイ構成に登録した {0} 件をすべて解除しますか？",
+    "Value": "Remove all {0} saved layouts for this display setup?"
   },
   {
     "Key": "登録済みの配置",
@@ -686,5 +686,17 @@
   {
     "Key": "アップデートを開始できませんでした。時間をおいて再試行してください。",
     "Value": "Could not start the update. Try again later."
+  },
+  {
+    "Key": "ディスプレイ構成: {0} 台",
+    "Value": "Display setup: {0} monitors"
+  },
+  {
+    "Key": "ディスプレイ構成を確認中…",
+    "Value": "Detecting display setup…"
+  },
+  {
+    "Key": "ディスプレイ構成が変わりました。表示が更新されてから操作してください。",
+    "Value": "The display setup changed. Wait for the list to refresh, then try again."
   }
 ]

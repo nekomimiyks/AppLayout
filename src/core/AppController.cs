@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Forms;
@@ -8,6 +8,7 @@ namespace AppLayout {
  public class WindowRow {
   public string Key; public AppEntry Entry; public WinInfo Window; public bool Saved;
   public string Name, Process, Position, Size, Monitor, TitleRule, Maximized, Status; public int StatusKind;
+  internal DisplayLayout Display;
  }
  public static class Texts {
   public static string Enabled { get { return L.T("配置を有効"); } } public static string AutoStart { get { return L.T("ログイン時に自動起動"); } } public static string LaunchMissing { get { return L.T("アプリ自動起動"); } } public static string MinimizeToTrayOnClose { get { return L.T("アプリ終了時自動縮小"); } }
@@ -19,22 +20,50 @@ namespace AppLayout {
   public static string Name { get { return L.T("名前"); } } public static string Process { get { return L.T("アプリ（プロセス名）"); } } public static string Position { get { return L.T("位置(X, Y)"); } } public static string Size { get { return L.T("サイズ(幅×高さ)"); } } public static string Monitor { get { return L.T("モニタ"); } } public static string TitleRule { get { return L.T("ウィンドウの見分け方"); } } public static string Maximized { get { return L.T("最大化"); } } public static string Status { get { return L.T("状態"); } }
  }
  public class AppController {
-  readonly ConfigStore store; readonly Keeper keeper; readonly SynchronizationContext context;
+  readonly ConfigStore store; readonly Keeper keeper; readonly WindowsFormsSynchronizationContext context;
   Dictionary<AppEntry, EntryStatus> statuses = new Dictionary<AppEntry, EntryStatus>();
   bool restorePending;
   volatile bool stopped;
   public event EventHandler RowsChanged;
   public string LastMessage { get; private set; }
   public AppController(ConfigStore store, bool startupMode) {
-   this.store = store; context = SynchronizationContext.Current ?? new WindowsFormsSynchronizationContext();
+   this.store = store;
+   // 汎用 SynchronizationContext の Post は UI スレッドに戻らない。
+   context = SynchronizationContext.Current as WindowsFormsSynchronizationContext ?? new WindowsFormsSynchronizationContext();
    keeper = new Keeper(store, startupMode); LastMessage = "";
-   keeper.StatusUpdated += delegate(Dictionary<AppEntry, EntryStatus> s) { context.Post(delegate { statuses = s; Changed(); }, null); };
+   keeper.StatusUpdated += delegate(Dictionary<AppEntry, EntryStatus> s) {
+    if(!stopped) context.Post(delegate { if(!stopped) { statuses=s;Changed(); } },null);
+   };
   }
   void Changed() { var h = RowsChanged; if (h != null) h(this, EventArgs.Empty); }
   internal void ClearMessage() {LastMessage="";}
-  public List<WindowRow> GetRows() {
+  internal DisplayLayout CurrentDisplay { get { lock(store.Sync) return store.ActiveDisplay; } }
+  internal bool DisplayReady { get { lock(store.Sync) return keeper.DisplayReady; } }
+  internal string DisplayStatus {
+   get {
+    lock(store.Sync) {
+     if(!keeper.DisplayReady) return L.T("ディスプレイ構成を確認中…");
+     var display=store.ActiveDisplay;
+     return display==null ? "" : L.F("ディスプレイ構成: {0} 台",display.Key.Split(';').Length);
+    }
+   }
+  }
+  void RequireDisplay(DisplayLayout expected) {
+   if(!keeper.DisplayReady || expected!=store.ActiveDisplay ||
+    (expected!=null && DisplayTopology.Key(WindowScanner.GetMonitors())!=expected.Key)) {
+    keeper.Kick();
+    throw new InvalidOperationException(L.T("ディスプレイ構成が変わりました。表示が更新されてから操作してください。"));
+   }
+  }
+  void RequireDisplay(IList<WindowRow> rows, DisplayLayout display) {
+   RequireDisplay(display);
+   foreach(var row in rows) if(row.Display!=display) RequireDisplay(row.Display);
+  }
+  public List<WindowRow> GetRows() { DisplayLayout display; return GetRows(out display); }
+  internal List<WindowRow> GetRows(out DisplayLayout display) {
+   AppEntry[] entries;
+   lock(store.Sync) { entries=store.Apps.ToArray(); display=store.ActiveDisplay; }
    var all = WindowScanner.ReadAll(); var mons = WindowScanner.GetMonitors(); var result = new List<WindowRow>();
-   AppEntry[] entries; lock(store.Sync) entries = store.Config.Apps.ToArray();
    Dictionary<IntPtr,int> assignments;
    var matchesByEntry=WindowScanner.MatchLayouts(entries,all,out assignments);
    foreach (var e in entries) {
@@ -53,13 +82,15 @@ namespace AppLayout {
    foreach (var w in all) if (!assignments.ContainsKey(w.Handle) && WindowScanner.IsPickable(w)) {
     result.Add(new WindowRow { Key = "w:" + w.Handle.ToInt64(), Window = w, Saved = false, Name = w.Title, Process = w.ProcessName, Position = w.Minimized ? "" : w.Bounds.Left + ", " + w.Bounds.Top, Size = w.Minimized ? "" : w.Width + " × " + w.Height, Monitor = w.Minimized ? "なし" : WindowScanner.MonitorLabel(w.Bounds.Left,w.Bounds.Top,w.Width,w.Height,mons), TitleRule = "アプリで判定", Maximized = "いいえ", Status = "未保存", StatusKind = 3 });
    }
+   foreach(var row in result) row.Display=display;
    return result;
   }
   AppEntry NewEntry(WinInfo w) { var e = AppEntry.FromWindow(w); int count = 0; foreach (var other in WindowScanner.ReadAll()) if (!WindowScanner.IsOwn(other) && e.Matches(other)) count++; if (count > 1) { e.TitleMode = "exact"; e.Title = w.Title; } return e; }
   public bool SetTarget(WindowRow row, bool enabled) {
    if(row==null)return false;
    lock(store.Sync) {
-    var previous=store.Config.Apps;
+    RequireDisplay(row.Display);
+    var previous=store.Apps;
     var next=new List<AppEntry>(previous);
     int index=row.Entry==null?-1:next.FindIndex(delegate(AppEntry item){return item.Id==row.Entry.Id;});
     if(!enabled) {
@@ -75,8 +106,8 @@ namespace AppLayout {
      foreach(var item in next)if(item.Matches(window))return true;
      next.Add(NewEntry(window));
     }
-    store.Config.Apps=next;
-    try{store.Save();}catch{store.Config.Apps=previous;throw;}
+    store.Apps=next;
+    try{store.Save();}catch{store.Apps=previous;throw;}
    }
    LastMessage=L.F(enabled?"{0}をONにしました。現在の配置を保存しました。":"{0}をOFFにしました。配置の登録を解除しました。",row.Name);
    keeper.Kick();Changed();return true;
@@ -87,7 +118,8 @@ namespace AppLayout {
    var selectedIds = new HashSet<string>();
    foreach (var row in rows) if (row.Saved && row.Entry != null) selectedIds.Add(row.Entry.Id);
    lock(store.Sync) {
-    var previous = store.Config.Apps;
+    RequireDisplay(rows,store.ActiveDisplay);
+    var previous = store.Apps;
     var next = new List<AppEntry>();
     foreach (var entry in previous) { if (selectedIds.Contains(entry.Id)) next.Add(entry.Clone()); else removed++; }
     var handles = new HashSet<IntPtr>();
@@ -107,18 +139,20 @@ namespace AppLayout {
      else continue;
      saved++;
     }
-    store.Config.Apps = next;
-    try { store.Save(); } catch { store.Config.Apps = previous; throw; }
+    store.Apps = next;
+    try { store.Save(); } catch { store.Apps = previous; throw; }
    }
    LastMessage = L.F("現在位置を登録 {0}件・登録を解除 {1}件",saved,removed) + (kept > 0 ? L.F("・既存の配置を保持 {0}件（未起動・最小化中など）",kept) : "") + (skipped.Count > 0 ? L.F("。登録できませんでした: {0}",string.Join(", ", skipped.ToArray())) : "");
    keeper.Kick(); Changed();
   }
-  public void UnsaveAll() {
+  public void UnsaveAll() { UnsaveAll(CurrentDisplay); }
+  internal void UnsaveAll(DisplayLayout display) {
    int count;
    lock (store.Sync) {
-    var previous = store.Config.Apps; count = previous.Count;
-    store.Config.Apps = new List<AppEntry>();
-    try { store.Save(); } catch { store.Config.Apps = previous; throw; }
+    RequireDisplay(display);
+    var previous = store.Apps; count = previous.Count;
+    store.Apps = new List<AppEntry>();
+    try { store.Save(); } catch { store.Apps = previous; throw; }
    }
    LastMessage = L.F("すべての配置を解除しました（{0}件）",count); keeper.Kick(); Changed();
   }
@@ -127,23 +161,28 @@ namespace AppLayout {
    foreach(var row in rows)if(row.Saved && row.Entry!=null)ids.Add(row.Entry.Id);
    int removed;
    lock(store.Sync) {
-    var previous=store.Config.Apps;
+    RequireDisplay(rows,store.ActiveDisplay);
+    var previous=store.Apps;
     var next=new List<AppEntry>(previous);
     removed=next.RemoveAll(delegate(AppEntry e){return ids.Contains(e.Id);});
     if(removed>0) {
-     store.Config.Apps=next;
-     try{store.Save();}catch{store.Config.Apps=previous;throw;}
+     store.Apps=next;
+     try{store.Save();}catch{store.Apps=previous;throw;}
     }
    }
    LastMessage=L.F("{0}件の保存を解除しました",removed);keeper.Kick();Changed();
   }
-  public void RestoreNow(IList<WindowRow> rows) {
+  public void RestoreNow(IList<WindowRow> rows) { RestoreNow(rows,CurrentDisplay); }
+  internal void RestoreNow(IList<WindowRow> rows, DisplayLayout display) {
    if(restorePending || stopped)return;
    var ids=new HashSet<string>();
    foreach(var row in rows)if(row.Saved && row.Entry!=null)ids.Add(row.Entry.Id);
    bool all=rows.Count==0;
    List<AppEntry> entries;
-   lock(store.Sync)entries=store.Config.Apps;
+   lock(store.Sync) {
+    RequireDisplay(rows,display);
+    entries=store.Apps;
+   }
    restorePending=true;
    ThreadPool.QueueUserWorkItem(delegate {
     int restored=0,skipped=0;
@@ -165,6 +204,7 @@ namespace AppLayout {
      context.Post(delegate {
       restorePending=false;
       if(stopped)return;
+      lock(store.Sync) if(store.ActiveDisplay!=display || !keeper.DisplayReady)return;
       LastMessage=error==null
        ? L.F("{0}件の配置を実行しました",restored)+(skipped>0?L.F("（未起動・最小化中など {0}件はそのまま）",skipped):"")
        : L.T("配置を変更できませんでした")+"\n"+error.Message;
@@ -174,6 +214,7 @@ namespace AppLayout {
    });
   }
   public bool Edit(WindowRow row, IWin32Window owner) {
+   lock(store.Sync) RequireDisplay(row.Display);
    AppEntry e;
    if (row.Saved) e = row.Entry.Clone();
    else {
@@ -185,19 +226,23 @@ namespace AppLayout {
    }
    using (var d = new EntryEditDialog(e, !row.Saved)) { if (d.ShowDialog(owner) != DialogResult.OK) return false; }
    lock(store.Sync) {
-    var previous = store.Config.Apps;
+    RequireDisplay(row.Display);
+    var previous = store.Apps;
     var next = new List<AppEntry>(previous);
     if (row.Saved) { int i = next.FindIndex(delegate(AppEntry item) { return item.Id == e.Id; }); if (i < 0) { LastMessage = L.T("この配置はすでに解除されています。"); Changed(); return false; } next[i] = e; }
     else next.Add(e);
-    store.Config.Apps = next;
-    try { store.Save(); } catch { store.Config.Apps = previous; throw; }
+    store.Apps = next;
+    try { store.Save(); } catch { store.Apps = previous; throw; }
    }
    LastMessage = L.F("{0}の配置を登録しました",e.Name); keeper.Kick(); Changed(); return true;
   }
   internal void ExportSettings(string destination) { store.ExportSettings(destination); }
 
   internal void RestoreSettings(LayoutConfig settings) {
-   store.RestoreBackup(settings);
+   lock(store.Sync) {
+    RequireDisplay(store.ActiveDisplay);
+    store.RestoreBackup(settings);
+   }
    L.SetLanguage(settings.Language);
    keeper.Kick();
    Changed();

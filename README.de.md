@@ -19,19 +19,21 @@ Das Installationsprogramm kann eine Desktopverknüpfung erstellen. Aktiviere die
 
 Schalten Sie die Zeile auf **OFF**, um das gespeicherte Layout zu entfernen. Über **Bearbeiten** passen Sie Koordinaten oder die Zuordnungsregel an. Über **Einstellungen öffnen** ändern Sie die Anzeigesprache.
 
+Speichern Sie Anordnungen separat für jede Bildschirmkonfiguration. Warten Sie nach dem Anschließen oder Trennen eines Monitors, bis die Anzeige aktualisiert wurde, ordnen Sie die Fenster an und schalten Sie die gewünschten Zeilen **ON**. AppLayout wählt die gespeicherten Anordnungen bei derselben Konfiguration erneut aus. Sicherungen enthalten alle Konfigurationen. Bisherige Anordnungen werden der ersten erkannten Konfiguration zugeordnet.
+
 ## Einstellungen sichern und wiederherstellen
 
 Öffnen Sie auf dem alten PC die Einstellungen und sichern Sie sie als JSON-Datei. Kopieren Sie die Datei auf den neuen PC und wählen Sie **Aus Sicherung wiederherstellen**. Prüfen Sie die Bildschirme, bevor Sie die automatische Anordnung wieder aktivieren.
 
 ## Screenshots
 
-![Hauptfenster im Dunkelmodus](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/de/main-dark.png)
+![Hauptfenster im Dunkelmodus](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/de/main-dark.png)
 
-![Hauptfenster im Hellmodus](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/de/main-light.png)
+![Hauptfenster im Hellmodus](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/de/main-light.png)
 
-![Layout bearbeiten](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/de/edit.png)
+![Layout bearbeiten](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/de/edit.png)
 
-![Einstellungen und Sicherung](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/de/settings-backup.png)
+![Einstellungen und Sicherung](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/de/settings-backup.png)
 
 ## Aus dem Quellcode erstellen
 

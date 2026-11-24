@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using Microsoft.Win32;
 
 namespace AppLayout
 {
@@ -16,12 +17,17 @@ namespace AppLayout
     public class Keeper
     {
         readonly ConfigStore store;
+        readonly DisplayDetection displays;
         readonly object placementSync = new object();
         readonly AutoResetEvent wake = new AutoResetEvent(false);
         Thread thread;
         volatile bool stopping;
         readonly bool startupMode;
         readonly Stopwatch uptime = Stopwatch.StartNew();
+        int displaySignal;
+        bool tracksDisplays;
+        internal bool DisplayReady { get { return !tracksDisplays || displays.IsReady(CurrentSignal); } }
+        int CurrentSignal { get { return Interlocked.CompareExchange(ref displaySignal, 0, 0); } }
         readonly HashSet<string> launchedAtStartup = new HashSet<string>();
         bool launchPassDone;
         public string LogPath;
@@ -31,18 +37,34 @@ namespace AppLayout
         public Keeper(ConfigStore store, bool startupMode)
         {
             this.store = store;
+            displays = new DisplayDetection(store);
             this.startupMode = startupMode;
             launchPassDone = !startupMode;
         }
 
         public void Start()
         {
+            lock (store.Sync) tracksDisplays = true;
+            SystemEvents.DisplaySettingsChanging += DisplayChanged;
+            SystemEvents.DisplaySettingsChanged += DisplayChanged;
             thread = new Thread(Loop) { IsBackground = true, Name = "Keeper" };
             thread.Start();
         }
 
-        public void Stop() { stopping = true; wake.Set(); }
+        public void Stop()
+        {
+            stopping = true;
+            SystemEvents.DisplaySettingsChanging -= DisplayChanged;
+            SystemEvents.DisplaySettingsChanged -= DisplayChanged;
+            wake.Set();
+        }
         public void Kick() { wake.Set(); }
+
+        void DisplayChanged(object sender, EventArgs e)
+        {
+            Interlocked.Increment(ref displaySignal);
+            Kick();
+        }
 
         void Loop()
         {
@@ -57,15 +79,23 @@ namespace AppLayout
 
         int Tick()
         {
+            int signal = CurrentSignal;
+            var monitors = WindowScanner.GetMonitors();
+            var key = DisplayTopology.Key(monitors);
             List<AppEntry> apps; bool enabled, launchMissing; int interval;
+            var result = new Dictionary<AppEntry, EntryStatus>();
             lock (store.Sync)
             {
-                apps = store.Config.Apps;
+                if (tracksDisplays && (signal != CurrentSignal || !displays.Observe(key, signal, uptime.ElapsedMilliseconds)))
+                {
+                    Publish(result);
+                    return 1;
+                }
+                apps = store.Apps;
                 enabled = store.Config.Enabled;
                 launchMissing = store.Config.LaunchMissingAtStartup;
                 interval = store.Config.IntervalSeconds;
             }
-            var result = new Dictionary<AppEntry, EntryStatus>();
             var wins = apps.Count == 0 ? new List<WinInfo>() : WindowScanner.ReadAll();
             Dictionary<IntPtr, int> assignments;
             var matchesByEntry = WindowScanner.MatchLayouts(apps, wins, out assignments);
@@ -85,7 +115,7 @@ namespace AppLayout
                         lock (store.Sync)
                         {
                             if (!stopping && store.Config.Enabled && store.Config.LaunchMissingAtStartup &&
-                                store.Config.Apps == apps && !launchedAtStartup.Contains(a.Id) &&
+                                DisplayReady && store.Apps == apps && !launchedAtStartup.Contains(a.Id) &&
                                 !WindowScanner.HasCloakedMatch(wins, a) && TryLaunch(a))
                             {
                                 launchedAtStartup.Add(a.Id);
@@ -109,8 +139,7 @@ namespace AppLayout
                         else if (r == 0 || r == WindowScanner.PlacementDeferred) st = new EntryStatus { Text = "配置中", Kind = 0 };
                         else
                         {
-                            var mons = WindowScanner.GetMonitors();
-                            bool off = WindowScanner.MonitorLabel(a.X, a.Y, a.Width, a.Height, mons)== "なし";
+                            bool off = WindowScanner.MonitorLabel(a.X, a.Y, a.Width, a.Height, monitors)== "なし";
                             st = off ? new EntryStatus { Text = "保存位置のモニタがありません", Kind = 1 }
                                      : new EntryStatus { Text = "配置を変更できませんでした", Kind = 1 };
                         }
@@ -120,19 +149,26 @@ namespace AppLayout
             }
             if (doLaunch)
             {
-                lock (store.Sync) launchPassDone = store.Config.Apps == apps;
+                lock (store.Sync) launchPassDone = DisplayReady && store.Apps == apps;
                 if (launchPassDone) launchedAtStartup.Clear();
             }
 
+            Publish(result);
+            return interval;
+        }
+
+        void Publish(Dictionary<AppEntry, EntryStatus> result)
+        {
             var h = StatusUpdated;
             if (!stopping && h != null) h(result);
-            return interval;
         }
 
         internal int Apply(WinInfo previous, AppEntry entry, List<AppEntry> matchedEntries, bool automatic)
         {
             lock (placementSync)
             {
+                DisplayLayout display;
+                lock (store.Sync) display = store.ActiveDisplay;
                 var window = WindowScanner.ReadCurrent(previous);
                 if (window == null || !entry.Matches(window) ||
                     matchedEntries.Exists(other => other != entry && other.Matches(window))) return -1;
@@ -140,9 +176,10 @@ namespace AppLayout
                     entry.Maximized, delegate
                     {
                         lock (store.Sync)
-                            return !stopping && store.Config.Apps == matchedEntries && (!automatic || store.Config.Enabled);
+                            return !stopping && DisplayReady && store.Apps == matchedEntries && (!automatic || store.Config.Enabled);
                     }, delegate
                     {
+                        if (display != null && DisplayTopology.Key(WindowScanner.GetMonitors()) != display.Key) return false;
                         if (WindowScanner.HasOtherMatch(window, entry)) return false;
                         var latest = WindowScanner.ReadCurrent(window);
                         return latest != null && entry.Matches(latest) &&

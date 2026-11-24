@@ -27,6 +27,7 @@ namespace AppLayout
         [DllImport("user32.dll")] static extern bool GetPhysicalCursorPos(out Point point);
         const int Target = 0, NameColumn = 1, Geometry = 2, Rule = 3, Max = 4, State = 5, EditColumn = 6;
         readonly AppController controller;
+        readonly int uiThreadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
         readonly LedgerGrid grid = new LedgerGrid();
         readonly GridScrollHost gridHost;
         readonly Dictionary<string, long> arrival = new Dictionary<string, long>();
@@ -39,7 +40,7 @@ namespace AppLayout
         readonly FlowLayoutPanel title, commands, automatic;
         readonly Button settings;
         bool arranging;
-        readonly Label savedCount, autoStatus, message;
+        readonly Label savedCount, autoStatus, displayStatus, message;
         readonly Button execute, clear;
         readonly FlowLayoutPanel preferences;
         readonly CheckBox enabled, login, launch, tray;
@@ -47,6 +48,7 @@ namespace AppLayout
         readonly Button installUpdate;
         long nextOrder;
         int savedTotal;
+        DisplayLayout displayedLayout;
         bool busy, readingSettings;
         DataGridViewRow hoverEdit;
         bool initialSizeApplied;
@@ -104,7 +106,10 @@ namespace AppLayout
             automatic.Padding = Pad(18, 0, 18, 8);
             enabled = Check(Texts.Enabled, Texts.EnabledTip);
             autoStatus = Caption("", secondary, AppTheme.Muted);
-            automatic.Controls.AddRange(new Control[] { enabled, autoStatus });
+            displayStatus = Caption("", secondary, AppTheme.Muted);
+            displayStatus.Margin = Pad(6, 0, 0, 0);
+            displayStatus.Visible = false;
+            automatic.Controls.AddRange(new Control[] { enabled, autoStatus, displayStatus });
             root.Controls.Add(automatic, 0, 1);
 
             preferences = Flow(); preferences.Dock = DockStyle.Fill; preferences.WrapContents = true;
@@ -172,14 +177,15 @@ namespace AppLayout
                 ForeColor = AppTheme.Muted, BackColor = AppTheme.Background, Visible = false };
             root.Controls.Add(message, 0, 5);
 
-            execute.Click += delegate { Perform(delegate { controller.RestoreNow(new List<WindowRow>()); }); };
+            execute.Click += delegate { Perform(delegate { controller.RestoreNow(new List<WindowRow>(), displayedLayout); }); };
             clear.Click += delegate
             {
                 Perform(delegate
                 {
-                    if (MessageBox.Show(this, L.F("登録済みの {0} 件をすべて解除しますか？",savedTotal),
+                    var display = displayedLayout;
+                    if (MessageBox.Show(this, L.F("このディスプレイ構成に登録した {0} 件をすべて解除しますか？",savedTotal),
                         Texts.Unsave, MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
-                        controller.UnsaveAll();
+                        controller.UnsaveAll(display);
                 });
             };
             BindSetting(enabled, delegate(bool value) { controller.Enabled = value; });
@@ -671,7 +677,7 @@ namespace AppLayout
                         if (dialog.ShowDialog(this) != DialogResult.OK) return;
                         var replacement = ConfigStore.ReadBackup(dialog.FileName);
                         if (MessageBox.Show(this, L.F("バックアップの配置 {0} 件で現在の設定を置き換えますか？\n自動配置とアプリの自動起動は一時停止します。復元後にモニタと配置を確認してください。",
-                            replacement.Apps.Count), title, MessageBoxButtons.YesNo, MessageBoxIcon.Question,
+                            replacement.PlacementCount), title, MessageBoxButtons.YesNo, MessageBoxIcon.Question,
                             MessageBoxDefaultButton.Button2) != DialogResult.Yes) return;
                         controller.RestoreSettings(replacement);
                         ReadSettings();
@@ -695,14 +701,29 @@ namespace AppLayout
             catch (Exception ex) { MessageBox.Show(this, ex.Message, L.T("配置を変更できませんでした"), MessageBoxButtons.OK, MessageBoxIcon.Error); }
             finally { busy = false; RefreshLedger(); }
         }
-        void RowsChanged(object sender, EventArgs e) { if (Visible) RefreshLedger(); }
+        void RowsChanged(object sender, EventArgs e)
+        {
+            if (IsDisposed || Disposing || !IsHandleCreated || !Visible) return;
+            try { RefreshLedger(); }
+            catch (System.ComponentModel.Win32Exception ex)
+            {
+                ex.Data["Operation"] = "LedgerForm.RowsChanged -> RefreshLedger";
+                ex.Data["UiThreadId"] = uiThreadId;
+                ex.Data["ThreadId"] = System.Threading.Thread.CurrentThread.ManagedThreadId;
+                ex.Data["FormState"] = string.Format("Visible={0}, IsHandleCreated={1}, Disposing={2}, IsDisposed={3}",
+                    Visible, IsHandleCreated, Disposing, IsDisposed);
+                throw;
+            }
+        }
         void RefreshLedger()
         {
             if (busy || IsDisposed || Disposing) return;
             busy = true;
             try
             {
-                SetRows(controller.GetRows(), false);
+                SetRows(controller.GetRows(out displayedLayout), false);
+                displayStatus.Text = controller.DisplayStatus;
+                displayStatus.Visible = displayStatus.Text.Length > 0;
                 var text = controller.LastMessage ?? "";
                 if (message.Text != text) { message.Text = text; tips.SetToolTip(message, text); message.Visible = text.Length > 0; }
             }
@@ -842,7 +863,7 @@ namespace AppLayout
         {
             savedTotal = views.Values.Select(v => v.Tag as WindowRow).Count(r => r != null && r.Saved);
             savedCount.Text = L.F("{0} 件",savedTotal);
-            execute.Enabled = clear.Enabled = savedTotal > 0;
+            execute.Enabled = clear.Enabled = savedTotal > 0 && controller.DisplayReady && displayedLayout == controller.CurrentDisplay;
             ArrangeCommands();
         }
         protected override void Dispose(bool disposing)

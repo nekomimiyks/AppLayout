@@ -19,19 +19,21 @@ O instalador pode criar um atalho na área de trabalho. Ative a verificação au
 
 Desative a linha (**OFF**) para remover o layout salvo. Use **Editar** para ajustar as coordenadas ou a regra de correspondência e selecione **Abrir configurações** para escolher o idioma.
 
+Salve layouts separados para cada configuração de telas. Depois de conectar ou desconectar um monitor, aguarde a atualização da configuração, organize as janelas e ative as linhas correspondentes. Ao voltar à mesma configuração, o AppLayout seleciona os layouts salvos. O backup inclui todas as configurações. Os layouts anteriores são associados à primeira configuração detectada após a atualização.
+
 ## Backup e restauração das configurações
 
 No PC antigo, abra as configurações e faça um backup em JSON. Copie o arquivo para o novo PC e selecione **Restaurar backup**. Confira os monitores antes de reativar o layout automático.
 
 ## Capturas de tela
 
-![Janela principal no modo escuro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/pt/main-dark.png)
+![Janela principal no modo escuro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/pt/main-dark.png)
 
-![Janela principal no modo claro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/pt/main-light.png)
+![Janela principal no modo claro](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/pt/main-light.png)
 
-![Edição de layout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/pt/edit.png)
+![Edição de layout](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/pt/edit.png)
 
-![Configurações e backup](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/pt/settings-backup.png)
+![Configurações e backup](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/pt/settings-backup.png)
 
 ## Compilar a partir do código-fonte
 

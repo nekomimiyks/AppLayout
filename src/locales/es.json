@@ -516,8 +516,8 @@
     "Value": "¿Eliminar las "
   },
   {
-    "Key": "登録済みの {0} 件をすべて解除しますか？",
-    "Value": "¿Eliminar las {0} disposiciones guardadas?"
+    "Key": "このディスプレイ構成に登録した {0} 件をすべて解除しますか？",
+    "Value": "¿Eliminar las {0} disposiciones guardadas para esta configuración de pantallas?"
   },
   {
     "Key": "登録済みの配置",
@@ -686,5 +686,17 @@
   {
     "Key": "アップデートを開始できませんでした。時間をおいて再試行してください。",
     "Value": "No se pudo iniciar la actualización. Inténtalo de nuevo más tarde."
+  },
+  {
+    "Key": "ディスプレイ構成: {0} 台",
+    "Value": "Configuración de pantallas: {0}"
+  },
+  {
+    "Key": "ディスプレイ構成を確認中…",
+    "Value": "Detectando la configuración de pantallas…"
+  },
+  {
+    "Key": "ディスプレイ構成が変わりました。表示が更新されてから操作してください。",
+    "Value": "La configuración de pantallas ha cambiado. Espera a que se actualice la lista y vuelve a intentarlo."
   }
 ]

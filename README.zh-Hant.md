@@ -19,19 +19,21 @@ AppLayout 可以儲存 Windows 視窗的位置和大小，並將視窗還原到�
 
 將對應列切換為 **OFF** 即可取消登錄。使用「編輯」調整座標或視窗比對規則，「開啟設定」即可切換顯示語言。
 
+可針對不同的顯示器配置分別儲存配置。連接或拔除顯示器後，請等待配置更新，再排列視窗並開啟對應列。回到相同的顯示器配置時，AppLayout 會選用對應的配置。備份包含所有顯示器配置。更新後，舊配置會移入首次偵測到的顯示器配置。
+
 ## 備份和還原設定
 
 在舊電腦上開啟設定，選擇**備份設定**並儲存 JSON 檔案。將檔案複製到新電腦，選擇**從備份還原**。重新啟用自動配置前，請檢查螢幕。
 
 ## 介面截圖
 
-![主介面（深色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/zh-Hant/main-dark.png)
+![主介面（深色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/zh-Hant/main-dark.png)
 
-![主介面（淺色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/zh-Hant/main-light.png)
+![主介面（淺色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/zh-Hant/main-light.png)
 
-![編輯配置](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/zh-Hant/edit.png)
+![編輯配置](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/zh-Hant/edit.png)
 
-![設定與備份](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/zh-Hant/settings-backup.png)
+![設定與備份](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/zh-Hant/settings-backup.png)
 
 ## 從原始碼建置
 

@@ -22,11 +22,13 @@ GitHub版の「設定を開く」で「更新を自動で確認」をONにする
 
 登録を解除するには行を **OFF** にします。全件を解除する場合は「すべての配置を解除」を選び、確認します。「編集」で座標やウィンドウの見分け方を変更できます。「設定を開く」から表示言語を切り替えられます。
 
+ディスプレイの構成ごとに配置を保存できます。モニターを接続・切断して上部の「ディスプレイ構成」が更新されたら、各ウィンドウを並べて対象行を **ON** にします。同じ構成に戻ると、その構成の配置が選ばれます。「配置を有効」が **ON** の間は自動で戻ります。構成は台数・解像度・画面の並び・メイン画面で判定します。バックアップには全構成が含まれます。旧設定は、更新後に最初に確定した構成に引き継がれます。
+
 ## 設定のバックアップと復元
 
 右上の **「設定を開く」** を押すと、バックアップと復元のボタンが表示されます。
 
-![設定画面。「設定をバックアップ」と「バックアップから復元」のボタン](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/ja/settings-backup.png)
+![設定画面。「設定をバックアップ」と「バックアップから復元」のボタン](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/ja/settings-backup.png)
 
 1. 元のPCで **「設定をバックアップ」** を押し、JSONファイルを保存します。
 2. USBメモリやOneDriveなどで、保存したJSONを新しいPCにコピーします。
@@ -37,15 +39,15 @@ GitHub版の「設定を開く」で「更新を自動で確認」をONにする
 
 ## スクリーンショット
 
-![メイン画面（ダーク）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/ja/main-dark.png)
+![メイン画面（ダーク）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/ja/main-dark.png)
 
-![メイン画面（ライト）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/ja/main-light.png)
+![メイン画面（ライト）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/ja/main-light.png)
 
-![配置の編集](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/ja/edit.png)
+![配置の編集](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/ja/edit.png)
 
 ## ソースからビルド
 
-インストーラーを作る場合は、Inno Setup の `ISCC.exe` のパスを `-Compiler` に指定して `installer\pack.ps1 -Version 1.3.0 -OutDir .\dist` を実行します。
+インストーラーを作る場合は、Inno Setup の `ISCC.exe` のパスを `-Compiler` に指定して `installer\pack.ps1 -Version 1.4.0 -OutDir .\dist` を実行します。
 
 WindowsのPowerShellで次を実行します。Windowsの.NET Frameworkコンパイラで `AppLayout.exe` が生成されます。
 

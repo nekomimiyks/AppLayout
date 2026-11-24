@@ -19,19 +19,21 @@ AppLayout 可以保存 Windows 窗口的位置和大小，并将窗口恢复到�
 
 将对应行设为 **OFF** 即可取消登记。使用「编辑」调整坐标或窗口匹配规则，「打开设置」即可切换显示语言。
 
+可以为不同的显示器配置分别保存布局。连接或断开显示器后，请等待配置更新，再排列窗口并开启对应行。恢复相同配置时，AppLayout 会选用对应的布局。备份包含所有配置。升级后，旧布局将归入首次检测到的配置。
+
 ## 备份和还原设置
 
 在旧电脑上打开设置，选择**备份设置**并保存 JSON 文件。将文件复制到新电脑，选择**从备份还原**。重新启用自动布局前，请检查显示器。
 
 ## 界面截图
 
-![主界面（深色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/zh-Hans/main-dark.png)
+![主界面（深色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/zh-Hans/main-dark.png)
 
-![主界面（浅色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/zh-Hans/main-light.png)
+![主界面（浅色模式）](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/zh-Hans/main-light.png)
 
-![编辑布局](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/zh-Hans/edit.png)
+![编辑布局](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/zh-Hans/edit.png)
 
-![设置与备份](https://raw.githubusercontent.com/nekomimiyks/AppLayout/a75f9b6b6184621f28f3f9af237fa4ef399f197b/zh-Hans/settings-backup.png)
+![设置与备份](https://raw.githubusercontent.com/nekomimiyks/AppLayout/7bdf8eef3b0d40f9f4cfd5bbf0416508ac2dd4be/zh-Hans/settings-backup.png)
 
 ## 从源代码构建
 
